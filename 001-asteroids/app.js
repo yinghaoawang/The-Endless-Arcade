@@ -29,7 +29,7 @@ var shipMaxSpeed = 5;
 var shipRotationSpeed = .065;
 var shipFriction = .025;
 
-var fireBulletCooldown = 150;
+var fireBulletCooldown = 200;
 var fireBulletTimer = 0;
 
 var bulletSpeed = 8;
@@ -49,6 +49,8 @@ function preload() {
     this.load.image('ship', 'assets/sprites/ship.png');
     this.load.image('bullet', 'assets/sprites/bullet.png');
     this.load.image('asteroid1', 'assets/sprites/asteroid1.png');
+    this.load.image('asteroid2', 'assets/sprites/asteroid1.png');
+    this.load.image('asteroid3', 'assets/sprites/asteroid1.png');
 }
 
 function create() {
@@ -71,11 +73,32 @@ function create() {
     // create ship
     ship = this.matter.add.image(400, 100, 'ship').setCollisionGroup(allyGroup);
     ship.setFriction(0, 0);
+    ship.setFixedRotation(true);
+    ship.unitType = "ship";
 
     this.matter.world.on('collisionstart', function (event) {
-        event.pairs[0].bodyA.gameObject.setTint(0xff0000);
-        event.pairs[0].bodyB.gameObject.setTint(0x00ff00);
+        let gameObjectA = event.pairs[0].bodyA.gameObject;
+        let gameObjectB = event.pairs[0].bodyB.gameObject;
 
+        let allyObject;
+        let enemyObject;
+        if (gameObjectA.body.collisionFilter.group == allyGroup) {
+            allyObject = gameObjectA;
+            enemyObject = gameObjectB;
+        } else {
+            allyObject = gameObjectB;
+            enemyObject = gameObjectA;
+        }
+        
+        if (allyObject.unitType == "bullet") {
+            let arrIndex = bulletList.indexOf(allyObject);
+            bulletList.splice(arrIndex, 1);
+            allyObject.destroy();
+        } else if (allyObject.unitType == "ship") {
+
+        } else {
+            console.error("Unknown unit type: " + allyObject.unitType);
+        }
     });
 }
 
@@ -132,14 +155,17 @@ function createAsteroids(self) {
         } while (Math.abs(ship.x - x) < 64 + (32 + (ship.width / 2)) &&
             Math.abs(ship.y - y) < 64 + (32 + (ship.height / 2)))
 
-        let asteroid = self.matter.add.image(x, y, 'asteroid1').setCollisionGroup(allyGroup);
+        let asteroid = self.matter.add.image(x, y, 'asteroid1').setCollisionGroup(enemyGroup);
         asteroid.setFriction(0, 0);
+        asteroid.setFixedRotation(true);
         asteroid.setRotation(Math.random() * 2 * Math.PI);
         let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
         let vxSign = (Math.random() < .5) ? 1 : -1;
         let vySign = (Math.random() < .5) ? 1 : -1;
         asteroid.setVelocityX(vxSign * speed * Math.cos(asteroid.rotation));
         asteroid.setVelocityY(vySign * speed * Math.sin(asteroid.rotation));
+        asteroid.asteroidState = 1;
+        asteroid.unitType = "asteroid";
         asteroidList.push(asteroid);
     }
 }
@@ -191,8 +217,10 @@ function fireBulletCheck(self) {
 
 function fireBullet(self) {
     let bullet = self.matter.add.image(ship.x, ship.y, 'bullet').setCollisionGroup(allyGroup);
+    bullet.unitType = "bullet";
     bullet.setFriction(0, 0);
     bullet.setRotation(ship.rotation)
+    bullet.setFixedRotation(true);
     bullet.x += Math.cos(bullet.rotation) * ship.width / 2;
     bullet.y += Math.sin(bullet.rotation) * ship.height / 2;
     bullet.setVelocityX(bulletSpeed * Math.cos(bullet.rotation));
