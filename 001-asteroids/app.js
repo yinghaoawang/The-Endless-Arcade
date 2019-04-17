@@ -18,6 +18,9 @@ var game = new Phaser.Game(config);
 var cursors;
 var wasd;
 var movementControls;
+var ship;
+var shipAcc = 200;
+var shipMaxSpeed = 200;
 
 function preload() {
     this.load.setBaseURL('');
@@ -27,7 +30,7 @@ function preload() {
 function create () {
     console.log(this);
 
-    let ship = this.physics.add.image(400, 100, 'ship');
+    ship = this.physics.add.image(400, 100, 'ship');
     cursors = {
         up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
         down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
@@ -58,15 +61,25 @@ function update() {
         if (scheme.right.isDown) rightPressed = true;
     }
     if (upPressed && !downPressed) {
-        console.log("up");
+        ship.body.velocity.x += shipAcc * Math.cos(ship.rotation);
+        ship.body.velocity.y += shipAcc * Math.sin(ship.rotation);
     }
     if (downPressed && !upPressed) {
-        console.log("down");
+        ship.body.velocity.x -= shipAcc * Math.cos(ship.rotation);
+        ship.body.velocity.y -= shipAcc * Math.sin(ship.rotation);
     }
     if (leftPressed && !rightPressed) {
         console.log("left");
+        ship.rotation -= .1;
     }
     if (rightPressed && !leftPressed) {
         console.log("right");
+        ship.rotation += .1;
+    }
+    // inefficient
+    let currShipSpeed = Math.sqrt(ship.body.velocity.y * ship.body.velocity.y + ship.body.velocity.x * ship.body.velocity.x);
+    if (currShipSpeed > shipMaxSpeed) {
+        ship.body.velocity.x = (ship.body.velocity.x / currShipSpeed) * shipMaxSpeed;
+        ship.body.velocity.y = (ship.body.velocity.y / currShipSpeed) * shipMaxSpeed;
     }
 }
