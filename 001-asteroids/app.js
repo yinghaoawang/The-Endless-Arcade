@@ -1,4 +1,4 @@
-let config = {
+var config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
@@ -44,11 +44,20 @@ function create () {
         right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
     }
     movementControls = [cursors, wasd];
-
-    ship.setCollideWorldBounds(true);
 }
 
 function update() {
+    // these are terrible function names but i'm not just very creative
+    // Keyboard listener
+    movementCheck();
+
+    // Bounds wrap
+    boundsWrap(this);
+    
+}
+
+// moves the ship based on input keys
+function movementCheck() {
     let upPressed = false;
     let downPressed = false;
     let leftPressed = false;
@@ -60,6 +69,12 @@ function update() {
         if (scheme.left.isDown) leftPressed = true;
         if (scheme.right.isDown) rightPressed = true;
     }
+    if (leftPressed && !rightPressed) {
+        ship.rotation -= .1;
+    }
+    if (rightPressed && !leftPressed) {
+        ship.rotation += .1;
+    }
     if (upPressed && !downPressed) {
         ship.body.velocity.x += shipAcc * Math.cos(ship.rotation);
         ship.body.velocity.y += shipAcc * Math.sin(ship.rotation);
@@ -68,18 +83,28 @@ function update() {
         ship.body.velocity.x -= shipAcc * Math.cos(ship.rotation);
         ship.body.velocity.y -= shipAcc * Math.sin(ship.rotation);
     }
-    if (leftPressed && !rightPressed) {
-        console.log("left");
-        ship.rotation -= .1;
-    }
-    if (rightPressed && !leftPressed) {
-        console.log("right");
-        ship.rotation += .1;
-    }
+
     // inefficient
     let currShipSpeed = Math.sqrt(ship.body.velocity.y * ship.body.velocity.y + ship.body.velocity.x * ship.body.velocity.x);
     if (currShipSpeed > shipMaxSpeed) {
         ship.body.velocity.x = (ship.body.velocity.x / currShipSpeed) * shipMaxSpeed;
         ship.body.velocity.y = (ship.body.velocity.y / currShipSpeed) * shipMaxSpeed;
+    }
+}
+
+// check if ship is out of bounds, and moves it to other side
+function boundsWrap(self) {
+    let width = self.physics.world.bounds.width;
+    let height = self.physics.world.bounds.height;
+    console.log(ship.body.position.x, width);
+    if (ship.x > width) {
+        ship.x -= width;
+    } else if (ship.x < 0) {
+        ship.x += width;
+    }
+    if (ship.y > height) {
+        ship.y -= height;
+    } else if (ship.y < 0) {
+        ship.y += height;
     }
 }
