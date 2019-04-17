@@ -18,6 +18,8 @@ var config = {
     }
 };
 
+var score;
+
 var game = new Phaser.Game(config);
 var cursors;
 var wasd;
@@ -49,8 +51,8 @@ function preload() {
     this.load.image('ship', 'assets/sprites/ship.png');
     this.load.image('bullet', 'assets/sprites/bullet.png');
     this.load.image('asteroid1', 'assets/sprites/asteroid1.png');
-    this.load.image('asteroid2', 'assets/sprites/asteroid1.png');
-    this.load.image('asteroid3', 'assets/sprites/asteroid1.png');
+    this.load.image('asteroid2', 'assets/sprites/asteroid2.png');
+    this.load.image('asteroid3', 'assets/sprites/asteroid3.png');
 }
 
 function create() {
@@ -76,6 +78,8 @@ function create() {
     ship.setFixedRotation(true);
     ship.unitType = "ship";
 
+    let self = this;
+
     this.matter.world.on('collisionstart', function (event) {
         let gameObjectA = event.pairs[0].bodyA.gameObject;
         let gameObjectB = event.pairs[0].bodyB.gameObject;
@@ -94,12 +98,43 @@ function create() {
             let arrIndex = bulletList.indexOf(allyObject);
             bulletList.splice(arrIndex, 1);
             allyObject.destroy();
-        } else if (allyObject.unitType == "ship") {
 
+            if (enemyObject.unitType == "asteroid") {
+                destroyAsteroid(self, enemyObject);
+            }
+        } else if (allyObject.unitType == "ship") {
+            destroyAsteroid(self, enemyObject);
+            gameOver(self);
         } else {
             console.error("Unknown unit type: " + allyObject.unitType);
         }
     });
+}
+
+function gameOver(self) {
+}
+
+// destroy asteroid and clean up references, asteroid splits if big or med
+function destroyAsteroid(self, asteroid) {
+    score += 50;
+    let arrayIndex = asteroidList.indexOf(asteroid);
+    asteroidList.splice(arrayIndex, 1);
+    // splits the asteroid
+    if (asteroid.asteroidState < 3) {
+        let splitAsteroid1 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation - .2, asteroid.asteroidState + 1);
+        let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
+        splitAsteroid1.setVelocityX(speed * Math.cos(splitAsteroid1.rotation));
+        splitAsteroid1.setVelocityY(speed * Math.sin(splitAsteroid1.rotation));
+        asteroidList.push(splitAsteroid1);
+
+        let splitAsteroid2 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation + .2, asteroid.asteroidState + 1);
+        speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
+        splitAsteroid2.setVelocityX(speed * Math.cos(splitAsteroid2.rotation));
+        splitAsteroid2.setVelocityY(speed * Math.sin(splitAsteroid2.rotation));
+
+        asteroidList.push(splitAsteroid2);
+    }
+    asteroid.destroy();
 }
 
 function update() {
@@ -141,6 +176,23 @@ function manageAsteroids(self) {
     }
 }
 
+// creates a single asteroid
+function createAsteroid(self, x, y, rotation, asteroidState) {
+    let asteroid = self.matter.add.image(x, y, 'asteroid' + asteroidState).setCollisionGroup(enemyGroup);
+    asteroid.setFriction(0, 0);
+    asteroid.setRotation(rotation);
+    asteroid.setFixedRotation(true);
+    let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
+    asteroid.asteroidState = asteroidState;
+    asteroid.unitType = "asteroid";
+    let vxSign = (Math.random() < .5) ? 1 : -1;
+    let vySign = (Math.random() < .5) ? 1 : -1;
+    asteroid.setVelocityX(vxSign * speed * Math.cos(asteroid.rotation));
+    asteroid.setVelocityY(vySign * speed * Math.sin(asteroid.rotation));
+    return asteroid;
+}
+
+// create many asteroids
 function createAsteroids(self) {
     let asteroidLimit = 5;
     let width = config.width;
@@ -155,17 +207,7 @@ function createAsteroids(self) {
         } while (Math.abs(ship.x - x) < 64 + (32 + (ship.width / 2)) &&
             Math.abs(ship.y - y) < 64 + (32 + (ship.height / 2)))
 
-        let asteroid = self.matter.add.image(x, y, 'asteroid1').setCollisionGroup(enemyGroup);
-        asteroid.setFriction(0, 0);
-        asteroid.setFixedRotation(true);
-        asteroid.setRotation(Math.random() * 2 * Math.PI);
-        let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
-        let vxSign = (Math.random() < .5) ? 1 : -1;
-        let vySign = (Math.random() < .5) ? 1 : -1;
-        asteroid.setVelocityX(vxSign * speed * Math.cos(asteroid.rotation));
-        asteroid.setVelocityY(vySign * speed * Math.sin(asteroid.rotation));
-        asteroid.asteroidState = 1;
-        asteroid.unitType = "asteroid";
+        let asteroid = createAsteroid(self, x, y, Math.random() * 2 * Math.PI, 1);
         asteroidList.push(asteroid);
     }
 }
