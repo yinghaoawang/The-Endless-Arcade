@@ -3,8 +3,10 @@ var config = {
     width: 800,
     height: 600,
     physics: {
-        default: 'arcade',
-        arcade: {
+        default: 'matter',
+        matter: {
+            debug: true,
+            gravity: { y: 0 }
         }
     },
     scene: {
@@ -19,24 +21,21 @@ var cursors;
 var wasd;
 var movementControls;
 var ship;
-var shipAcc = 200;
-var shipMaxSpeed = 200;
+var shipAcc = .1;
+var shipMaxSpeed = 5;
+var shipRotationSpeed = .065;
+var shipFriction = .025;
 
 function preload() {
     this.load.setBaseURL('');
     this.load.image('ship', 'assets/sprites/ship.png');
 }
 
-function create () {
-    console.log(this);
-
-    ship = this.physics.add.image(400, 100, 'ship');
-    cursors = {
-        up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
-        down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
-        left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
-        right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
-    }
+function create() {
+    ship = this.matter.add.image(400, 100, 'ship');
+    ship.setFriction(0);
+    ship.setFrictionAir(0);
+    cursors = this.input.keyboard.createCursorKeys();
     wasd = {
         up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
         down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
@@ -48,9 +47,9 @@ function create () {
 
 function update() {
     // these are terrible function names but i'm not just very creative
+
     // Keyboard listener
     movementCheck();
-
     // Bounds wrap
     boundsWrap(this);
     
@@ -70,33 +69,40 @@ function movementCheck() {
         if (scheme.right.isDown) rightPressed = true;
     }
     if (leftPressed && !rightPressed) {
-        ship.rotation -= .1;
+        ship.rotation -= shipRotationSpeed;
+        
+    } else if (rightPressed && !leftPressed) {
+        ship.rotation += shipRotationSpeed;
     }
-    if (rightPressed && !leftPressed) {
-        ship.rotation += .1;
-    }
-    if (upPressed && !downPressed) {
-        ship.body.velocity.x += shipAcc * Math.cos(ship.rotation);
-        ship.body.velocity.y += shipAcc * Math.sin(ship.rotation);
-    }
-    if (downPressed && !upPressed) {
-        ship.body.velocity.x -= shipAcc * Math.cos(ship.rotation);
-        ship.body.velocity.y -= shipAcc * Math.sin(ship.rotation);
+    ship.body.rotation = ship.rotation;
+    if (upPressed) {
+        let newVx = ship.body.velocity.x + shipAcc * Math.cos(ship.rotation);
+        let newVy = ship.body.velocity.y + shipAcc * Math.sin(ship.rotation);
+        ship.setVelocity(newVx, newVy);
     }
 
-    // inefficient
-    let currShipSpeed = Math.sqrt(ship.body.velocity.y * ship.body.velocity.y + ship.body.velocity.x * ship.body.velocity.x);
-    if (currShipSpeed > shipMaxSpeed) {
-        ship.body.velocity.x = (ship.body.velocity.x / currShipSpeed) * shipMaxSpeed;
-        ship.body.velocity.y = (ship.body.velocity.y / currShipSpeed) * shipMaxSpeed;
+    // apply friction
+    let newVx = ship.body.velocity.x - shipFriction * Math.cos(ship.rotation);
+    let newVy = ship.body.velocity.y - shipFriction * Math.sin(ship.rotation);
+    if (newVx < 0) newVx = 0;
+    if (newVy < 0) newVy = 0;
+    ship.setVelocity(newVx, newVy);
+
+    // prevents ship from going faster than its max speed
+    let currShipSpeedSquared = ship.body.velocity.y * ship.body.velocity.y + ship.body.velocity.x * ship.body.velocity.x;
+    if (currShipSpeedSquared > shipMaxSpeed * shipMaxSpeed) {
+        let currShipSpeed = Math.sqrt(currShipSpeedSquared);
+        let newVx = (ship.body.velocity.x / currShipSpeed) * shipMaxSpeed;
+        let newVy = (ship.body.velocity.y / currShipSpeed) * shipMaxSpeed;
+        ship.setVelocity(newVx, newVy);
     }
 }
 
 // check if ship is out of bounds, and moves it to other side
 function boundsWrap(self) {
-    let width = self.physics.world.bounds.width;
-    let height = self.physics.world.bounds.height;
-    console.log(ship.body.position.x, width);
+    // inaccurate
+    let width = config.width;
+    let height = config.height;
     if (ship.x > width) {
         ship.x -= width;
     } else if (ship.x < 0) {
