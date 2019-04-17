@@ -33,7 +33,7 @@ var fireBulletCooldown = 150;
 var fireBulletTimer = 0;
 
 var bulletSpeed = 8;
-var bulletMaxLifespan = 1000;
+var bulletMaxLifespan = 600;
 
 var bulletList = [];
 
@@ -47,8 +47,6 @@ function preload() {
 }
 
 function create() {
-    
-
     // controls setup
     cursors = this.input.keyboard.createCursorKeys();
     cursors.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
@@ -83,9 +81,41 @@ function update() {
     movementCheck();
     fireBulletCheck(this);
 
+    // deletes bullet if they expire, and wraps them
+    manageBullets(this);
+
     // Bounds wrap
     boundsWrap(this);
     
+}
+
+function manageBullets(self) {
+    let width = config.width;
+    let height = config.height;
+    for (let i = 0; i < bulletList.length; ++i) {
+        let bullet = bulletList[i];
+
+        // destroy bullet if it exists for a certain time
+        if (self.time.now - bullet.createdAt > bulletMaxLifespan) {
+            bullet.destroy();
+            bulletList.splice(i, 1);
+            --i;
+            continue;
+        }
+
+        // wrap bullet around bounds
+        if (bullet.x > width) {
+            bullet.x -= width;
+        } else if (bullet.x < 0) {
+            bullet.x += width;
+        }
+
+        if (bullet.y > height) {
+            bullet.y -= height;
+        } else if (bullet.y < 0) {
+            bullet.y += height;
+        }
+    }
 }
 
 function fireBulletCheck(self) {
@@ -108,8 +138,11 @@ function fireBullet(self) {
     let bullet = self.matter.add.image(ship.x, ship.y, 'bullet').setCollisionGroup(allyGroup);
     bullet.setFriction(0, 0);
     bullet.setRotation(ship.rotation)
+    bullet.x += Math.cos(bullet.rotation) * ship.width / 2;
+    bullet.y += Math.sin(bullet.rotation) * ship.height / 2;
     bullet.setVelocityX(bulletSpeed * Math.cos(bullet.rotation));
     bullet.setVelocityY(bulletSpeed * Math.sin(bullet.rotation));
+    bullet.createdAt = self.time.now;
     bulletList.push(bullet);
 }
 
