@@ -37,6 +37,10 @@ var bulletMaxLifespan = 600;
 
 var bulletList = [];
 
+var asteroidMinSpeed = 1;
+var asteroidMaxSpeed = 4;
+var asteroidList = [];
+
 var allyCategory;
 var enemyCategory;
 
@@ -44,18 +48,19 @@ function preload() {
     this.load.setBaseURL('');
     this.load.image('ship', 'assets/sprites/ship.png');
     this.load.image('bullet', 'assets/sprites/bullet.png');
+    this.load.image('asteroid1', 'assets/sprites/asteroid1.png');
 }
 
 function create() {
     // controls setup
     cursors = this.input.keyboard.createCursorKeys();
-    cursors.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+    cursors.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     wasd = {
         up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
         down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
         left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
         right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-        space: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+        space: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD)
     }
     controls = [cursors, wasd];
 
@@ -87,6 +92,48 @@ function update() {
     // Bounds wrap
     boundsWrap(this);
     
+    // asteroids stuff
+    if (asteroidList.length == 0) {
+        createAsteroids(this);
+    }
+    manageAsteroids(this);
+}
+
+function manageAsteroids(self) {
+    let width = config.width;
+    let height = config.height;
+    for (let i = 0; i < asteroidList.length; ++i) {
+        let asteroid = asteroidList[i];
+        if (asteroid.x > width) asteroid.x -= width;
+        else if (asteroid.y < 0) asteroid.x += width;
+        if (asteroid.y > height) asteroid.y -= height;
+        else if (asteroid.y < 0) asteroid.y += height;
+    }
+}
+
+function createAsteroids(self) {
+    let asteroidLimit = 5;
+    let width = config.width;
+    let height = config.height;
+
+    for (let i = 0; i < asteroidLimit; ++i) {
+        let x, y;
+        // makes sure the asteroids spawn sufficiently far away from the ship
+        do {
+            x = Math.random() * width;
+            y = Math.random() * height;
+        } while (Math.abs(ship.x - x) < 64 + (32 + (ship.width / 2)) &&
+            Math.abs(ship.y - y) < 64 + (32 + (ship.height / 2)))
+
+        let asteroid = self.matter.add.image(x, y, 'asteroid1').setCollisionGroup(allyGroup);
+        asteroid.setFriction(0, 0);
+        asteroid.setRotation(Math.random() * 2 * Math.PI);
+        let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
+        console.log(speed);
+        asteroid.setVelocityX(speed * Math.cos(asteroid.rotation));
+        asteroid.setVelocityY(speed * Math.sin(asteroid.rotation));
+        asteroidList.push(asteroid);
+    }
 }
 
 function manageBullets(self) {
