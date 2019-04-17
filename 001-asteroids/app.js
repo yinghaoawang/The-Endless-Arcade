@@ -18,9 +18,19 @@ var config = {
     }
 };
 
-var score;
+var chars = [
+    [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' ],
+    [ 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T' ],
+    [ 'U', 'V', 'W', 'X', 'Y', 'Z', '.', '-', '<', '>' ]
+];
 
 var game = new Phaser.Game(config);
+var score;
+var isMainMenu;
+var isGameOver;
+var isPlaying;
+var highScores;
+
 var cursors;
 var wasd;
 
@@ -56,6 +66,7 @@ function preload() {
 }
 
 function create() {
+    isPlaying = false;
     // controls setup
     cursors = this.input.keyboard.createCursorKeys();
     cursors.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -64,7 +75,9 @@ function create() {
         down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
         left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
         right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-        space: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD)
+        space: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD),
+        reset: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R),
+        start: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     }
     controls = [cursors, wasd];
 
@@ -72,14 +85,8 @@ function create() {
     allyGroup = -1;
     enemyGroup = -2;
 
-    // create ship
-    ship = this.matter.add.image(400, 100, 'ship').setCollisionGroup(allyGroup);
-    ship.setFriction(0, 0);
-    ship.setFixedRotation(true);
-    ship.unitType = "ship";
-
+    // add collision listener
     let self = this;
-
     this.matter.world.on('collisionstart', function (event) {
         let gameObjectA = event.pairs[0].bodyA.gameObject;
         let gameObjectB = event.pairs[0].bodyB.gameObject;
@@ -104,14 +111,67 @@ function create() {
             }
         } else if (allyObject.unitType == "ship") {
             destroyAsteroid(self, enemyObject);
-            gameOver(self);
+            ship.destroy();
+            isGameOver = true;
+            createGameOverMenu(self);
         } else {
             console.error("Unknown unit type: " + allyObject.unitType);
         }
     });
+
+    createMainMenu(this);
 }
 
-function gameOver(self) {
+function reset() {
+    for (let i = 0; i < asteroidList.length; ++i) {
+        let asteroid = asteroidList[i];
+        asteroid.destroy();
+        asteroidList.splice(i, 1);
+        --i;
+    }
+    for (let i = 0; i < bulletList; ++i) {
+        let bullet = bulletList[i];
+        bullet.destroy();
+        bulletList.splice(i, 1);
+        --i;
+    }
+    if (ship != null) ship.destroy();
+
+    // reset values
+    isPlaying = false;
+    isGameOver = false;
+    score = 0;
+}
+
+function init(self) {
+    // create ship
+    isPlaying = true;
+    isMainMenu = false;
+    ship = self.matter.add.image(400, 100, 'ship').setCollisionGroup(allyGroup);
+    ship.setFriction(0, 0);
+    ship.setFixedRotation(true);
+    ship.unitType = "ship";
+}
+
+function createGameOverMenu(self) {
+
+}
+
+function createMainMenu(self) {
+    isMainMenu = true;
+}
+
+function resetGameCheck(self) {
+    let resetPressed = false;
+    for (let i = 0; i < controls.length; ++i) {
+        let scheme = controls[i];
+        if (scheme.hasOwnProperty('reset') && scheme.reset.isDown) resetPressed = true;
+    }
+    if (resetPressed) {
+        reset(self);
+        isMainMenu = true;
+        createMainMenu(self);
+    }
 }
 
 // destroy asteroid and clean up references, asteroid splits if big or med
@@ -137,24 +197,42 @@ function destroyAsteroid(self, asteroid) {
     asteroid.destroy();
 }
 
+function startCheck(self) {
+    let startPressed = false;
+    for (let i = 0; i < controls.length; ++i) {
+        let scheme = controls[i];
+        if (scheme.hasOwnProperty('start') && scheme.start.isDown) startPressed = true;
+    }
+    if (startPressed) {
+        init(self);
+        isMainMenu = false;
+    }
+}
+
 function update() {
     // these are terrible function names but i'm not just very creative
+    if (isMainMenu) {
+        startCheck(this);
+    } else if (isPlaying) {
+        if (isGameOver) {
+            resetGameCheck(this);
+        } else {
+            // Keyboard listener
+            movementCheck();
+            fireBulletCheck(this);
 
-    // Keyboard listener
-    movementCheck();
-    fireBulletCheck(this);
-
-    // deletes bullet if they expire, and wraps them
-    manageBullets(this);
-
-    // Bounds wrap
-    boundsWrap(this);
-    
-    // asteroids stuff
-    if (asteroidList.length == 0) {
-        createAsteroids(this);
+            // Bounds wrap
+            boundsWrap(this);
+            
+            // asteroids stuff
+            if (asteroidList.length == 0) {
+                createAsteroids(this);
+            }
+        }
+        // deletes bullet if they expire, and wraps them
+        manageBullets(this);
+        manageAsteroids(this);
     }
-    manageAsteroids(this);
 }
 
 function manageAsteroids(self) {
