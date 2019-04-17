@@ -104,10 +104,17 @@ function manageAsteroids(self) {
     let height = config.height;
     for (let i = 0; i < asteroidList.length; ++i) {
         let asteroid = asteroidList[i];
-        if (asteroid.x > width) asteroid.x -= width;
-        else if (asteroid.y < 0) asteroid.x += width;
-        if (asteroid.y > height) asteroid.y -= height;
-        else if (asteroid.y < 0) asteroid.y += height;
+        if (asteroid.body.velocity.x > 0 && asteroid.x - asteroid.width / 2 > width) {
+            asteroid.x -= width + asteroid.width;
+        } else if (asteroid.body.velocity.x < 0 && asteroid.x + asteroid.width / 2 < 0) {
+            asteroid.x += width + asteroid.width;
+        }
+
+        if (asteroid.body.velocity.y > 0 && asteroid.y - asteroid.height / 2 > height) {
+            asteroid.y -= height + asteroid.height;
+        } else if (asteroid.body.velocity.y < 0 && asteroid.y + asteroid.height / 2 < 0) {
+            asteroid.y += height + asteroid.height;
+        }
     }
 }
 
@@ -129,9 +136,10 @@ function createAsteroids(self) {
         asteroid.setFriction(0, 0);
         asteroid.setRotation(Math.random() * 2 * Math.PI);
         let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
-        console.log(speed);
-        asteroid.setVelocityX(speed * Math.cos(asteroid.rotation));
-        asteroid.setVelocityY(speed * Math.sin(asteroid.rotation));
+        let vxSign = (Math.random() < .5) ? 1 : -1;
+        let vySign = (Math.random() < .5) ? 1 : -1;
+        asteroid.setVelocityX(vxSign * speed * Math.cos(asteroid.rotation));
+        asteroid.setVelocityY(vySign * speed * Math.sin(asteroid.rotation));
         asteroidList.push(asteroid);
     }
 }
