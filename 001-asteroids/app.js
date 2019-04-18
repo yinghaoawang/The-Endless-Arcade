@@ -18,11 +18,10 @@ var config = {
     }
 };
 
-var chars = [
-    [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' ],
-    [ 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T' ],
-    [ 'U', 'V', 'W', 'X', 'Y', 'Z', '.', '-', '<', '>' ]
+var nameKeyArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 ];
+var nameKeyCSV = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z';
+var nameKeyScheme;
 
 var game = new Phaser.Game(config);
 var score;
@@ -56,13 +55,15 @@ var asteroidList = [];
 var allyCategory;
 var enemyCategory;
 
+var asteroidImageNames = ['asteroid1', 'asteroid2', 'asteroid3'];
+
 function preload() {
     this.load.setBaseURL('');
     this.load.image('ship', 'assets/sprites/ship.png');
     this.load.image('bullet', 'assets/sprites/bullet.png');
-    this.load.image('asteroid1', 'assets/sprites/asteroid1.png');
-    this.load.image('asteroid2', 'assets/sprites/asteroid2.png');
-    this.load.image('asteroid3', 'assets/sprites/asteroid3.png');
+    for (let i = 0; i < asteroidImageNames.length; ++i) {
+        this.load.image(asteroidImageNames[i], 'assets/sprites/' + asteroidImageNames[i] + '.png');
+    }
 }
 
 function create() {
@@ -76,9 +77,14 @@ function create() {
         left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
         right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
         space: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD),
-        reset: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R),
+        reset: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER),
         start: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     }
+
+    nameKey = this.input.keyboard.addKeys(nameKeyCSV);
+    nameKey['backspace'] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);
+    nameKey['enter'] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+
     controls = [cursors, wasd];
 
     // collision setup
@@ -163,9 +169,11 @@ function createMainMenu(self) {
 
 function resetGameCheck(self) {
     let resetPressed = false;
-    for (let i = 0; i < controls.length; ++i) {
-        let scheme = controls[i];
-        if (scheme.hasOwnProperty('reset') && scheme.reset.isDown) resetPressed = true;
+    for (let i = 0; i < nameKeyArray.length; ++i) {
+        let key = nameKeyArray[i];
+        if (nameKey[key].isDown) {
+            console.log(key);
+        }
     }
     if (resetPressed) {
         reset(self);
@@ -180,7 +188,7 @@ function destroyAsteroid(self, asteroid) {
     let arrayIndex = asteroidList.indexOf(asteroid);
     asteroidList.splice(arrayIndex, 1);
     // splits the asteroid
-    if (asteroid.asteroidState < 3) {
+    if (asteroid.asteroidState < 4) {
         let splitAsteroid1 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation - .2, asteroid.asteroidState + 1);
         let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
         splitAsteroid1.setVelocityX(speed * Math.cos(splitAsteroid1.rotation));
@@ -256,7 +264,11 @@ function manageAsteroids(self) {
 
 // creates a single asteroid
 function createAsteroid(self, x, y, rotation, asteroidState) {
-    let asteroid = self.matter.add.image(x, y, 'asteroid' + asteroidState).setCollisionGroup(enemyGroup);
+
+    let randIndex = Math.floor(asteroidImageNames.length * Math.random());
+    let randAsteroidImageName = asteroidImageNames[randIndex];
+    console.log(randAsteroidImageName);
+    let asteroid = self.matter.add.image(x, y, randAsteroidImageName).setCollisionGroup(enemyGroup);
     asteroid.setFriction(0, 0);
     asteroid.setRotation(rotation);
     asteroid.setFixedRotation(true);
