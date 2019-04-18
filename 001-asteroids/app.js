@@ -36,26 +36,28 @@ var wasd;
 var controls;
 var ship;
 var shipAcc = .125;
-var shipMaxSpeed = 8;
-var shipRotationSpeed = .09;
+var shipMaxSpeed = 5;
+var shipRotationSpeed = .11;
 var shipFriction = .020;
 
 var fireBulletCooldown = 200;
 var fireBulletTimer;
 
-var bulletSpeed = 8;
-var bulletMaxLifespan = 750;
+var bulletSpeed = 15;
+var bulletMaxLifespan = 400;
 
 var bulletList = [];
 
 var asteroidMinSpeed = 1;
-var asteroidMaxSpeed = 5;
+var asteroidMaxSpeed = 3;
+var asteroidDivisor = 1.6;
+var asteroidMaxDivisions = 5;
 var asteroidList = [];
 
 var allyCategory;
 var enemyCategory;
 
-var asteroidImageNames = ['asteroid1', 'asteroid2', 'asteroid3'];
+var asteroidImageNames = ['asteroid4'];
 
 function preload() {
     this.load.setBaseURL('');
@@ -193,10 +195,9 @@ function destroyAsteroid(self, asteroid, rotation) {
     }
     score += 50;
     let arrayIndex = asteroidList.indexOf(asteroid);
-    let asteroidDivisor = 1.5;
     asteroidList.splice(arrayIndex, 1);
     // splits the asteroid
-    if (asteroid.asteroidState < 6) {
+    if (asteroid.asteroidState < asteroidMaxDivisions) {
         let splitAsteroid1 = createAsteroid(self, asteroid.x, asteroid.y, rotation - Math.PI / 6, asteroid.asteroidState + 1, asteroid.displayWidth / asteroidDivisor, asteroid.displayHeight / asteroidDivisor);
         let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
         splitAsteroid1.setVelocityX(speed * Math.cos(splitAsteroid1.rotation));
