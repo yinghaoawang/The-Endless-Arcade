@@ -19,6 +19,22 @@ var config = {
     }
 };
 
+var username = "guy123";
+
+var fetchHighScores = function () {
+    let numberCheck = $.ajax({
+        url: 'http://localhost:5000/hs',//'https://stately-app.herokuapp.com/',
+        type: 'GET',
+        data: {
+            gameTitle: 'asteroid-souls'
+        },
+    }).done(function(data) {
+        console.log(data);
+    });
+};
+
+var fetchedHighScores = [];
+
 var nameKeyArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 ];
 var nameKeyCSV = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z';
@@ -188,8 +204,9 @@ function createGameOverMenu(self) {
         gameOverText = self.add.text(config.width * .5, config.height * .35, 'You Died');
         gameOverText.setOrigin(.5);
         gameOverText.setStyle({
-            fontSize: '23px'
+            fontSize: '30px'
         });
+        gameOverText.depth = -1;
     }
     gameOverText.setVisible(true);
 }
