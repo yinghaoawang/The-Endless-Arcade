@@ -2,6 +2,7 @@ var config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+    pixelArt: true,
     physics: {
         default: 'matter',
         matter: {
@@ -35,7 +36,7 @@ var wasd;
 
 var controls;
 var ship;
-var shipAcc = .125;
+var shipAcc = .1;
 var shipMaxSpeed = 5;
 var shipRotationSpeed = .11;
 var shipFriction = .020;
@@ -53,11 +54,16 @@ var asteroidMaxSpeed = 3;
 var asteroidDivisor = 1.6;
 var asteroidMaxDivisions = 5;
 var asteroidList = [];
+var asteroidImageNames = ['asteroid4'];
 
 var allyCategory;
 var enemyCategory;
 
-var asteroidImageNames = ['asteroid4'];
+var titleText;
+var startText;
+var gameOverText;
+var scoreText;
+var highScoreBoardText;
 
 function preload() {
     this.load.setBaseURL('');
@@ -80,7 +86,7 @@ function create() {
         right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
         space: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD),
         reset: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER),
-        start: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
+        start: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
     }
 
     nameKey = this.input.keyboard.addKeys(nameKeyCSV);
@@ -109,25 +115,25 @@ function create() {
             enemyObject = gameObjectA;
         }
         
-        if (allyObject.unitType == "bullet") {
+        if (allyObject.unitType == 'bullet') {
             let arrIndex = bulletList.indexOf(allyObject);
             bulletList.splice(arrIndex, 1);
             allyObject.destroy();
 
-            if (enemyObject.unitType == "asteroid") {
+            if (enemyObject.unitType == 'asteroid') {
                 destroyAsteroid(self, enemyObject, enemyObject.rotation);
             }
-        } else if (allyObject.unitType == "ship") {
+        } else if (allyObject.unitType == 'ship') {
             destroyAsteroid(self, enemyObject, enemyObject.rotation);
             ship.destroy();
             isGameOver = true;
             createGameOverMenu(self);
         } else {
-            console.error("Unknown unit type: " + allyObject.unitType);
+            console.error('Unknown unit type: ' + allyObject.unitType);
         }
     });
 
-    createMainMenu(this);
+    showMainMenu(this);
 }
 
 function reset() {
@@ -152,6 +158,15 @@ function reset() {
 }
 
 function init(self) {
+    hideMainMenu();
+    score = 0;
+    if (typeof scoreText == 'undefined') {
+        scoreText = self.add.text(10, 10, '', {
+            fontSize: '12px'
+        });
+        scoreText.depth = 200;
+    }
+    updateScoreText();
     // create ship
     fireBulletTimer = 0;
     isPlaying = true;
@@ -159,15 +174,54 @@ function init(self) {
     ship = self.matter.add.image(400, 100, 'ship').setCollisionGroup(allyGroup);
     ship.setFriction(0, 0);
     ship.setFixedRotation(true);
-    ship.unitType = "ship";
+    ship.unitType = 'ship';
+}
+
+function updateScoreText() {
+    if (typeof scoreText != 'undefined') {
+        scoreText.setText('Score: ' + score)
+    }
 }
 
 function createGameOverMenu(self) {
-    // TOIDO
+    if (typeof gameOverText == 'undefined') {
+        gameOverText = self.add.text(config.width * .5, config.height * .35, 'You Died');
+        gameOverText.setOrigin(.5);
+        gameOverText.setStyle({
+            fontSize: '23px'
+        });
+    }
+    gameOverText.setVisible(true);
 }
 
-function createMainMenu(self) {
+function hideGameOverMenu() {
+    if (typeof gameOverText != 'undefined') gameOverText.setVisible(false);
+}
+
+function hideMainMenu() {
+    titleText.setVisible(false);
+    startText.setVisible(false);
+}
+
+function showMainMenu(self) {
+    hideGameOverMenu();
     isMainMenu = true;
+    if (typeof titleText == 'undefined') {
+        titleText = self.add.text(config.width * .5, config.height * .35, 'Asteroid Souls');
+        titleText.setOrigin(.5);
+        titleText.setStyle({
+            fontSize: '30px'
+        });
+    }
+    if (typeof startText == 'undefined') {
+        startText = self.add.text(config.width * .5, config.height * .35 + 30, 'Press Space to play');
+        startText.setOrigin(.5);
+        startText.setStyle({
+            fontSize: '14px'
+        });
+    }
+    titleText.setVisible(true);
+    startText.setVisible(true);
 }
 
 function resetGameCheck(self) {
@@ -184,16 +238,17 @@ function resetGameCheck(self) {
     if (enterPressed) {
         reset(self);
         isMainMenu = true;
-        createMainMenu(self);
+        showMainMenu(self);
     }
 }
 
 // destroy asteroid and clean up references, asteroid splits if big or med
 function destroyAsteroid(self, asteroid, rotation) {
-    if (typeof rotation == "undefined") {
+    if (typeof rotation == 'undefined') {
         rotation = 2 * Math.PI * Math.random();
     }
     score += 50;
+    updateScoreText();
     let arrayIndex = asteroidList.indexOf(asteroid);
     asteroidList.splice(arrayIndex, 1);
     // splits the asteroid
@@ -246,10 +301,12 @@ function update() {
             if (asteroidList.length == 0) {
                 createAsteroids(this);
             }
-        }
-        // deletes bullet if they expire, and wraps them
+
+            // deletes bullet if they expire, and wraps them
         manageBullets(this);
         manageAsteroids(this);
+        }
+        
     }
 }
 
@@ -277,7 +334,7 @@ function createAsteroid(self, x, y, rotation, asteroidState, displayWidth, displ
     let randIndex = Math.floor(asteroidImageNames.length * Math.random());
     let randAsteroidImageName = asteroidImageNames[randIndex];
     let asteroid = self.matter.add.image(x, y, randAsteroidImageName).setCollisionGroup(enemyGroup);
-    if (typeof displayWidth != "undefined" && typeof displayHeight != "undefined") {
+    if (typeof displayWidth != 'undefined' && typeof displayHeight != 'undefined') {
         asteroid.setDisplaySize(displayWidth, displayHeight);
     }
     asteroid.setFriction(0, 0);
@@ -285,7 +342,7 @@ function createAsteroid(self, x, y, rotation, asteroidState, displayWidth, displ
     asteroid.setFixedRotation(true);
     let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
     asteroid.asteroidState = asteroidState;
-    asteroid.unitType = "asteroid";
+    asteroid.unitType = 'asteroid';
     asteroid.setVelocityX(speed * Math.cos(asteroid.rotation));
     asteroid.setVelocityY(speed * Math.sin(asteroid.rotation));
     return asteroid;
@@ -358,7 +415,7 @@ function fireBulletCheck(self) {
 
 function fireBullet(self) {
     let bullet = self.matter.add.image(ship.x, ship.y, 'bullet').setCollisionGroup(allyGroup);
-    bullet.unitType = "bullet";
+    bullet.unitType = 'bullet';
     bullet.setFriction(0, 0);
     bullet.setRotation(ship.rotation)
     bullet.setFixedRotation(true);
