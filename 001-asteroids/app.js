@@ -5,7 +5,7 @@ var config = {
     physics: {
         default: 'matter',
         matter: {
-            debug: true,
+            debug: false,
             gravity: { x:0, y: 0 },
             friction: 0,
             airFriction: 0
@@ -35,21 +35,21 @@ var wasd;
 
 var controls;
 var ship;
-var shipAcc = .1;
-var shipMaxSpeed = 5;
-var shipRotationSpeed = .065;
-var shipFriction = .025;
+var shipAcc = .125;
+var shipMaxSpeed = 8;
+var shipRotationSpeed = .09;
+var shipFriction = .020;
 
 var fireBulletCooldown = 200;
-var fireBulletTimer = 0;
+var fireBulletTimer;
 
 var bulletSpeed = 8;
-var bulletMaxLifespan = 600;
+var bulletMaxLifespan = 750;
 
 var bulletList = [];
 
 var asteroidMinSpeed = 1;
-var asteroidMaxSpeed = 4;
+var asteroidMaxSpeed = 5;
 var asteroidList = [];
 
 var allyCategory;
@@ -113,10 +113,10 @@ function create() {
             allyObject.destroy();
 
             if (enemyObject.unitType == "asteroid") {
-                destroyAsteroid(self, enemyObject);
+                destroyAsteroid(self, enemyObject, enemyObject.rotation);
             }
         } else if (allyObject.unitType == "ship") {
-            destroyAsteroid(self, enemyObject);
+            destroyAsteroid(self, enemyObject, enemyObject.rotation);
             ship.destroy();
             isGameOver = true;
             createGameOverMenu(self);
@@ -151,6 +151,7 @@ function reset() {
 
 function init(self) {
     // create ship
+    fireBulletTimer = 0;
     isPlaying = true;
     isMainMenu = false;
     ship = self.matter.add.image(400, 100, 'ship').setCollisionGroup(allyGroup);
@@ -160,7 +161,7 @@ function init(self) {
 }
 
 function createGameOverMenu(self) {
-
+    // TOIDO
 }
 
 function createMainMenu(self) {
@@ -168,14 +169,17 @@ function createMainMenu(self) {
 }
 
 function resetGameCheck(self) {
-    let resetPressed = false;
+    let enterPressed = false;
     for (let i = 0; i < nameKeyArray.length; ++i) {
         let key = nameKeyArray[i];
         if (nameKey[key].isDown) {
             console.log(key);
         }
     }
-    if (resetPressed) {
+    if (nameKey['enter'].isDown) {
+        enterPressed = true;
+    }
+    if (enterPressed) {
         reset(self);
         isMainMenu = true;
         createMainMenu(self);
@@ -183,20 +187,25 @@ function resetGameCheck(self) {
 }
 
 // destroy asteroid and clean up references, asteroid splits if big or med
-function destroyAsteroid(self, asteroid) {
+function destroyAsteroid(self, asteroid, rotation) {
+    if (typeof rotation == "undefined") {
+        rotation = 2 * Math.PI * Math.random();
+    }
     score += 50;
     let arrayIndex = asteroidList.indexOf(asteroid);
+    let asteroidDivisor = 1.5;
     asteroidList.splice(arrayIndex, 1);
     // splits the asteroid
-    if (asteroid.asteroidState < 5) {
-        let splitAsteroid1 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation - .2, asteroid.asteroidState + 1, asteroid.displayWidth / 2, asteroid.displayHeight / 2);
+    if (asteroid.asteroidState < 6) {
+        let splitAsteroid1 = createAsteroid(self, asteroid.x, asteroid.y, rotation - Math.PI / 6, asteroid.asteroidState + 1, asteroid.displayWidth / asteroidDivisor, asteroid.displayHeight / asteroidDivisor);
         let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
         splitAsteroid1.setVelocityX(speed * Math.cos(splitAsteroid1.rotation));
         splitAsteroid1.setVelocityY(speed * Math.sin(splitAsteroid1.rotation));
         asteroidList.push(splitAsteroid1);
 
-        let splitAsteroid2 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation + .2, asteroid.asteroidState + 1, asteroid.displayWidth / 2, asteroid.displayHeight / 2);
+        let splitAsteroid2 = createAsteroid(self, asteroid.x, asteroid.y, rotation + Math.PI / 6, asteroid.asteroidState + 1, asteroid.displayWidth / asteroidDivisor, asteroid.displayHeight / asteroidDivisor);
         speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
+
         splitAsteroid2.setVelocityX(speed * Math.cos(splitAsteroid2.rotation));
         splitAsteroid2.setVelocityY(speed * Math.sin(splitAsteroid2.rotation));
 
@@ -266,11 +275,9 @@ function manageAsteroids(self) {
 function createAsteroid(self, x, y, rotation, asteroidState, displayWidth, displayHeight) {
     let randIndex = Math.floor(asteroidImageNames.length * Math.random());
     let randAsteroidImageName = asteroidImageNames[randIndex];
-    console.log(randAsteroidImageName);
     let asteroid = self.matter.add.image(x, y, randAsteroidImageName).setCollisionGroup(enemyGroup);
     if (typeof displayWidth != "undefined" && typeof displayHeight != "undefined") {
         asteroid.setDisplaySize(displayWidth, displayHeight);
-        console.log(displayWidth, displayHeight);
     }
     asteroid.setFriction(0, 0);
     asteroid.setRotation(rotation);
@@ -278,10 +285,8 @@ function createAsteroid(self, x, y, rotation, asteroidState, displayWidth, displ
     let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
     asteroid.asteroidState = asteroidState;
     asteroid.unitType = "asteroid";
-    let vxSign = (Math.random() < .5) ? 1 : -1;
-    let vySign = (Math.random() < .5) ? 1 : -1;
-    asteroid.setVelocityX(vxSign * speed * Math.cos(asteroid.rotation));
-    asteroid.setVelocityY(vySign * speed * Math.sin(asteroid.rotation));
+    asteroid.setVelocityX(speed * Math.cos(asteroid.rotation));
+    asteroid.setVelocityY(speed * Math.sin(asteroid.rotation));
     return asteroid;
 }
 
@@ -383,7 +388,6 @@ function movementCheck() {
     } else if (rightPressed && !leftPressed) {
         ship.rotation += shipRotationSpeed;
     }
-    ship.body.rotation = ship.rotation;
     if (upPressed) {
         let newVx = ship.body.velocity.x + shipAcc * Math.cos(ship.rotation);
         let newVy = ship.body.velocity.y + shipAcc * Math.sin(ship.rotation);
