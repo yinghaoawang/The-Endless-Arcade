@@ -188,14 +188,14 @@ function destroyAsteroid(self, asteroid) {
     let arrayIndex = asteroidList.indexOf(asteroid);
     asteroidList.splice(arrayIndex, 1);
     // splits the asteroid
-    if (asteroid.asteroidState < 4) {
-        let splitAsteroid1 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation - .2, asteroid.asteroidState + 1);
+    if (asteroid.asteroidState < 5) {
+        let splitAsteroid1 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation - .2, asteroid.asteroidState + 1, asteroid.displayWidth / 2, asteroid.displayHeight / 2);
         let speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
         splitAsteroid1.setVelocityX(speed * Math.cos(splitAsteroid1.rotation));
         splitAsteroid1.setVelocityY(speed * Math.sin(splitAsteroid1.rotation));
         asteroidList.push(splitAsteroid1);
 
-        let splitAsteroid2 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation + .2, asteroid.asteroidState + 1);
+        let splitAsteroid2 = createAsteroid(self, asteroid.x, asteroid.y, asteroid.rotation + .2, asteroid.asteroidState + 1, asteroid.displayWidth / 2, asteroid.displayHeight / 2);
         speed = Math.random() * (asteroidMaxSpeed - asteroidMinSpeed) + asteroidMinSpeed;
         splitAsteroid2.setVelocityX(speed * Math.cos(splitAsteroid2.rotation));
         splitAsteroid2.setVelocityY(speed * Math.sin(splitAsteroid2.rotation));
@@ -248,27 +248,30 @@ function manageAsteroids(self) {
     let height = config.height;
     for (let i = 0; i < asteroidList.length; ++i) {
         let asteroid = asteroidList[i];
-        if (asteroid.body.velocity.x > 0 && asteroid.x - asteroid.width / 2 > width) {
-            asteroid.x -= width + asteroid.width;
-        } else if (asteroid.body.velocity.x < 0 && asteroid.x + asteroid.width / 2 < 0) {
-            asteroid.x += width + asteroid.width;
+        if (asteroid.body.velocity.x > 0 && asteroid.x - asteroid.displayWidth / 2 > width) {
+            asteroid.x -= width + asteroid.displayWidth;
+        } else if (asteroid.body.velocity.x < 0 && asteroid.x + asteroid.displayWidth / 2 < 0) {
+            asteroid.x += width + asteroid.displayWidth;
         }
 
-        if (asteroid.body.velocity.y > 0 && asteroid.y - asteroid.height / 2 > height) {
-            asteroid.y -= height + asteroid.height;
-        } else if (asteroid.body.velocity.y < 0 && asteroid.y + asteroid.height / 2 < 0) {
-            asteroid.y += height + asteroid.height;
+        if (asteroid.body.velocity.y > 0 && asteroid.y - asteroid.displayHeight / 2 > height) {
+            asteroid.y -= height + asteroid.displayHeight;
+        } else if (asteroid.body.velocity.y < 0 && asteroid.y + asteroid.displayHeight / 2 < 0) {
+            asteroid.y += height + asteroid.displayHeight;
         }
     }
 }
 
 // creates a single asteroid
-function createAsteroid(self, x, y, rotation, asteroidState) {
-
+function createAsteroid(self, x, y, rotation, asteroidState, displayWidth, displayHeight) {
     let randIndex = Math.floor(asteroidImageNames.length * Math.random());
     let randAsteroidImageName = asteroidImageNames[randIndex];
     console.log(randAsteroidImageName);
     let asteroid = self.matter.add.image(x, y, randAsteroidImageName).setCollisionGroup(enemyGroup);
+    if (typeof displayWidth != "undefined" && typeof displayHeight != "undefined") {
+        asteroid.setDisplaySize(displayWidth, displayHeight);
+        console.log(displayWidth, displayHeight);
+    }
     asteroid.setFriction(0, 0);
     asteroid.setRotation(rotation);
     asteroid.setFixedRotation(true);
