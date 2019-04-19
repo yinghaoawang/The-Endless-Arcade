@@ -1,0 +1,27 @@
+{
+  "name": "the-endless-arcade",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "devstart": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yinghaoawang/The-Endless-Arcade.git"
+  },
+  "author": "Yinghao Wang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yinghaoawang/The-Endless-Arcade/issues"
+  },
+  "homepage": "https://github.com/yinghaoawang/The-Endless-Arcade#readme",
+  "devDependencies": {
+    "nodemon": "^1.18.11"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
