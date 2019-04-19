@@ -8,8 +8,7 @@ var config = {
         matter: {
             debug: false,
             gravity: { x:0, y: 0 },
-            friction: 0,
-            airFriction: 0
+            friction: 0
         }
     },
     scene: {
@@ -19,10 +18,16 @@ var config = {
     }
 };
 
+var devMode = false;
+
 // ajax request to get high scores
 var fetchHighScores = function () {
+    let apiURL = 'http://localhost:5000/hs';
+    if (devMode == false) {
+        apiURL = 'https://stately-app.herokuapp.com/hs'
+    }
     let numberCheck = $.ajax({
-        url: 'http://localhost:5000/hs',//'https://stately-app.herokuapp.com/',
+        url: apiURL,
         type: 'GET',
         data: {
             gameName: 'asteroid-souls',
@@ -35,10 +40,20 @@ var fetchHighScores = function () {
     });
 };
 
+// update with new high scores every 10 seconds
+fetchHighScores();
+setInterval(function() {
+    fetchHighScores()
+}, 10000);
+
 // ajax request to post high score
 var postHighScore = function (name, score) {
+    let apiURL = 'http://localhost:5000/hs';
+    if (devMode == false) {
+        apiURL = 'https://stately-app.herokuapp.com/hs'
+    }
     let numberCheck = $.ajax({
-        url: 'http://localhost:5000/hs',//'https://stately-app.herokuapp.com/',
+        url: apiURL,
         type: 'POST',
         data: {
             gameName: 'asteroid-souls',
@@ -49,12 +64,6 @@ var postHighScore = function (name, score) {
         fetchHighScores();
     });
 };
-
-// update with new high scores every 10 seconds
-fetchHighScores();
-setInterval(function() {
-    fetchHighScores()
-}, 10000);
 
 var nameKeyArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 ];
@@ -124,17 +133,18 @@ function create() {
     isPlaying = false;
     // controls setup
     cursors = this.input.keyboard.createCursorKeys();
-    cursors.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    cursors.fire = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    cursors.start = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     wasd = {
         up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
         down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
         left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
         right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-        space: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD),
-        reset: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER),
+        fire: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PERIOD),
         start: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
     }
 
+    nameKey = this.input.keyboard.addKeys(nameKeyCSV);
     nameKey['backspace'] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);
     nameKey['enter'] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
@@ -171,8 +181,6 @@ function create() {
         } else if (allyObject.unitType == 'ship') {
             destroyAsteroid(self, enemyObject, enemyObject.rotation);
             ship.destroy();
-            isGameOver = true;
-            isPlaying = false;
             showGameOverMenu(self);
             name = '';
         } else {
@@ -201,6 +209,7 @@ function reset() {
     // reset values
     isPlaying = false;
     isGameOver = false;
+    //TODO
     score = 0;
 }
 
@@ -251,7 +260,7 @@ function startCheck(self) {
     let startPressed = false;
     for (let i = 0; i < controls.length; ++i) {
         let scheme = controls[i];
-        if (scheme.hasOwnProperty('start') && scheme.start.isDown) startPressed = true;
+        if (scheme.hasOwnProperty('start') && Phaser.Input.Keyboard.JustDown(scheme.start)) startPressed = true;
     }
     if (startPressed) {
         init(self);
@@ -263,11 +272,18 @@ function startCheck(self) {
 function enterNameCheck(self) {
     let enterPressed = false;
     let backspacePressed = false;
-    if (nameKey['enter'].isDown) {
+    let keyPressed;
+    for (let i = 0; i < nameKeyArray.length; ++i) {
+        let key = nameKeyArray[i];
+        if (Phaser.Input.Keyboard.JustDown(nameKey[key])) {
+            keyPressed = key;
+        }
+    }
+    if (Phaser.Input.Keyboard.JustDown(nameKey['enter'])) {
         enterPressed = true;
         tryPostScore();
     }
-    if (nameKey['backspace'].isDown) {
+    if (Phaser.Input.Keyboard.JustDown(nameKey['backspace'])) {
         backspacePressed = true;
     }
     if (enterPressed) { reset(self);
@@ -277,6 +293,10 @@ function enterNameCheck(self) {
     } else if (backspacePressed) {
         if (name.length > 0) {
             name = name.substring(0, name.length - 1);
+        }
+    } else if (typeof keyPressed != 'undefined') {
+        if (name.length < maxNameLength) {
+            name += keyPressed;
         }
     }
 }
@@ -340,7 +360,7 @@ function fireBulletCheck(self) {
     let spacePressed = false;
     for (let i = 0; i < controls.length; ++i) {
         let scheme = controls[i];
-        if (scheme.space.isDown) spacePressed = true;
+        if (Phaser.Input.Keyboard.JustDown(scheme.fire)) spacePressed = true;
     }
 
     if (spacePressed) {
@@ -373,6 +393,9 @@ function hideMainMenu() {
 }
 
 function showGameOverMenu(self) {
+    isGameOver = true;
+    isPlaying = false;
+    
     if (typeof gameOverText == 'undefined') {
         gameOverText = self.add.text(config.width * .5, config.height * .1, 'You Died');
         gameOverText.setOrigin(.5, 0);
