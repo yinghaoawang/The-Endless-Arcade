@@ -1,8 +1,8 @@
-class Doggo extends Phaser.GameObjects.Image {
+class Doggo extends Phaser.GameObjects.Sprite {
     constructor (scene, x, y) {
-        super(scene, x, y);
-        this.setTexture('doggo');
-        this.setPosition(x, y);
+        super(scene, x, y, 'doggo');
+        this.scene = scene;
+        this.scene.add.existing(this);
     }
 }
 

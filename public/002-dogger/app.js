@@ -16,6 +16,12 @@ var config = {
     }
 };
 
+const States = {
+    MAIN_MENU: 1,
+    IS_PLAYING: 2,
+    GAME_OVER: 3
+}
+
 const carImages = ['horse1'];
 
 function preload() {
@@ -27,9 +33,28 @@ function preload() {
 }
 
 function create() {
-    
+    state = States.MAIN_MENU;
+    this.score;
+    this.state;
 }
 
 function update() {
+    if (state == States.MAIN_MENU) {
+        this.state = States.IS_PLAYING;
+        initGame(this);
+    } else if (state == States.IS_PLAYING) {
+        console.log('hello');
+    } else if (state == States.GAME_OVER) {
+        state = States.MAIN_MENU;
+    } else {
+        console.error('ERROR: Unknown game state: ' + state);
+    }
 
 }
+
+function initGame(scene) {
+    this.doggo = new Doggo(10, 10);
+    this.score = 0;
+}
+
+var game = new Phaser.Game(config);
