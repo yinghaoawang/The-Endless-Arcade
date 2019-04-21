@@ -6,7 +6,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true,
+            debug: false,
         }
     },
     scene: {
@@ -91,6 +91,8 @@ function nextLevel(scene) {
             --i;
         }
     }
+
+    scene.score += 100;
 
     if (scene.level / 5 >= 1) {
         scene.level = 1;

@@ -158,7 +158,6 @@ class HorseSpawner {
         this.startRight = startRight;
         this.nextSpawnTime;
     }
-
     update(time, delta) {
         if (!this.spawning) {
             this.nextSpawnTime = time + Math.random() * (this.spawnMaxCD - this.spawnMinCD) + this.spawnMinCD;
