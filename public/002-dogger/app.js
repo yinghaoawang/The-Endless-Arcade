@@ -1,6 +1,6 @@
 var config = {
     type: Phaser.AUTO,
-    width: 601,
+    width: 541,
     height: 781,
     pixelArt: true,
     physics: {
@@ -51,10 +51,9 @@ function create() {
 }
 
 function update(time, delta) {
-    console.log(this.units);
     if (this.state == States.MAIN_MENU) {
         this.state = States.IS_PLAYING;
-        initGame(this);
+        initGame(this, delta);
     } else if (this.state == States.IS_PLAYING) {
         keyboardCheck(this);
 
@@ -76,17 +75,17 @@ function update(time, delta) {
     }
 }
 
-function initGame(scene) {
+function initGame(scene, delta) {
     if (scene.gridG == null) scene.gridG = createTileGraphics(scene);
     scene.doggo = new Doggo(scene);
     scene.score = 0;
     scene.level = 4;
-    scene.ng = 5;
+    scene.ng = 1;
     scene.units.push(scene.doggo);
     initLevel(scene);
 }
 
-function initLevel(scene) {
+function initLevel(scene, delta) {
     let level = scene.level;
     let ng = scene.ng;
     let middleX = scene.tileXCount / 2;
@@ -94,7 +93,7 @@ function initLevel(scene) {
     scene.doggo.setTilePos(middleX, lastY);
     
     let horseIndex = 0;
-    let safeRowEvery = 3 + ng;
+    let safeRowEvery = 2 + ng;
     
     let yRank = lastY - 1;
     for (; yRank > 0; --yRank) {
@@ -103,21 +102,30 @@ function initLevel(scene) {
         }
 
         let startRight = Math.random() < .5 ? true : false;
-        let minCD = Math.max(200, 1200 - (ng * 200) - (level - 100));
-        let maxCD = Math.max(400, 1200 - (ng * 50) - (level * 50));
+        let minCD = 400;
+        let maxCD = 1200;
         let horseMoveCD = Math.random() * (maxCD - minCD) + minCD;
 
-        let minSpawnCD = Math.max(3000 - level * 300 - ng * 250, 1500);
-        let maxSpawnCD = Math.max(6000 - level * 600 - ng * 500, 2500);
+        let minSpawnCD = Math.max(4000 - level * 300 - ng * 300, 2000);
+        let maxSpawnCD = minSpawnCD * 1.5;
         let horseSpawner = new HorseSpawner(scene, yRank, horseMoveCD, minSpawnCD, maxSpawnCD, startRight);
-
         scene.units.push(horseSpawner);
+
+        let horseTime = 0;
+        for (let nextHorseX = (startRight) ? -1 : scene.tileXCount; nextHorseX < scene.screenWidth;) {
+
+            nextHorseX += tileSize
+            let targetTileX = startRight ? scene.tileXCount : -1;
+            let startTileX = coordsToTilePos(nextHorseX, yRank).x;
+            let hose = new Horsie(scene, startTileX, yRank, targetTileX, yRank, 
+                (1000 * Math.abs(targetTileX - startTileX)) / 6
+            );
+            scene.units.push(hose);
+            if (!startRight) hose.flipX = true;
+        }
         
     }
-    
 }
-
-
 
 function keyboardCheck(scene) {
     let upPressed = false;
@@ -141,14 +149,17 @@ function keyboardCheck(scene) {
         }
         if (scheme.slow.isDown) {
             slowPressed = true;
-            console.log('slow');
         }
     }
 
-    if (slowPressed ) {
-        scene.doggo.moveCoolDown = 300;
+    if (slowPressed) {
+        if (scene.doggo.canMove) {
+            scene.doggo.moveCoolDown = 400;
+        }
     } else {
-        scene.doggo.moveCoolDown = 150;
+        if (scene.doggo.canMove) {
+            scene.doggo.moveCoolDown = 200;
+        }
     }
 
     if (upPressed && !downPressed) {
