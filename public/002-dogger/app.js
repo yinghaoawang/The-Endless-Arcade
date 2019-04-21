@@ -35,6 +35,17 @@ function preload() {
     }
 }
 
+function reset(scene) {
+    // remove all units but our doggo
+    for (let i = 0; i < scene.units.length; ++i) {
+        let unit = scene.units[i];
+        scene.units.splice(scene.units.indexOf(unit), 1);
+        unit.destroy();
+        --i;
+    }
+    initGame(scene);
+}
+
 function create() {
     this.state = States.MAIN_MENU;
     this.screenWidth = config.width;
@@ -51,7 +62,7 @@ function create() {
     this.units = [];
     this.dogHorseCollide = (dog, horse) => {
         --this.lives;
-        nextLevel(this);
+        reset(this);
     };
     this.playingMenu = new PlayingMenu(this);
 }
@@ -138,14 +149,14 @@ function initLevel(scene) {
 
         let startRight = Math.random() < .5 ? true : false;
         let minCD = 400;
-        let maxCD = 1200;
+        let maxCD = 800;
         let horseMoveCD = Math.random() * (maxCD - minCD) + minCD;
 
-        let minSpawnCD = Math.max(4000 - level * 300 - ng * 300, 2000);
+        let minSpawnCD = Math.max(3000 - level * 300 - ng * 300, 1000);
         let maxSpawnCD = minSpawnCD * 1.5;
         let horseSpawner = new HorseSpawner(scene, yRank, horseMoveCD, minSpawnCD, maxSpawnCD, startRight);
         scene.units.push(horseSpawner);
-
+        console.log(minSpawnCD, maxSpawnCD);
         for (let i = -1; i < scene.tileXCount; ++i) {
             let targetTileX = startRight ? scene.tileXCount : -1;
             let startTileX = startRight ? i : scene.tileXCount - 1 - i;
