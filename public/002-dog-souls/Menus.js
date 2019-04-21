@@ -113,7 +113,7 @@ class HighScoreMenu {
         this.highScoreNumberText.setText(highScoreNumberStr);
         this.highScoreNameText.setText(highScoreNameStr);
         this.userScoreText.setText(this.scene.score);
-        this.userNameText.setText('hello');
+        this.userNameText.setText(this.scene.userName);
     }
 
     hide() {

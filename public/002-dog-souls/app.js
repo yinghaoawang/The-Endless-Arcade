@@ -37,6 +37,10 @@ function preload() {
     }
 }
 
+var userNameCharArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+];
+var userNameCharCSV = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z';
+
 function gameOver(scene) {
     for (let i = 0; i < scene.units.length; ++i) {
         let unit = scene.units[i];
@@ -48,6 +52,7 @@ function gameOver(scene) {
     }
     scene.doggo.destroy();
     scene.state = States.GAME_OVER;
+    scene.userName = '';
     scene.highScoreMenu.show();
 }
 
@@ -64,6 +69,7 @@ function reset(scene) {
 
 function create() {
     // ajax request to get high scores
+    this.gameName = 'dog-souls';
     this.highScores = [];
     let scene = this;
     this.fetchHighScores = function () {
@@ -75,7 +81,7 @@ function create() {
             url: apiURL,
             type: 'GET',
             data: {
-                gameName: 'asteroid-souls',
+                gameName: scene.gameName,
                 count: 20
             },
             dataType: 'json'
@@ -83,6 +89,11 @@ function create() {
             scene.highScores = data;
         });
     };
+    this.fetchHighScores();
+    setInterval(function() {
+        scene.fetchHighScores()
+    }, 10000);
+
     this.postHighScore = function (name, score) {
         let apiURL = 'http://localhost:5000/hs';
         if (devMode == false) {
@@ -92,29 +103,44 @@ function create() {
             url: apiURL,
             type: 'POST',
             data: {
-                gameName: 'asteroid-souls',
+                gameName: scene.gameName,
                 scoreName: name,
                 scoreNumber: score
             },
         }).done(function(data) {
-            fetchHighScores();
+            scene.fetchHighScores();
         });
     };
-    this.fetchHighScores();
+    
     this.state = States.MAIN_MENU;
     this.screenWidth = config.width;
     this.screenHeight = config.height;
     this.score;
     this.lives;
     this.gridG;
-    this.tiles = [];
     this.tileXCount = Math.floor(this.screenWidth / tileSize);
     this.tileYCount = Math.floor(this.screenHeight / tileSize);
+    
+    this.wasd = {
+        up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+        down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+        left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+        right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+        slow: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT),
+    }
     this.cursors = this.input.keyboard.createCursorKeys();
     this.cursors.slow = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.keySchemes = [this.cursors];
+    this.keySchemes = [this.cursors, this.wasd];
+
+    this.userNameScheme = this.input.keyboard.addKeys(userNameCharCSV);
+    this.userNameScheme.backspace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);
+    this.userNameScheme.enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    
+    this.userName;
+    this.maxNameLength = 6;
+
     this.units = [];
-    this.dogHorseCollide = (dog, horse) => {
+    this.dogHorseCollide = () => {
         --this.lives;
         placeDogInSpawn(this);
         if (this.lives <= 0) {
@@ -151,6 +177,7 @@ function update(time, delta) {
         checkWin(this);
     } else if (this.state == States.GAME_OVER) {
         this.highScoreMenu.update();
+        userNameInputCheck(this);
         updateUnits(this, time, delta);
     } else {
         console.error('ERROR: Unknown game state: ' + this.state);
@@ -231,7 +258,6 @@ function initLevel(scene) {
         let maxSpawnCD = minSpawnCD * 1.5;
         let horseSpawner = new HorseSpawner(scene, yRank, horseMoveCD, minSpawnCD, maxSpawnCD, startRight);
         scene.units.push(horseSpawner);
-        console.log(minSpawnCD, maxSpawnCD);
         for (let i = -1; i < scene.tileXCount; ++i) {
             let targetTileX = startRight ? scene.tileXCount : -1;
             let startTileX = startRight ? i : scene.tileXCount - 1 - i;
@@ -242,6 +268,47 @@ function initLevel(scene) {
             if (!startRight) hose.flipX = true;
         }
         
+    }
+}
+
+function toMainMenu(scene) {
+    reset(scene);
+    scene.state = States.MAIN_MENU;
+    scene.playingMenu.hide();
+    scene.highScoreMenu.hide();
+}
+
+function userNameInputCheck(scene) {
+    let enterPressed = false;
+    let backspacePressed = false;
+    let keyPressed;
+    for (let i = 0; i < userNameCharArray.length; ++i) {
+        let key = userNameCharArray[i];
+        if (Phaser.Input.Keyboard.JustDown(scene.userNameScheme[key])) {
+            keyPressed = key;
+        }
+    }
+    if (Phaser.Input.Keyboard.JustDown(scene.userNameScheme.enter)) enterPressed = true;
+    if (Phaser.Input.Keyboard.JustDown(scene.userNameScheme.backspace)) backspacePressed = true;
+
+    if (enterPressed) {
+        tryPostScore(scene);
+        toMainMenu(scene);
+    } else if (backspacePressed) {
+        if (scene.userName.length > 0) {
+            scene.userName = scene.userName.substring(0, scene.userName.length - 1);
+        }
+    } else if (typeof keyPressed != 'undefined') {
+        if (scene.userName.length < scene.maxNameLength) {
+            scene.userName += keyPressed;
+        }
+    }
+}
+
+// posts score if reaches requirements
+function tryPostScore(scene) {
+    if (scene.userName.length > 0 && scene.score >= 50) {
+        scene.postHighScore(scene.userName, scene.score);
     }
 }
 
