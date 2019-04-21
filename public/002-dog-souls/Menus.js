@@ -15,6 +15,10 @@ class PlayingMenu {
         });
         this.bigNG.setOrigin(.5);
 
+        this.bonusText = scene.add.text(scene.screenWidth * .5, 10, 'Bonus: ');
+        this.bonusText.setOrigin(.5, 0);
+        this.bonusText.setAlign('left');
+
         this.levelText = scene.add.text(scene.screenWidth - 10, 10, 'Level: ');
         this.ngText = scene.add.text(scene.screenWidth - 10, 30, 'NG: ');
         this.levelText.setOrigin(1, 0);
@@ -46,18 +50,25 @@ class PlayingMenu {
         } else {
             this.ngText.setText('');
         }
+        if (this.scene.state == States.IS_PLAYING) {
+            this.bonusText.setText('Bonus: ' + this.scene.bonus);
+        } else {
+            this.bonusText.setText('');
+        }
     }
     show() {
         this.livesText.setVisible(true);
         this.scoreText.setVisible(true);
         this.levelText.setVisible(true);
         this.ngText.setVisible(true);
+        this.bonusText.setVisible(true);
     }
     hide() {
         this.livesText.setVisible(false);
         this.scoreText.setVisible(false);
         this.levelText.setVisible(false);
         this.ngText.setVisible(false);
+        this.bonusText.setVisible(false);
     }
 }
 

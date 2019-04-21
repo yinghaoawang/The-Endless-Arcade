@@ -16,7 +16,7 @@ var config = {
     }
 };
 
-var devMode = true;
+var devMode = false;
 
 const States = {
     MAIN_MENU: 1,
@@ -115,6 +115,8 @@ function create() {
     this.screenWidth = config.width;
     this.screenHeight = config.height;
     this.score;
+    this.bonus;
+    this.bonusTimer;
     this.lives;
     this.gridG;
     this.tileXCount = Math.floor(this.screenWidth / tileSize);
@@ -145,12 +147,17 @@ function update(time, delta) {
         startGameCheck(this);
     } else if (this.state == States.IS_PLAYING) {
         keyboardCheck(this);
+
         this.playingMenu.update();
+
+        updateBonusTimer(this, time)
         updateUnits(this, time, delta);
+
         checkWin(this);
     } else if (this.state == States.GAME_OVER) {
         this.playingMenu.update();
         this.highScoreMenu.update();
+
         userNameInputCheck(this);
         updateUnits(this, time, delta);
     } else {
@@ -166,6 +173,15 @@ function updateUnits(scene, time, delta) {
             if (typeof unit.finalTargetTile == 'undefined') {
                 unit.destroy();
             }
+        }
+    }
+}
+
+function updateBonusTimer(scene, time) {
+    if (scene.bonus > 0) {
+        if (scene.bonusTimer - time <= 0) {
+            scene.bonusTimer = time + 1000;
+            --scene.bonus;
         }
     }
 }
@@ -190,6 +206,7 @@ function initGame(scene) {
     scene.doggo = new Doggo(scene);
     scene.physics.add.existing(scene.doggo);
     scene.score = 0;
+    scene.bonusTimer = 0;
     scene.level = 1;
     scene.lives = 3;
     scene.ng = 0;
@@ -200,6 +217,7 @@ function initGame(scene) {
 function initLevel(scene) {
     let level = scene.level;
     let ng = scene.ng;
+    scene.bonus = 100 * (scene.ng + 1) + 1;
     let lastY = scene.tileYCount - 1;
     placeDogInSpawn(scene);
     
@@ -260,14 +278,14 @@ function nextLevel(scene) {
 
 function checkWin(scene) {
     if (scene.doggo.currTile.y == 0) {
-        scene.score += 100;
+        scene.score += 100 * (scene.ng + 1) + scene.bonus;
         nextLevel(scene);
     }
 }
 
 // posts score if reaches requirements
 function tryPostScore(scene) {
-    if (scene.userName.length > 0 && scene.score >= 1000) {
+    if (scene.userName.length > 0 && scene.score >= 2000) {
         scene.postHighScore(scene.userName, scene.score);
     }
 }
