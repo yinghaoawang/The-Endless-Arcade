@@ -64,7 +64,6 @@ function reset(scene) {
         unit.destroy();
         --i;
     }
-    initGame(scene);
 }
 
 function create() {
@@ -121,20 +120,7 @@ function create() {
     this.tileXCount = Math.floor(this.screenWidth / tileSize);
     this.tileYCount = Math.floor(this.screenHeight / tileSize);
     
-    this.wasd = {
-        up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-        down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-        left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-        right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-        slow: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT),
-    }
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.cursors.slow = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.keySchemes = [this.cursors, this.wasd];
-
-    this.userNameScheme = this.input.keyboard.addKeys(userNameCharCSV);
-    this.userNameScheme.backspace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);
-    this.userNameScheme.enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    setKeySchemes(this);
     
     this.userName;
     this.maxNameLength = 6;
@@ -149,6 +135,27 @@ function create() {
     };
     this.playingMenu = new PlayingMenu(this);
     this.highScoreMenu = new HighScoreMenu(this);
+    this.mainMenu = new MainMenu(this);
+
+    toMainMenu(this);
+}
+
+function update(time, delta) {
+    if (this.state == States.MAIN_MENU) {
+        startGameCheck(this);
+    } else if (this.state == States.IS_PLAYING) {
+        keyboardCheck(this);
+        this.playingMenu.update();
+        updateUnits(this, time, delta);
+        checkWin(this);
+    } else if (this.state == States.GAME_OVER) {
+        this.playingMenu.update();
+        this.highScoreMenu.update();
+        userNameInputCheck(this);
+        updateUnits(this, time, delta);
+    } else {
+        console.error('ERROR: Unknown game state: ' + this.state);
+    }
 }
 
 function updateUnits(scene, time, delta) {
@@ -163,53 +170,20 @@ function updateUnits(scene, time, delta) {
     }
 }
 
-function update(time, delta) {
-    if (this.state == States.MAIN_MENU) {
-        this.state = States.IS_PLAYING;
-        initGame(this);
-        nextLevel(this);
-    } else if (this.state == States.IS_PLAYING) {
-        keyboardCheck(this);
-        this.playingMenu.update();
-        
-        updateUnits(this, time, delta);
-        
-        checkWin(this);
-    } else if (this.state == States.GAME_OVER) {
-        this.highScoreMenu.update();
-        userNameInputCheck(this);
-        updateUnits(this, time, delta);
-    } else {
-        console.error('ERROR: Unknown game state: ' + this.state);
-    }
+function toMainMenu(scene) {
+    reset(scene);
+    scene.state = States.MAIN_MENU;
+    scene.gridG = createTileGraphics(scene);
+    scene.playingMenu.hide();
+    scene.highScoreMenu.hide();
+    scene.mainMenu.show();
 }
 
-function checkWin(scene) {
-    if (scene.doggo.currTile.y == 0) nextLevel(scene);
-}
-
-function nextLevel(scene) {
-    // remove all units but our doggo
-    for (let i = 0; i < scene.units.length; ++i) {
-        let unit = scene.units[i];
-        if (!(unit instanceof Doggo)) {
-            scene.units.splice(scene.units.indexOf(unit), 1);
-            unit.destroy();
-            --i;
-        }
-    }
-
-    scene.score += 100;
-
-    if (scene.level / 5 >= 1) {
-        scene.level = 1;
-        ++scene.ng;
-        ++scene.lives;
-        scene.playingMenu.ngFade();
-    } else {
-        ++scene.level;
-    }
-    initLevel(scene);
+function toPlayGame(scene) {
+    scene.mainMenu.hide()
+    scene.playingMenu.show();
+    scene.state = States.IS_PLAYING;
+    initGame(scene);
 }
 
 function initGame(scene) {
@@ -220,16 +194,7 @@ function initGame(scene) {
     scene.lives = 3;
     scene.ng = 0;
     scene.units.push(scene.doggo);
-    scene.playingMenu.show();
     initLevel(scene);
-}
-
-function placeDogInSpawn(scene) {
-    let middleX = scene.tileXCount / 2;
-    let lastY = scene.tileYCount - 1;
-    scene.doggo.setTilePos(middleX, lastY);
-    scene.doggo.setTargetTilePos(middleX, lastY);
-    scene.doggo.canMove = true;
 }
 
 function initLevel(scene) {
@@ -271,91 +236,48 @@ function initLevel(scene) {
     }
 }
 
-function toMainMenu(scene) {
-    reset(scene);
-    scene.state = States.MAIN_MENU;
-    scene.playingMenu.hide();
-    scene.highScoreMenu.hide();
-}
-
-function userNameInputCheck(scene) {
-    let enterPressed = false;
-    let backspacePressed = false;
-    let keyPressed;
-    for (let i = 0; i < userNameCharArray.length; ++i) {
-        let key = userNameCharArray[i];
-        if (Phaser.Input.Keyboard.JustDown(scene.userNameScheme[key])) {
-            keyPressed = key;
+function nextLevel(scene) {
+    // remove all units but our doggo
+    for (let i = 0; i < scene.units.length; ++i) {
+        let unit = scene.units[i];
+        if (!(unit instanceof Doggo)) {
+            scene.units.splice(scene.units.indexOf(unit), 1);
+            unit.destroy();
+            --i;
         }
     }
-    if (Phaser.Input.Keyboard.JustDown(scene.userNameScheme.enter)) enterPressed = true;
-    if (Phaser.Input.Keyboard.JustDown(scene.userNameScheme.backspace)) backspacePressed = true;
 
-    if (enterPressed) {
-        tryPostScore(scene);
-        toMainMenu(scene);
-    } else if (backspacePressed) {
-        if (scene.userName.length > 0) {
-            scene.userName = scene.userName.substring(0, scene.userName.length - 1);
-        }
-    } else if (typeof keyPressed != 'undefined') {
-        if (scene.userName.length < scene.maxNameLength) {
-            scene.userName += keyPressed;
-        }
+    if (scene.level / 5 >= 1) {
+        scene.level = 1;
+        ++scene.ng;
+        ++scene.lives;
+        scene.playingMenu.ngFade();
+    } else {
+        ++scene.level;
+    }
+    initLevel(scene);
+}
+
+function checkWin(scene) {
+    if (scene.doggo.currTile.y == 0) {
+        scene.score += 100;
+        nextLevel(scene);
     }
 }
 
 // posts score if reaches requirements
 function tryPostScore(scene) {
-    if (scene.userName.length > 0 && scene.score >= 50) {
+    if (scene.userName.length > 0 && scene.score >= 1000) {
         scene.postHighScore(scene.userName, scene.score);
     }
 }
 
-function keyboardCheck(scene) {
-    let upPressed = false;
-    let downPressed = false;
-    let leftPressed = false;
-    let rightPressed = false;
-    let slowPressed = false;
-    for (let i = 0; i < scene.keySchemes.length; ++i) {
-        let scheme = scene.keySchemes[i];
-        if (Phaser.Input.Keyboard.JustDown(scheme.up)) {
-            upPressed = true;
-        }
-        if (Phaser.Input.Keyboard.JustDown(scheme.down)) {
-            downPressed = true;
-        }
-        if (Phaser.Input.Keyboard.JustDown(scheme.left)) {
-            leftPressed = true;
-        }
-        if (Phaser.Input.Keyboard.JustDown(scheme.right)) {
-            rightPressed = true;
-        }
-        if (scheme.slow.isDown) {
-            slowPressed = true;
-        }
-    }
-
-    if (slowPressed) {
-        if (scene.doggo.canMove) {
-            scene.doggo.moveCoolDown = 400;
-        }
-    } else {
-        if (scene.doggo.canMove) {
-            scene.doggo.moveCoolDown = 200;
-        }
-    }
-
-    if (upPressed && !downPressed) {
-        scene.doggo.moveUp();
-    } else if (downPressed && !upPressed) {
-        scene.doggo.moveDown();
-    } else if (leftPressed && !rightPressed) {
-        scene.doggo.moveLeft();
-    } else if (rightPressed && !leftPressed) {
-        scene.doggo.moveRight();
-    }
+function placeDogInSpawn(scene) {
+    let middleX = scene.tileXCount / 2;
+    let lastY = scene.tileYCount - 1;
+    scene.doggo.setTilePos(middleX, lastY);
+    scene.doggo.setTargetTilePos(middleX, lastY);
+    scene.doggo.canMove = true;
 }
 
 var game = new Phaser.Game(config);

@@ -61,6 +61,33 @@ class PlayingMenu {
     }
 }
 
+class MainMenu {
+    constructor(scene) {
+        this.scene = scene;
+        this.titleText = scene.add.text(scene.screenWidth * .5, scene.screenHeight * .1, 'DOG SOULS', {
+            fontSize: '40px'
+        });
+        this.titleText.setOrigin(.5, 0);
+
+        this.instructionsText = scene.add.text(scene.screenWidth * .525, scene.screenHeight * .2);
+        this.instructionsText.setText(`You are a DOG.\nReach the TOP to win.\nAvoid HORSES.\n\nArrow keys or WASD to move.\nHold SPACE or SHIFT to move slowly.\n\nPress SPACE to begin.`);
+        this.instructionsText.setOrigin(.5, 0);
+        this.instructionsText.setAlign('left');
+        this.instructionsText.setLineSpacing('5');
+        this.hide();
+    }
+
+    show() {
+        this.instructionsText.setVisible(true);
+        this.titleText.setVisible(true);
+    }
+    hide() {
+        this.instructionsText.setVisible(false);
+        this.titleText.setVisible(false);
+    }
+}
+
+
 class HighScoreMenu {
     constructor(scene) {
         this.scene = scene;
@@ -68,29 +95,29 @@ class HighScoreMenu {
             fontSize: '20px'
         };
 
-        this.gameOverText = scene.add.text(config.width * .5, config.height * .09, 'High Scores');
+        this.gameOverText = scene.add.text(scene.screenWidth * .5, scene.screenHeight * .09, 'High Scores');
         this.gameOverText.setOrigin(.5, 0);
         this.gameOverText.setStyle({ fontSize: '35px' });
         this.gameOverText.depth = -1;
 
-        this.highScoreNameText = scene.add.text(config.width * .4, config.height * .15);
+        this.highScoreNameText = scene.add.text(scene.screenWidth * .4, scene.screenHeight * .15);
         this.highScoreNameText.setStyle(this.highScoreStyle);
         this.highScoreNameText.setAlign('right');
         this.highScoreNameText.setOrigin(.5, 0);
         this.highScoreNameText.setLineSpacing(5);
 
-        this.userNameText = scene.add.text(config.width * .4, config.height * .82);
+        this.userNameText = scene.add.text(scene.screenWidth * .4, scene.screenHeight * .82);
         this.userNameText.setStyle(this.highScoreStyle);
         this.userNameText.setAlign('right');
         this.userNameText.setOrigin(.5, 0);
 
-        this.highScoreNumberText = scene.add.text(config.width * .6, config.height * .15);
+        this.highScoreNumberText = scene.add.text(scene.screenWidth * .6, scene.screenHeight * .15);
         this.highScoreNumberText.setStyle(this.highScoreStyle);
         this.highScoreNumberText.setAlign('left');
         this.highScoreNumberText.setOrigin(.5, 0);
         this.highScoreNumberText.setLineSpacing(5);
 
-        this.userScoreText = scene.add.text(config.width * .6, config.height * .82);
+        this.userScoreText = scene.add.text(scene.screenWidth * .6, scene.screenHeight * .82);
         this.userScoreText.setStyle(this.highScoreStyle);
         this.userScoreText.setAlign('left');
         this.userScoreText.setOrigin(.5, 0);
