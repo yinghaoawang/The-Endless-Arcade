@@ -74,6 +74,7 @@ function update(time, delta) {
     if (this.state == States.MAIN_MENU) {
         this.state = States.IS_PLAYING;
         initGame(this);
+        nextLevel(this);
     } else if (this.state == States.IS_PLAYING) {
         keyboardCheck(this);
         this.playingMenu.update();
@@ -112,6 +113,7 @@ function nextLevel(scene) {
         scene.level = 1;
         ++scene.ng;
         ++scene.lives;
+        scene.playingMenu.ngFade();
     } else {
         ++scene.level;
     }
