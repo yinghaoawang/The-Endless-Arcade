@@ -62,7 +62,7 @@ function create() {
     this.units = [];
     this.dogHorseCollide = (dog, horse) => {
         --this.lives;
-        reset(this);
+        if (this.lives <= 0) reset(this);
     };
     this.playingMenu = new PlayingMenu(this);
 }
