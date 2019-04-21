@@ -29,9 +29,15 @@ class GridUnit extends Phaser.GameObjects.Sprite {
     
     moveToTile(tileX, tileY) {
         if (this.canMove) {
+            let signX = 0;
+            if (tileX - this.currTile.x < 0) signX = -1;
+            else if (tileX - this.currTile.x > 0) signX = 1;
+            let signY = 0;
+            if (tileY - this.currTile.y < 0) signY = -1;
+            else if (tileY - this.currTile.y > 0) signY = 1; 
             this.canMove = false;
             this.moveTimer = this.scene.time.now + this.moveCoolDown;
-            this.setTargetTilePos(tileX, tileY);
+            this.setTargetTilePos(this.currTile.x + signX, this.currTile.y + signY);
         }
     }
 
@@ -54,10 +60,8 @@ class GridUnit extends Phaser.GameObjects.Sprite {
             if (timeRemaining <= 0) {
                 this.allowMove();
             } else {
-                let distX = (this.targetTile.x - this.currTile.x) * tileSize;
-                let distY = (this.targetTile.y - this.currTile.y) * tileSize;
-                let vX = delta * distX / (this.moveCoolDown);
-                let vY = delta * distY / (this.moveCoolDown)
+                let vX = delta * tileSize * (this.targetTile.x - this.currTile.x) / (this.moveCoolDown);
+                let vY = delta * tileSize * (this.targetTile.y - this.currTile.y) / (this.moveCoolDown)
                 this.x += vX;
                 this.y += vY;
             }
@@ -114,7 +118,7 @@ class ControlledGridUnit extends GridUnit {
 class Doggo extends ControlledGridUnit {
     constructor(scene, tileX, tileY) {
         super(scene, tileX, tileY, 'doggo');
-        this.moveCoolDown = 125;
+        this.moveCoolDown = 150;
     }
 }
 
@@ -124,8 +128,22 @@ class Horsie extends GridUnit {
         if (typeof moveCoolDownPerTile == 'undefined') {
             moveCoolDownPerTile = 300;
         }
-        this.moveCoolDown = (this.scene.tileXCount + 1) * moveCoolDownPerTile;
+        this.moveCoolDown = moveCoolDownPerTile;
         this.moveToTile(targetTileX, targetTileY);
+        this.finalTargetTile = {
+            x: targetTileX,
+            y: targetTileY
+        }
+    }
+
+    update(time, delta) {
+        super.update(time, delta);
+        if (typeof targetTile == 'undefined') {
+            if (this.currTile.x != this.finalTargetTile.x ||
+                this.currTile.y != this.finalTargetTile.y) {
+                this.moveToTile(this.finalTargetTile.x, this.finalTargetTile.y);
+            }
+        }
     }
 }
 
@@ -156,7 +174,14 @@ class HorseSpawner {
                 }
                 this.scene.units.push(horse);
                 this.spawning = false;
+                // bad
+                this.scene.physics.add.existing(horse);
+                this.scene.physics.add.collider(this.scene.doggo, horse, this.scene.dogHorseCollide);
             }
         }
+    }
+
+    destroy() {
+        delete this;
     }
 }

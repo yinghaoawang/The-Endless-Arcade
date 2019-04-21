@@ -40,6 +40,7 @@ function create() {
     this.screenWidth = config.width;
     this.screenHeight = config.height;
     this.score;
+    this.lives;
     this.gridG;
     this.tiles = [];
     this.tileXCount = Math.floor(this.screenWidth / tileSize);
@@ -48,26 +49,31 @@ function create() {
     this.cursors.slow = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.keySchemes = [this.cursors];
     this.units = [];
+    this.dogHorseCollide = (dog, horse) => {
+        --this.lives;
+        nextLevel(this);
+    };
+    this.playingMenu = new PlayingMenu(this);
 }
 
 function update(time, delta) {
     if (this.state == States.MAIN_MENU) {
         this.state = States.IS_PLAYING;
-        initGame(this, delta);
+        initGame(this);
     } else if (this.state == States.IS_PLAYING) {
         keyboardCheck(this);
+        this.playingMenu.update();
 
         for (let i = 0; i < this.units.length; ++i) {
             let unit = this.units[i];
             unit.update(time, delta);
             if (unit instanceof Horsie) {
-                if (typeof unit.targetTile == 'undefined') {
-                    this.units.splice(this.units.indexOf(unit), 1);
+                if (typeof unit.finalTargetTile == 'undefined') {
                     unit.destroy();
                 }
             }
         }
-
+        if (this.doggo.currTile.y == 0) nextLevel(this);
     } else if (this.state == States.GAME_OVER) {
         this.state = States.MAIN_MENU;
     } else {
@@ -75,29 +81,56 @@ function update(time, delta) {
     }
 }
 
-function initGame(scene, delta) {
-    if (scene.gridG == null) scene.gridG = createTileGraphics(scene);
-    scene.doggo = new Doggo(scene);
-    scene.score = 0;
-    scene.level = 4;
-    scene.ng = 1;
-    scene.units.push(scene.doggo);
+function nextLevel(scene) {
+    // remove all units but our doggo
+    for (let i = 0; i < scene.units.length; ++i) {
+        let unit = scene.units[i];
+        if (!(unit instanceof Doggo)) {
+            scene.units.splice(scene.units.indexOf(unit), 1);
+            unit.destroy();
+            --i;
+        }
+    }
+
+    if (scene.level / 5 >= 1) {
+        scene.level = 1;
+        ++scene.ng;
+    } else {
+        ++scene.level;
+    }
+    console.log(scene.level, scene.ng);
     initLevel(scene);
 }
 
-function initLevel(scene, delta) {
+function initGame(scene) {
+    scene.doggo = new Doggo(scene);
+    scene.physics.add.existing(scene.doggo);
+    scene.score = 0;
+    scene.level = 1;
+    scene.lives = 3;
+    scene.ng = 0;
+    scene.units.push(scene.doggo);
+    scene.playingMenu.show();
+    initLevel(scene);
+}
+
+function initLevel(scene) {
     let level = scene.level;
     let ng = scene.ng;
     let middleX = scene.tileXCount / 2;
     let lastY = scene.tileYCount - 1;
     scene.doggo.setTilePos(middleX, lastY);
+    scene.doggo.setTargetTilePos(middleX, lastY);
+    scene.doggo.canMove = true;
     
     let horseIndex = 0;
     let safeRowEvery = 2 + ng;
+    scene.gridG = createTileGraphics(scene);
     
     let yRank = lastY - 1;
     for (; yRank > 0; --yRank) {
         if (++horseIndex % (safeRowEvery + 1) == 0) {
+            drawGrassOnRow(scene, scene.gridG, yRank);
             continue;
         }
 
@@ -111,15 +144,12 @@ function initLevel(scene, delta) {
         let horseSpawner = new HorseSpawner(scene, yRank, horseMoveCD, minSpawnCD, maxSpawnCD, startRight);
         scene.units.push(horseSpawner);
 
-        let horseTime = 0;
-        for (let nextHorseX = (startRight) ? -1 : scene.tileXCount; nextHorseX < scene.screenWidth;) {
-
-            nextHorseX += tileSize
+        for (let i = -1; i < scene.tileXCount; ++i) {
             let targetTileX = startRight ? scene.tileXCount : -1;
-            let startTileX = coordsToTilePos(nextHorseX, yRank).x;
-            let hose = new Horsie(scene, startTileX, yRank, targetTileX, yRank, 
-                (1000 * Math.abs(targetTileX - startTileX)) / 6
-            );
+            let startTileX = startRight ? i : scene.tileXCount - 1 - i;
+            let hose = new Horsie(scene, startTileX, yRank, targetTileX, yRank, horseMoveCD);
+            scene.physics.add.existing(hose);
+            scene.physics.add.collider(scene.doggo, hose, scene.dogHorseCollide);
             scene.units.push(hose);
             if (!startRight) hose.flipX = true;
         }
