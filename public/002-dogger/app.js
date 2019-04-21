@@ -161,7 +161,7 @@ function initLevel(scene) {
         let maxCD = 800;
         let horseMoveCD = Math.random() * (maxCD - minCD) + minCD;
 
-        let minSpawnCD = Math.max(3000 - level * 250 - ng * 350, 1000);
+        let minSpawnCD = Math.max(3000 - level * 200 - ng * 350, 1000);
         let maxSpawnCD = minSpawnCD * 1.5;
         let horseSpawner = new HorseSpawner(scene, yRank, horseMoveCD, minSpawnCD, maxSpawnCD, startRight);
         scene.units.push(horseSpawner);
