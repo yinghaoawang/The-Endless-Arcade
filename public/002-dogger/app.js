@@ -111,6 +111,7 @@ function nextLevel(scene) {
     if (scene.level / 5 >= 1) {
         scene.level = 1;
         ++scene.ng;
+        ++scene.lives;
     } else {
         ++scene.level;
     }
