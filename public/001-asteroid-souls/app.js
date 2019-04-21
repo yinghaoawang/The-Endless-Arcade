@@ -20,25 +20,7 @@ var config = {
 
 var devMode = false;
 
-// ajax request to get high scores
-var fetchHighScores = function () {
-    let apiURL = 'http://localhost:5000/hs';
-    if (devMode == false) {
-        apiURL = 'https://stately-app.herokuapp.com/hs'
-    }
-    let numberCheck = $.ajax({
-        url: apiURL,
-        type: 'GET',
-        data: {
-            gameName: 'asteroid-souls',
-            count: 10
-        },
-        dataType: 'json'
-    }).done(function(data) {
-        fetchedHighScores = data;
-        highScores = fetchedHighScores;
-    });
-};
+
 
 // update with new high scores every 10 seconds
 fetchHighScores();

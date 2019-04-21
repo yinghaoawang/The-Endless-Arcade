@@ -16,6 +16,8 @@ var config = {
     }
 };
 
+var devMode = true;
+
 const States = {
     MAIN_MENU: 1,
     IS_PLAYING: 2,
@@ -35,6 +37,20 @@ function preload() {
     }
 }
 
+function gameOver(scene) {
+    for (let i = 0; i < scene.units.length; ++i) {
+        let unit = scene.units[i];
+        if (unit instanceof HorseSpawner) {
+            scene.units.splice(scene.units.indexOf(unit), 1);
+            --i;
+            unit.destroy();
+        }
+    }
+    scene.doggo.destroy();
+    scene.state = States.GAME_OVER;
+    scene.highScoreMenu.show();
+}
+
 function reset(scene) {
     // remove all units but our doggo
     for (let i = 0; i < scene.units.length; ++i) {
@@ -47,6 +63,44 @@ function reset(scene) {
 }
 
 function create() {
+    // ajax request to get high scores
+    this.highScores = [];
+    let scene = this;
+    this.fetchHighScores = function () {
+        let apiURL = 'http://localhost:5000/hs';
+        if (devMode == false) {
+            apiURL = 'https://stately-app.herokuapp.com/hs'
+        }
+        $.ajax({
+            url: apiURL,
+            type: 'GET',
+            data: {
+                gameName: 'asteroid-souls',
+                count: 20
+            },
+            dataType: 'json'
+        }).done(function(data) {
+            scene.highScores = data;
+        });
+    };
+    this.postHighScore = function (name, score) {
+        let apiURL = 'http://localhost:5000/hs';
+        if (devMode == false) {
+            apiURL = 'https://stately-app.herokuapp.com/hs'
+        }
+        $.ajax({
+            url: apiURL,
+            type: 'POST',
+            data: {
+                gameName: 'asteroid-souls',
+                scoreName: name,
+                scoreNumber: score
+            },
+        }).done(function(data) {
+            fetchHighScores();
+        });
+    };
+    this.fetchHighScores();
     this.state = States.MAIN_MENU;
     this.screenWidth = config.width;
     this.screenHeight = config.height;
@@ -64,10 +118,23 @@ function create() {
         --this.lives;
         placeDogInSpawn(this);
         if (this.lives <= 0) {
-            reset(this);
+            gameOver(this);
         }
     };
     this.playingMenu = new PlayingMenu(this);
+    this.highScoreMenu = new HighScoreMenu(this);
+}
+
+function updateUnits(scene, time, delta) {
+    for (let i = 0; i < scene.units.length; ++i) {
+        let unit = scene.units[i];
+        unit.update(time, delta);
+        if (unit instanceof Horsie) {
+            if (typeof unit.finalTargetTile == 'undefined') {
+                unit.destroy();
+            }
+        }
+    }
 }
 
 function update(time, delta) {
@@ -78,22 +145,20 @@ function update(time, delta) {
     } else if (this.state == States.IS_PLAYING) {
         keyboardCheck(this);
         this.playingMenu.update();
-
-        for (let i = 0; i < this.units.length; ++i) {
-            let unit = this.units[i];
-            unit.update(time, delta);
-            if (unit instanceof Horsie) {
-                if (typeof unit.finalTargetTile == 'undefined') {
-                    unit.destroy();
-                }
-            }
-        }
-        if (this.doggo.currTile.y == 0) nextLevel(this);
+        
+        updateUnits(this, time, delta);
+        
+        checkWin(this);
     } else if (this.state == States.GAME_OVER) {
-        this.state = States.MAIN_MENU;
+        this.highScoreMenu.update();
+        updateUnits(this, time, delta);
     } else {
         console.error('ERROR: Unknown game state: ' + this.state);
     }
+}
+
+function checkWin(scene) {
+    if (scene.doggo.currTile.y == 0) nextLevel(scene);
 }
 
 function nextLevel(scene) {
@@ -117,7 +182,6 @@ function nextLevel(scene) {
     } else {
         ++scene.level;
     }
-    console.log(scene.level, scene.ng);
     initLevel(scene);
 }
 
