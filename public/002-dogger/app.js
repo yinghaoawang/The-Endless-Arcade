@@ -62,7 +62,10 @@ function create() {
     this.units = [];
     this.dogHorseCollide = (dog, horse) => {
         --this.lives;
-        if (this.lives <= 0) reset(this);
+        placeDogInSpawn(this);
+        if (this.lives <= 0) {
+            reset(this);
+        }
     };
     this.playingMenu = new PlayingMenu(this);
 }
@@ -127,14 +130,19 @@ function initGame(scene) {
     initLevel(scene);
 }
 
-function initLevel(scene) {
-    let level = scene.level;
-    let ng = scene.ng;
+function placeDogInSpawn(scene) {
     let middleX = scene.tileXCount / 2;
     let lastY = scene.tileYCount - 1;
     scene.doggo.setTilePos(middleX, lastY);
     scene.doggo.setTargetTilePos(middleX, lastY);
     scene.doggo.canMove = true;
+}
+
+function initLevel(scene) {
+    let level = scene.level;
+    let ng = scene.ng;
+    let lastY = scene.tileYCount - 1;
+    placeDogInSpawn(scene);
     
     let horseIndex = 0;
     let safeRowEvery = 2 + ng;
