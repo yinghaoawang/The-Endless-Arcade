@@ -9,7 +9,7 @@ export default class Window extends Phaser.GameObjects.Container {
         if (typeof height == 'undefined') {
             height = 300;
         }
-        console.log(width, height);
+
         this.width = width;
         this.height = height;
 
@@ -31,9 +31,10 @@ export default class Window extends Phaser.GameObjects.Container {
         this.topBar.setDisplaySize(this.width, 30);
         this.add(this.topBar);
 
+        this.paneMargin = 10;
         this.innerPane = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2 + this.topBar.displayHeight, 'window-inner-pane');
         this.innerPane.setOrigin(.5, 0);
-        this.innerPane.setDisplaySize(this.width - 20, this.height - 10 - this.topBar.displayHeight);
+        this.innerPane.setDisplaySize(this.width - this.paneMargin * 2, this.height - this.paneMargin - this.topBar.displayHeight);
         this.innerPane.setInteractive();
         this.add(this.innerPane);
 
@@ -53,10 +54,13 @@ export default class Window extends Phaser.GameObjects.Container {
         });
         this.closeBtn.on('pointerup', function() {
             if (this.closeBtn.clicked) {
-                console.log(this);
+                this.close();
             }
         }.bind(this));
         this.add(this.closeBtn);
-        
+    }
+
+    close() {
+        this.destroy();
     }
 }

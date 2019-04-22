@@ -1,6 +1,6 @@
 import Phaser from 'phaser3';
 import Player from '../unit/Player';
-import Window from '../window/Window';
+import InventoryWindow from '../window/InventoryWindow';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -8,6 +8,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('game-bg', 'assets/backgrounds/game-background.png');
         this.load.image('window-bg', 'assets/window/window-background.png');
         this.load.image('window-top-bar', 'assets/window/window-top-bar.png');
         this.load.image('window-inner-pane', 'assets/window/window-inner-pane.png');
@@ -23,8 +24,11 @@ export default class GameScene extends Phaser.Scene {
         this.player.addItem('arrow', 1000);
         this.player.removeItem('arrow', 1001);
 
-        this.statsWindow = new Window(this, this.screenWidth / 2, this.screenHeight / 2, 562, 200);
-        this.add.existing(this.statsWindow);
+        this.inventoryWindow = new InventoryWindow(this, this.screenWidth / 2, this.screenHeight / 2);
+        this.add.existing(this.inventoryWindow);
+        this.backgroundImage = this.add.image(this.screenWidth / 2, this.screenHeight / 2, 'game-bg');
+        this.backgroundImage.setDisplaySize(this.screenWidth, this.screenHeight);
+        this.backgroundImage.depth = -1000;
     }
 
     update() {
