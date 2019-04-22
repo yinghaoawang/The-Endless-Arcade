@@ -1,7 +1,15 @@
-import { default as idk, Dog, Cat } from './idk';
+import Phaser from 'phaser3';
+import config from './config/config';
+import GameScene from './scenes/GameScene';
 
-let dog = new Dog();
+class Game extends Phaser.Game {
+    constructor() {
+        super(config);
+        this.scene.add('Game', GameScene);
+        this.scene.start('Game');
+    }
+}
 
-let asd = new idk();
-let score = 1000;
-console.log(score);
+window.onload = () => {
+    window.game = new Game();
+};
