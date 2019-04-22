@@ -1,3 +1,5 @@
+import { States } from './States';
+
 class PlayingMenu {
     constructor(scene) {
         this.scene = scene;
@@ -171,3 +173,7 @@ class HighScoreMenu {
     }
     
 }
+
+export {
+    PlayingMenu, MainMenu, HighScoreMenu 
+};

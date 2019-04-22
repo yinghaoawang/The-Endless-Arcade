@@ -39,3 +39,11 @@ function coordsToTilePos(x, y) {
         y: Math.floor((y - tileYOffset - (tileSize / 2)) / tileSize),
     }
 }
+
+const tileSize = 60;
+const tileXOffset = 1;
+const tileYOffset = 0;
+
+export {
+    tileSize, tileXOffset, tileYOffset, createTileGraphics, drawGrassOnRow, tilePosToCoords, coordsToTilePos
+};

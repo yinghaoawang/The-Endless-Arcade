@@ -1,3 +1,5 @@
+import { tileSize, tileXOffset, tileYOffset, createTileGraphics, drawGrassOnRow, tilePosToCoords, coordsToTilePos } from './Tile';
+
 class GridUnit extends Phaser.GameObjects.Sprite {
     constructor(scene, tileX, tileY, texture) {
         super(scene, tilePosToCoords(tileX, tileY).x, tilePosToCoords(tileX, tileY).y, texture);
@@ -184,3 +186,7 @@ class HorseSpawner {
         delete this;
     }
 }
+
+export {
+    GridUnit, ControlledGridUnit, Doggo, Horsie, HorseSpawner
+};

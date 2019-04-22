@@ -1,3 +1,10 @@
+import { keyboardCheck, startGameCheck, setKeySchemes, userNameInputCheck } from './keyboard';
+import { PlayingMenu, MainMenu, HighScoreMenu } from './Menus';
+import { tileSize, tileXOffset, tileYOffset, createTileGraphics, drawGrassOnRow, tilePosToCoords, coordsToTilePos } from './Tile';
+import { GridUnit, ControlledGridUnit, Doggo, Horsie, HorseSpawner } from './Units';
+import { States } from './States';
+
+
 var config = {
     type: Phaser.AUTO,
     width: 541,
@@ -18,15 +25,6 @@ var config = {
 
 var devMode = false;
 
-const States = {
-    MAIN_MENU: 1,
-    IS_PLAYING: 2,
-    GAME_OVER: 3
-}
-
-const tileSize = 60;
-const tileXOffset = 1;
-const tileYOffset = 0;
 const carImages = ['horse1'];
 
 function preload() {
@@ -36,10 +34,6 @@ function preload() {
         this.load.image(carImages[i], 'assets/sprites/' + carImages[i] + '.png');
     }
 }
-
-var userNameCharArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-];
-var userNameCharCSV = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z';
 
 function gameOver(scene) {
     for (let i = 0; i < scene.units.length; ++i) {
@@ -144,7 +138,9 @@ function create() {
 
 function update(time, delta) {
     if (this.state == States.MAIN_MENU) {
-        startGameCheck(this);
+        if (startGameCheck(this)) {
+            toPlayGame(this);
+        }
     } else if (this.state == States.IS_PLAYING) {
         keyboardCheck(this);
 
@@ -158,7 +154,9 @@ function update(time, delta) {
         this.playingMenu.update();
         this.highScoreMenu.update();
 
-        userNameInputCheck(this);
+        if (userNameInputCheck(this)) {
+            toMainMenu(this);
+        }
         updateUnits(this, time, delta);
     } else {
         console.error('ERROR: Unknown game state: ' + this.state);
@@ -280,13 +278,6 @@ function checkWin(scene) {
     if (scene.doggo.currTile.y == 0) {
         scene.score += 100 * (scene.ng + 1) + scene.bonus;
         nextLevel(scene);
-    }
-}
-
-// posts score if reaches requirements
-function tryPostScore(scene) {
-    if (scene.userName.length > 0 && scene.score >= 2000) {
-        scene.postHighScore(scene.userName, scene.score);
     }
 }
 

@@ -1,3 +1,6 @@
+const userNameCharArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+const userNameCharCSV = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z';
+
 function userNameInputCheck(scene) {
     let enterPressed = false;
     let backspacePressed = false;
@@ -13,7 +16,7 @@ function userNameInputCheck(scene) {
 
     if (enterPressed) {
         tryPostScore(scene);
-        toMainMenu(scene);
+        return true;
     } else if (backspacePressed) {
         if (scene.userName.length > 0) {
             scene.userName = scene.userName.substring(0, scene.userName.length - 1);
@@ -22,6 +25,13 @@ function userNameInputCheck(scene) {
         if (scene.userName.length < scene.maxNameLength) {
             scene.userName += keyPressed;
         }
+    }
+}
+
+// posts score if reaches requirements
+function tryPostScore(scene) {
+    if (scene.userName.length > 0 && scene.score >= 2000) {
+        scene.postHighScore(scene.userName, scene.score);
     }
 }
 
@@ -53,7 +63,7 @@ function startGameCheck(scene) {
         }
     }
     if (startPressed) {
-        toPlayGame(scene);
+        return true;
     }
 }
 
@@ -102,3 +112,8 @@ function keyboardCheck(scene) {
         scene.doggo.moveRight();
     }
 }
+
+export {
+    keyboardCheck, startGameCheck, setKeySchemes, userNameInputCheck, userNameCharArray, userNameCharCSV
+};
+

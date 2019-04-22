@@ -81,32 +81,32 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./003-dope-wars/src/app.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./003-dope-wars/app.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./003-dope-wars/src/app.js":
-/*!**********************************!*\
-  !*** ./003-dope-wars/src/app.js ***!
-  \**********************************/
+/***/ "./003-dope-wars/app.js":
+/*!******************************!*\
+  !*** ./003-dope-wars/app.js ***!
+  \******************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _idk__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./idk */ \"./003-dope-wars/src/idk.js\");\n\r\n\r\nlet dog = new _idk__WEBPACK_IMPORTED_MODULE_0__[\"Dog\"]();\r\n\r\nlet asd = new _idk__WEBPACK_IMPORTED_MODULE_0__[\"default\"]();\r\nlet score = 1000;\r\nconsole.log(score);\n\n//# sourceURL=webpack:///./003-dope-wars/src/app.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _idk__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./idk */ \"./003-dope-wars/idk.js\");\n\r\n\r\nlet dog = new _idk__WEBPACK_IMPORTED_MODULE_0__[\"Dog\"]();\r\n\r\nlet asd = new _idk__WEBPACK_IMPORTED_MODULE_0__[\"default\"]();\r\nlet score = 1000;\r\nconsole.log(score);\n\n//# sourceURL=webpack:///./003-dope-wars/app.js?");
 
 /***/ }),
 
-/***/ "./003-dope-wars/src/idk.js":
-/*!**********************************!*\
-  !*** ./003-dope-wars/src/idk.js ***!
-  \**********************************/
+/***/ "./003-dope-wars/idk.js":
+/*!******************************!*\
+  !*** ./003-dope-wars/idk.js ***!
+  \******************************/
 /*! exports provided: default, Dog, Cat */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return idk; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Dog\", function() { return Dog; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Cat\", function() { return Cat; });\nclass idk {\r\n  constructor() {\r\n    console.log('idk man');\r\n  }\r\n  \r\n  sayHello() {\r\n    console.log('hello');\r\n  }\r\n}\r\n\r\nclass Cat extends idk {\r\n  constructor() {\r\n    super();\r\n    console.log('cat');\r\n  }\r\n}\r\n\r\nclass Dog extends idk {\r\n  constructor() {\r\n    super();\r\n    console.log('woof');\r\n  }\r\n}\r\n\r\n\n\n//# sourceURL=webpack:///./003-dope-wars/src/idk.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return idk; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Dog\", function() { return Dog; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Cat\", function() { return Cat; });\nclass idk {\r\n  constructor() {\r\n    console.log('idk man');\r\n  }\r\n  \r\n  sayHello() {\r\n    console.log('hello');\r\n  }\r\n}\r\n\r\nclass Cat extends idk {\r\n  constructor() {\r\n    super();\r\n    console.log('cat');\r\n  }\r\n}\r\n\r\nclass Dog extends idk {\r\n  constructor() {\r\n    super();\r\n    console.log('woof');\r\n  }\r\n}\r\n\r\n\n\n//# sourceURL=webpack:///./003-dope-wars/idk.js?");
 
 /***/ })
 
