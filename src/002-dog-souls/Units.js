@@ -1,4 +1,5 @@
-import { tileSize, tileXOffset, tileYOffset, createTileGraphics, drawGrassOnRow, tilePosToCoords, coordsToTilePos } from './Tile';
+import Phaser from 'phaser3';
+import { tileSize, tilePosToCoords, coordsToTilePos } from './Tile';
 
 class GridUnit extends Phaser.GameObjects.Sprite {
     constructor(scene, tileX, tileY, texture) {

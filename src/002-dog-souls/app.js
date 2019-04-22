@@ -1,3 +1,6 @@
+import $ from 'jquery';
+import Phaser from 'phaser3';
+
 import { keyboardCheck, startGameCheck, setKeySchemes, userNameInputCheck } from './keyboard';
 import { PlayingMenu, MainMenu, HighScoreMenu } from './Menus';
 import { tileSize, tileXOffset, tileYOffset, createTileGraphics, drawGrassOnRow, tilePosToCoords, coordsToTilePos } from './Tile';

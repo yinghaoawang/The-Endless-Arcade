@@ -1,3 +1,6 @@
+import $ from 'jquery';
+import Phaser from 'phaser3';
+
 var config = {
     type: Phaser.AUTO,
     width: 800,
@@ -104,14 +107,14 @@ var asteroidMaxDivisions = 5;
 var asteroidList = [];
 var asteroidImageNames = ['asteroid4'];
 
-var allyCategory;
-var enemyCategory;
+var allyGroup;
+var enemyGroup;
 
 var titleText;
 var startText;
 var gameOverText;
 var scoreText;
-var highScoresText;
+var highScoreText;
 var scoreNameText;
 var highScoreNameText;
 var userScoreNameText;
