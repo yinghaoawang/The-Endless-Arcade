@@ -10,4 +10,8 @@ export default class Unit {
     addItem(item, quantity) {
         return this.inventory.addItem(item, quantity);
     }
+
+    removeItem(item, quantity) {
+        return this.inventory.removeItem(item, quantity);
+    }
 }
