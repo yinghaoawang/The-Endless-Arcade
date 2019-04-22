@@ -97,6 +97,18 @@ eval("!function(t,e){ true?module.exports=e():undefined}(window,function(){retur
 
 /***/ }),
 
+/***/ "./003-dope-wars/MessageHandler.js":
+/*!*****************************************!*\
+  !*** ./003-dope-wars/MessageHandler.js ***!
+  \*****************************************/
+/*! exports provided: messageHandler, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"messageHandler\", function() { return messageHandler; });\nclass MessageHandler {\n    constructor() {\n        this.lastMessage = '';\n        this.lastError = '';\n    }\n    printError(message) {\n        this.lastError = message;\n        console.error(message);\n    }\n    print(message) {\n        this.lastMessage = message;\n        console.log(message);\n    }\n    getLastMessage() {\n        return this.lastMessage();\n    }\n    getLastError() {\n        return this.lastError();\n    }\n}\n\nlet messageHandler = new MessageHandler();\n\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (messageHandler);\n\n\n//# sourceURL=webpack:///./003-dope-wars/MessageHandler.js?");
+
+/***/ }),
+
 /***/ "./003-dope-wars/app.js":
 /*!******************************!*\
   !*** ./003-dope-wars/app.js ***!
@@ -113,11 +125,47 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var phas
 /*!****************************************!*\
   !*** ./003-dope-wars/config/config.js ***!
   \****************************************/
-/*! exports provided: config */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"config\", function() { return config; });\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n\n\nlet config = {\n    type: phaser3__WEBPACK_IMPORTED_MODULE_0___default.a.AUTO,\n    width: 800,\n    height: 600,\n    pixelArt: true,\n    physics: {\n        default: 'arcade',\n        arcade: {\n            debug: false,\n        }\n    },\n    scene: {\n        preload: 'preload',\n        create: 'create',\n        update: 'update'\n    }\n};\n\n\n//# sourceURL=webpack:///./003-dope-wars/config/config.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n    type: phaser3__WEBPACK_IMPORTED_MODULE_0___default.a.AUTO,\n    width: 800,\n    height: 600,\n    pixelArt: true,\n    physics: {\n        default: 'arcade',\n        arcade: {\n            debug: false,\n        }\n    },\n});\n\n\n//# sourceURL=webpack:///./003-dope-wars/config/config.js?");
+
+/***/ }),
+
+/***/ "./003-dope-wars/inventory/Inventory.js":
+/*!**********************************************!*\
+  !*** ./003-dope-wars/inventory/Inventory.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return Inventory; });\n/* harmony import */ var _item_Item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../item/Item */ \"./003-dope-wars/item/Item.js\");\n/* harmony import */ var _ItemSlot__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ItemSlot */ \"./003-dope-wars/inventory/ItemSlot.js\");\n/* harmony import */ var _MessageHandler__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../MessageHandler */ \"./003-dope-wars/MessageHandler.js\");\n\n\n\n\nclass Inventory {\n    constructor(maxSlots) {\n        if (typeof maxSlots == 'undefined') {\n            maxSlots = 10;\n        }\n        this.maxSlots = maxSlots;\n        this.slots = [];\n    }\n\n    addItem(item, quantity) {\n        if (!(item instanceof _item_Item__WEBPACK_IMPORTED_MODULE_0__[\"default\"])) {\n            _MessageHandler__WEBPACK_IMPORTED_MODULE_2__[\"default\"].printError('addItem() requires an item.');\n            return false;\n        }\n\n        let requiredSlots = Math.floor(quantity / item.maxStack);\n        let lastStackSize = quantity % item.maxStack;\n        if (lastStackSize == 0) {\n            --requiredSlots;\n            lastStackSize = item.maxStack;\n        }\n\n        if (this.slots.length + requiredSlots >= this.maxSlots) {\n            _MessageHandler__WEBPACK_IMPORTED_MODULE_2__[\"default\"].print('Inventory does not have enough slots to add ' + item.name + '.');\n            return false;\n        }\n\n        for (let i = 0; i < requiredSlots + 1; ++i) {\n            if (i == requiredSlots) {\n                this.slots.push(new _ItemSlot__WEBPACK_IMPORTED_MODULE_1__[\"default\"](item, lastStackSize));\n            } else {\n                this.slots.push(new _ItemSlot__WEBPACK_IMPORTED_MODULE_1__[\"default\"](item, item.maxStack));\n            }\n        }\n    }\n}\n\n\n//# sourceURL=webpack:///./003-dope-wars/inventory/Inventory.js?");
+
+/***/ }),
+
+/***/ "./003-dope-wars/inventory/ItemSlot.js":
+/*!*********************************************!*\
+  !*** ./003-dope-wars/inventory/ItemSlot.js ***!
+  \*********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return ItemSlot; });\n/* harmony import */ var _MessageHandler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../MessageHandler */ \"./003-dope-wars/MessageHandler.js\");\n/* harmony import */ var _item_Item__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../item/Item */ \"./003-dope-wars/item/Item.js\");\n\n\n\nclass ItemSlot {\n    constructor(item, quantity) {\n        if (!(item instanceof _item_Item__WEBPACK_IMPORTED_MODULE_1__[\"default\"])) {\n            _MessageHandler__WEBPACK_IMPORTED_MODULE_0__[\"default\"].printError('ItemSlot.addItem() requires an item.');\n            return;\n        }\n        if (typeof quantity == 'undefined') {\n            _MessageHandler__WEBPACK_IMPORTED_MODULE_0__[\"default\"].printError('ItemSlot.addItem() requires a quantity value.');\n            return;\n        }\n        if (quantity <= 0) {\n            _MessageHandler__WEBPACK_IMPORTED_MODULE_0__[\"default\"].print('Must have a quantity value greater than 0 to add the item.');\n            return;\n        }\n        if (quantity > item.maxStack) {\n            _MessageHandler__WEBPACK_IMPORTED_MODULE_0__[\"default\"].print('Quantity exceeds the item\\'s max stack.');\n            return;\n        }\n        this.item = item;\n        this.quantity = quantity;\n        return;\n    }\n}\n\n\n//# sourceURL=webpack:///./003-dope-wars/inventory/ItemSlot.js?");
+
+/***/ }),
+
+/***/ "./003-dope-wars/item/Item.js":
+/*!************************************!*\
+  !*** ./003-dope-wars/item/Item.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return Item; });\nclass Item {\n    constructor(name, maxStack) {\n        this.name = name;\n        if (typeof maxStack == 'undefined') maxStack = 1;\n        this.maxStack = maxStack;\n    }\n}\n\n//# sourceURL=webpack:///./003-dope-wars/item/Item.js?");
 
 /***/ }),
 
@@ -129,7 +177,31 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) *
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return GameScene; });\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n\n\nclass GameScene extends phaser3__WEBPACK_IMPORTED_MODULE_0___default.a.Scene {\n    constructor() {\n        super();\n    }\n\n    preload() {\n\n    }\n\n    create() {\n\n    }\n\n    update() {\n    }\n}\n\n//# sourceURL=webpack:///./003-dope-wars/scenes/GameScene.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return GameScene; });\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _unit_Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../unit/Player */ \"./003-dope-wars/unit/Player.js\");\n/* harmony import */ var _item_Item__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../item/Item */ \"./003-dope-wars/item/Item.js\");\n\n\n\n\nclass GameScene extends phaser3__WEBPACK_IMPORTED_MODULE_0___default.a.Scene {\n    constructor() {\n        super();\n    }\n\n    preload() {\n\n    }\n\n    create() {\n        this.player = new _unit_Player__WEBPACK_IMPORTED_MODULE_1__[\"default\"]('Jonah');\n        let sword = new _item_Item__WEBPACK_IMPORTED_MODULE_2__[\"default\"]('Sword', 1);\n        let arrow = new _item_Item__WEBPACK_IMPORTED_MODULE_2__[\"default\"]('Arrow', 100);\n        this.player.addItem(arrow, 200);\n        console.log(this.player);\n    }\n\n    update() {\n    }\n}\n\n\n//# sourceURL=webpack:///./003-dope-wars/scenes/GameScene.js?");
+
+/***/ }),
+
+/***/ "./003-dope-wars/unit/Player.js":
+/*!**************************************!*\
+  !*** ./003-dope-wars/unit/Player.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return Player; });\n/* harmony import */ var _Unit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Unit */ \"./003-dope-wars/unit/Unit.js\");\n\n\nclass Player extends _Unit__WEBPACK_IMPORTED_MODULE_0__[\"default\"] {\n    constructor(name) {\n        super(name);\n    }\n}\n\n//# sourceURL=webpack:///./003-dope-wars/unit/Player.js?");
+
+/***/ }),
+
+/***/ "./003-dope-wars/unit/Unit.js":
+/*!************************************!*\
+  !*** ./003-dope-wars/unit/Unit.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return Unit; });\n/* harmony import */ var _inventory_Inventory__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../inventory/Inventory */ \"./003-dope-wars/inventory/Inventory.js\");\n\n\nclass Unit {\n    constructor(name) {\n        this.name = name;\n        this.gold = 0;\n        this.inventory = new _inventory_Inventory__WEBPACK_IMPORTED_MODULE_0__[\"default\"]();\n    }\n\n    addItem(item, quantity) {\n        return this.inventory.addItem(item, quantity);\n    }\n}\n\n//# sourceURL=webpack:///./003-dope-wars/unit/Unit.js?");
 
 /***/ })
 

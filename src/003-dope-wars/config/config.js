@@ -1,6 +1,6 @@
 import Phaser from 'phaser3';
 
-export let config = {
+export default {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
@@ -11,9 +11,4 @@ export let config = {
             debug: false,
         }
     },
-    scene: {
-        preload: 'preload',
-        create: 'create',
-        update: 'update'
-    }
 };
