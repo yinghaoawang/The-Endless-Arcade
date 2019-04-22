@@ -9,22 +9,12 @@ export default class Window extends Phaser.GameObjects.Container {
         if (typeof height == 'undefined') {
             height = 300;
         }
+        console.log(width, height);
         this.width = width;
         this.height = height;
 
         this.backgroundImage = new Phaser.GameObjects.Image(scene, 0, 0, 'window-bg');
         this.backgroundImage.setDisplaySize(this.width, this.height);
-        this.add(this.backgroundImage);
-
-        this.topBar = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2 + 15, 'window-top-bar');
-        this.topBar.setDisplaySize(this.width, 30);
-        this.add(this.topBar);
-
-        this.innerPane = new Phaser.GameObjects.Image(scene, 0, 10, 'window-inner-pane');
-        this.innerPane.setDisplaySize(380, 260);
-        this.add(this.innerPane);
-        this.innerPane.setInteractive();
-
         this.backgroundImage.setInteractive({ draggable: true });
         this.backgroundImage.on('dragstart', function(pointer) {
             this.dragDistX = pointer.x - this.x;
@@ -34,11 +24,22 @@ export default class Window extends Phaser.GameObjects.Container {
             this.x = pointer.x - this.dragDistX,
             this.y = pointer.y - this.dragDistY
         }.bind(this));
+        this.add(this.backgroundImage);
 
-        this.closeBtn = new Phaser.GameObjects.Image(scene, this.width / 2 - 15, -1 * this.height / 2 + 15, 'window-close-btn');
-        this.closeBtn.setDisplaySize(17.5, 17.5);
-        this.add(this.closeBtn);
-        
+        this.topBar = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2, 'window-top-bar');
+        this.topBar.setOrigin(.5, 0)
+        this.topBar.setDisplaySize(this.width, 30);
+        this.add(this.topBar);
+
+        this.innerPane = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2 + this.topBar.displayHeight, 'window-inner-pane');
+        this.innerPane.setOrigin(.5, 0);
+        this.innerPane.setDisplaySize(this.width - 20, this.height - 10 - this.topBar.displayHeight);
+        this.innerPane.setInteractive();
+        this.add(this.innerPane);
+
+        this.closeBtn = new Phaser.GameObjects.Image(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 'window-close-btn');
+        this.closeBtn.setOrigin(1, 0);
+        this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
         this.closeBtn.setInteractive();
         this.closeBtn.on('pointerdown', function() {
             this.clicked = true;
@@ -55,7 +56,7 @@ export default class Window extends Phaser.GameObjects.Container {
                 console.log(this);
             }
         }.bind(this));
-
+        this.add(this.closeBtn);
         
     }
 }

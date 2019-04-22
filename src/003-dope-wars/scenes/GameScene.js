@@ -23,7 +23,7 @@ export default class GameScene extends Phaser.Scene {
         this.player.addItem('arrow', 1000);
         this.player.removeItem('arrow', 1001);
 
-        this.statsWindow = new Window(this, this.screenWidth / 2, this.screenHeight / 2);
+        this.statsWindow = new Window(this, this.screenWidth / 2, this.screenHeight / 2, 562, 200);
         this.add.existing(this.statsWindow);
     }
 
