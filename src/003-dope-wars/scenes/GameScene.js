@@ -1,6 +1,7 @@
 import Phaser from 'phaser3';
 import Player from '../unit/Player';
 import InventoryWindow from '../window/InventoryWindow';
+import { setKeySchemes } from '../keyboard/KeyboardInput';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -29,8 +30,11 @@ export default class GameScene extends Phaser.Scene {
         this.backgroundImage = this.add.image(this.screenWidth / 2, this.screenHeight / 2, 'game-bg');
         this.backgroundImage.setDisplaySize(this.screenWidth, this.screenHeight);
         this.backgroundImage.depth = -1000;
+
+        setKeySchemes(this);
     }
 
     update() {
+        this.inventoryWindow.update();
     }
 }

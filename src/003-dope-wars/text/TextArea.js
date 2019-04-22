@@ -5,5 +5,6 @@ export default class TextArea extends Text {
         super(scene, x, y, text);
         this.setWordWrapWidth(width);
         this.setMaxLines(maxLines);
+        
     }
 }

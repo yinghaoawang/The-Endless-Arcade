@@ -10,6 +10,8 @@ export default class Window extends Phaser.GameObjects.Container {
             height = 300;
         }
 
+        this.updateList = [];
+
         this.width = width;
         this.height = height;
 
@@ -60,7 +62,21 @@ export default class Window extends Phaser.GameObjects.Container {
         this.add(this.closeBtn);
     }
 
+    update() {
+        for (let i = 0; i < this.updateList.length; ++i) {
+            let updateItem = this.updateList[i];
+            updateItem.update();
+        }
+    }
+
     close() {
+        for (let i = 0; i < this.updateList.length; ++i) {
+            let updateItem = this.updateList[i];
+            updateItem.destroy();
+            this.updateList.splice(i, 1);
+            --i;
+        }
         this.destroy();
+        
     }
 }

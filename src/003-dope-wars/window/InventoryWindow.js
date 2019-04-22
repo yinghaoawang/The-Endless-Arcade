@@ -1,5 +1,7 @@
 import Window from './Window';
 import Text from '../text/Text';
+import TextField from '../text/TextField';
+import messageHandler from '../MessageHandler';
 
 export default class InventoryWindow extends Window {
     constructor(scene, x, y) {
@@ -10,15 +12,19 @@ export default class InventoryWindow extends Window {
         this.itemNameText = new Text(this.scene, itemRowXOffset, itemRowYOffset, 'Name');
         this.add(this.itemNameText);
 
-        let priceXOffset = itemRowXOffset + 100;
-        this.itemPriceText = new Text(this.scene, priceXOffset, itemRowYOffset, 'Price');
-        this.add(this.itemPriceText);
-
-        let quantityXOffset = priceXOffset + 80;
+        let quantityXOffset = itemRowXOffset + 100;
         this.itemQuantityText = new Text(this.scene, quantityXOffset, itemRowYOffset, 'Qty.');
         this.add(this.itemQuantityText);
 
-        let valueXOffset = quantityXOffset + 60;
+        let priceXOffset = quantityXOffset + 60;
+        this.itemPriceText = new Text(this.scene, priceXOffset, itemRowYOffset, 'Price');
+        this.add(this.itemPriceText);
+
+        let dealQuantityXOffset = priceXOffset + 80;
+        this.itemDealQuantityText = new Text(this.scene, dealQuantityXOffset, itemRowYOffset, 'Deal Qty.');
+        this.add(this.itemDealQuantityText);
+
+        let valueXOffset = dealQuantityXOffset + 70;
         this.itemValueText = new Text(this.scene, valueXOffset, itemRowYOffset, 'Value');
         this.add(this.itemValueText);
 
@@ -26,17 +32,54 @@ export default class InventoryWindow extends Window {
         let itemRowDistance = 20;
 
         this.itemNameTexts = this.createTextRow(itemRowXOffset, itemRowYOffset, itemRowDistance, 'Battleaxe');
-        this.itemPriceTexts = this.createTextRow(priceXOffset, itemRowYOffset, itemRowDistance, '$1000000');
         this.itemQuantityTexts = this.createTextRow(quantityXOffset, itemRowYOffset, itemRowDistance, 10);
+        this.itemPriceTexts = this.createTextRow(priceXOffset, itemRowYOffset, itemRowDistance, '$11111111');
+        this.itemDealQuantityTexts = this.createInputTextRow(dealQuantityXOffset, itemRowYOffset, itemRowDistance, 40, '0');
         this.itemValueTexts = this.createTextRow(valueXOffset, itemRowYOffset, itemRowDistance, '$10000000');
+        
+        this.updateList.push(...this.itemDealQuantityTexts);
     }
 
-    createTextRow(rowXOffset, rowYOffset, itemRowDistance, message) {
+    update() {
+        super.update();
+        for (let i = 0; i < this.itemRows; ++i) {
+            let itemDealQuantityText = this.itemDealQuantityTexts[i].trueText;
+            
+            let itemPrice = this.itemPriceTexts[i].text;
+            if (itemPrice[0] != '$') {
+                messageHandler.printError('Price does not have a dollar sign in front.');
+                return;
+            } else {
+                itemPrice = itemPrice.substring(1);
+            }
+            
+            
+            if (itemDealQuantityText.length == 0) {
+                itemDealQuantityText = 0;
+            }
+            
+            let itemValue = itemDealQuantityText * itemPrice;
+            this.itemValueTexts[i].setText('$' + itemValue);
+        }
+    }
+
+    createTextRow(rowXOffset, rowYOffset, rowDistance, message) {
         let texts = [];
         for (let i = 0; i < this.itemRows; ++i) {
-            let text = new Text(this.scene, rowXOffset, rowYOffset + itemRowDistance * (i + 1), message);
+            let text = new Text(this.scene, rowXOffset, rowYOffset + rowDistance * (i + 1), message);
             texts.push(text);
             this.add(text);
+        }
+        return texts;
+    }
+
+    createInputTextRow(rowXOffset, rowYOffset, rowDistance, rowWidth, message) {
+        let texts = [];
+        for (let i = 0; i < this.itemRows; ++i) {
+            let inputText = new TextField(this.scene, rowXOffset, rowYOffset + rowDistance * (i + 1), rowWidth, this, message);
+            inputText.name = 'input-text-' + i;
+            texts.push(inputText);
+            this.add(inputText);
         }
         return texts;
     }
