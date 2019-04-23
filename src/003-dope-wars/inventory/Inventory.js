@@ -108,7 +108,7 @@ export default class Inventory {
             if (slot.item == item) availableQuantity += item.maxStack - slot.quantity;
         }
         if (availableQuantity < quantity) {
-            messageHandler.print('Inventory does not have enough slots to add ' + item.name + '.');
+            messageHandler.print('Inventory does not have enough slots to add ' + quantity + ' ' + item.name + '.');
             return false;
         }
 
@@ -129,9 +129,7 @@ export default class Inventory {
             }
         }
         if (remainingQuantity > 0) {
-            
             for (let i = this.slots.length; i < this.maxSlots; ++i) {
-
                 if (remainingQuantity > item.maxStack) {
                     this.slots[i] = new ItemSlot(item, item.maxStack);
                     remainingQuantity -= item.maxStack;

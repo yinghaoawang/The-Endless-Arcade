@@ -40,6 +40,22 @@ export default class InventoryWindow extends Window {
         this.updateList.push(...this.itemDealQuantityTexts);
     }
 
+    showRow(index) {
+        this.itemNameTexts[index].setVisible(true);
+        this.itemQuantityTexts[index].setVisible(true);
+        this.itemPriceTexts[index].setVisible(true);
+        this.itemDealQuantityTexts[index].setVisible(true);
+        this.itemValueTexts[index].setVisible(true);
+    }
+
+    hideRow(index) {
+        this.itemNameTexts[index].setVisible(false);
+        this.itemQuantityTexts[index].setVisible(false);
+        this.itemPriceTexts[index].setVisible(false);
+        this.itemDealQuantityTexts[index].setVisible(false);
+        this.itemValueTexts[index].setVisible(false);
+    }
+
     update() {
         super.update();
         this.syncUserInventory();
@@ -47,6 +63,16 @@ export default class InventoryWindow extends Window {
     }
 
     syncUserInventory() {
+        let playerInventory = this.scene.player.inventory;
+        for (let i = 0; i < playerInventory.slots.length; ++i) {
+            let slot = playerInventory.slots[i];
+            this.itemNameTexts[i].setText(slot.item.name);
+            this.itemQuantityTexts[i].setText(slot.quantity);
+            this.showRow(i);
+        }
+        for (let i = playerInventory.slots.length; i < playerInventory.maxSlots; ++i) {
+            this.hideRow(i);
+        }
     }
 
     updateDealQuantityValue() {

@@ -22,10 +22,11 @@ export default class GameScene extends Phaser.Scene {
         this.screenHeight = this.cameras.main.height;
 
         this.player = new Player('Jonah');
-        this.player.addItem('arrow', 3230);
+        this.player.addItem('arrow', 3212);
         this.player.addItem('arrow', 2);
         this.player.addItem('sword', 2);
         this.player.addItem('shield', 1);
+        this.player.addItem('bow', 1);
 
 
         console.log(this.player);
