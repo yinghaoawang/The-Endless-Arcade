@@ -4,7 +4,7 @@ import messageHandler from '../MessageHandler';
 export let ItemList = [
     new Item('Sword'),
     new Item('Shield'),
-    new Item('Arrow', 100),
+    new Item('Arrow', 1000),
 ];
 
 export function getItemByName(name) {

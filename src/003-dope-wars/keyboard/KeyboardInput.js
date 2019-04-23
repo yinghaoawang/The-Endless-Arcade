@@ -6,6 +6,14 @@ const numberKeysArray = ['ZERO', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', '
 function setKeySchemes(scene) {
     scene.numberScheme = scene.input.keyboard.addKeys(numberKeysCSV);
     scene.backspaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);
+    scene.enterKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+}
+
+function enterInputListener(scene) {
+    if (Phaser.Input.Keyboard.JustDown(scene.enterKey)) {
+        return true;
+    }
+    return false;
 }
 
 function backspaceInputListener(scene) {
@@ -27,4 +35,4 @@ function numberInputListener(scene) {
     return null;
 }
 
-export { setKeySchemes, numberInputListener, backspaceInputListener };
+export { setKeySchemes, numberInputListener, backspaceInputListener, enterInputListener };

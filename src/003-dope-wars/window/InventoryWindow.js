@@ -21,10 +21,10 @@ export default class InventoryWindow extends Window {
         this.add(this.itemPriceText);
 
         let dealQuantityXOffset = priceXOffset + 80;
-        this.itemDealQuantityText = new Text(this.scene, dealQuantityXOffset, itemRowYOffset, 'Deal Qty.');
+        this.itemDealQuantityText = new Text(this.scene, dealQuantityXOffset, itemRowYOffset, 'Deal');
         this.add(this.itemDealQuantityText);
 
-        let valueXOffset = dealQuantityXOffset + 70;
+        let valueXOffset = dealQuantityXOffset + 50;
         this.itemValueText = new Text(this.scene, valueXOffset, itemRowYOffset, 'Value');
         this.add(this.itemValueText);
 
@@ -34,7 +34,7 @@ export default class InventoryWindow extends Window {
         this.itemNameTexts = this.createTextRow(itemRowXOffset, itemRowYOffset, itemRowDistance, 'Battleaxe');
         this.itemQuantityTexts = this.createTextRow(quantityXOffset, itemRowYOffset, itemRowDistance, 10);
         this.itemPriceTexts = this.createTextRow(priceXOffset, itemRowYOffset, itemRowDistance, '$11111111');
-        this.itemDealQuantityTexts = this.createInputTextRow(dealQuantityXOffset, itemRowYOffset, itemRowDistance, 40, '0');
+        this.itemDealQuantityTexts = this.createInputTextRow(dealQuantityXOffset, itemRowYOffset, itemRowDistance, 32, '0');
         this.itemValueTexts = this.createTextRow(valueXOffset, itemRowYOffset, itemRowDistance, '$10000000');
         
         this.updateList.push(...this.itemDealQuantityTexts);
@@ -42,6 +42,14 @@ export default class InventoryWindow extends Window {
 
     update() {
         super.update();
+        this.syncUserInventory();
+        this.updateDealQuantityValue();
+    }
+
+    syncUserInventory() {
+    }
+
+    updateDealQuantityValue() {
         for (let i = 0; i < this.itemRows; ++i) {
             let itemDealQuantityText = this.itemDealQuantityTexts[i].trueText;
             
@@ -52,7 +60,6 @@ export default class InventoryWindow extends Window {
             } else {
                 itemPrice = itemPrice.substring(1);
             }
-            
             
             if (itemDealQuantityText.length == 0) {
                 itemDealQuantityText = 0;
@@ -76,7 +83,7 @@ export default class InventoryWindow extends Window {
     createInputTextRow(rowXOffset, rowYOffset, rowDistance, rowWidth, message) {
         let texts = [];
         for (let i = 0; i < this.itemRows; ++i) {
-            let inputText = new TextField(this.scene, rowXOffset, rowYOffset + rowDistance * (i + 1), rowWidth, this, message);
+            let inputText = new TextField(this.scene, rowXOffset, rowYOffset + rowDistance * (i + 1), rowWidth, this, 4, message);
             inputText.name = 'input-text-' + i;
             texts.push(inputText);
             this.add(inputText);

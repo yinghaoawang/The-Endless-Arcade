@@ -1,15 +1,15 @@
 import Phaser from 'phaser3';
 
 import Text from './Text';
-import { numberInputListener, backspaceInputListener } from '../keyboard/KeyboardInput';
+import { numberInputListener, backspaceInputListener, enterInputListener } from '../keyboard/KeyboardInput';
 
 export default class TextField extends Text {
-    constructor(scene, x, y, width, parentContainer, text) {
+    constructor(scene, x, y, width, parentContainer, maxTrueText, text) {
         super(scene, x, y, text);
         this.trueText = text;
         this.trueWidth = width;
         this.trueHeight = this.height;
-        this.maxTrueText = 5;
+        this.maxTrueText = maxTrueText;
         this.setWordWrapWidth(width);
         
         this.setMaxLines(1);
@@ -30,10 +30,16 @@ export default class TextField extends Text {
         });
     }
 
+    setVisible(value) {
+        this.backgroundRect.setVisible(value);
+        super.setVisible(value);
+    }
+
     update() {
         if (this.scene.selectedInput === this) {
             let numberPressed = numberInputListener(this.scene);
             let backspaceInput = backspaceInputListener(this.scene);
+            let enterInput = enterInputListener(this.scene);
             
             if (numberPressed != null && this.trueText.length < this.maxTrueText) {
                 this.trueText += numberPressed;
@@ -42,6 +48,9 @@ export default class TextField extends Text {
                 if (this.trueText.length > 0) {
                     this.trueText = this.trueText.substring(0, this.trueText.length - 1);
                 }
+            }
+            if (enterInput) {
+                this.scene.selectedInput = null;
             }
 
             if (this.trueText.length < this.maxTrueText) {

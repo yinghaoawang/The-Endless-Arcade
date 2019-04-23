@@ -1,6 +1,6 @@
 import Item from '../item/Item';
-import { getItemByName } from '../item/ItemList';
 import ItemSlot from './ItemSlot';
+import { getItemByName } from '../item/ItemList';
 import messageHandler from '../MessageHandler';
 
 export default class Inventory {
@@ -100,24 +100,47 @@ export default class Inventory {
             messageHandler.printError('Inventory.addItem() requires a positive or zero quantity');
         }
 
-        let requiredSlots = Math.floor(quantity / item.maxStack);
-        let lastStackSize = quantity % item.maxStack;
-        if (lastStackSize == 0) {
-            --requiredSlots;
-            lastStackSize = item.maxStack;
+        let emptySlots = this.maxSlots - this.slots.length;
+        let availableQuantity = emptySlots * item.maxStack;
+        
+        for (let i = 0; i < this.slots; ++i) {
+            let slot = this.slots[i];
+            if (slot.item == item) availableQuantity += item.maxStack - slot.quantity;
         }
-
-        if (this.slots.length + requiredSlots >= this.maxSlots) {
+        if (availableQuantity < quantity) {
             messageHandler.print('Inventory does not have enough slots to add ' + item.name + '.');
             return false;
         }
 
-        for (let i = 0; i < requiredSlots + 1; ++i) {
-            if (i == requiredSlots) {
-                this.slots.push(new ItemSlot(item, lastStackSize));
-            } else {
-                this.slots.push(new ItemSlot(item, item.maxStack));
+        let remainingQuantity = quantity;
+        
+        for (let i = 0; i < this.slots.length; ++i) {
+            let slot = this.slots[i];
+            if (slot.item == item) {
+                let stackableQuantity = item.maxStack - slot.quantity;
+                if (stackableQuantity >= remainingQuantity) {
+                    slot.quantity += remainingQuantity;
+                    remainingQuantity = 0;
+                    break;
+                } else {
+                    remainingQuantity -= stackableQuantity;
+                    slot.quantity += stackableQuantity;
+                }
             }
         }
+        if (remainingQuantity > 0) {
+            
+            for (let i = this.slots.length; i < this.maxSlots; ++i) {
+
+                if (remainingQuantity > item.maxStack) {
+                    this.slots[i] = new ItemSlot(item, item.maxStack);
+                    remainingQuantity -= item.maxStack;
+                } else {
+                    this.slots[i] = new ItemSlot(item, remainingQuantity);
+                    return;
+                }
+            }
+        }
+        messageHandler.printError('Algorithm for adding item stacks incorrect.');
     }
 }
