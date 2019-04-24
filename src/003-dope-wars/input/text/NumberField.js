@@ -37,6 +37,7 @@ export default class NumberTextField extends Text {
 
     update() {
         if (this.scene.selectedInput === this) {
+            this.trueText += '';
             let numberPressed = numberInputListener(this.scene);
             let backspaceInput = backspaceInputListener(this.scene);
             let enterInput = enterInputListener(this.scene);

@@ -3,7 +3,6 @@ import Phaser from 'phaser3';
 export default class Button extends Phaser.GameObjects.Image {
     constructor(scene, x, y, width, height, pointerUpTexture, pointerDownTexture, pointerOverTexture) {
         super(scene, x, y, pointerUpTexture);
-        this.setSize(width, height);
         this.setDisplaySize(width, height);
         this.pointerUpTexture = pointerUpTexture;
         this.pointerDownTexture = pointerDownTexture;

@@ -39,12 +39,32 @@ export default class Inventory {
         }
         return count;
     }
+
+    removeItemAtIndex(index, quantity) {
+        let item = this.slots[index].item;
+        if (quantity > item.maxStack) {
+            messageHandler.printError('Cannot to remove a quantity at index greater than the max stack.');
+            return false;
+        }
+        if (quantity > this.slots[index].quantity) {
+            messageHandler.printError('Item slot does not have enough quantity to be removed.');
+            return false;
+        }
+
+        if (quantity == this.slots[index].quantity) {
+            this.slots.splice(index, 1);
+        } else {
+            this.slots[index].quantity -= quantity;
+        }
+        return true;
+    }
     
 
     removeItem(item, quantity) {
         if (typeof item === 'string') {
             item = getItemByName(item);
             if (item == null) {
+                messageHandler.printError('Item with name ' + item + 'doesn\'t exist.');
                 return false;
             }
         }
@@ -83,10 +103,15 @@ export default class Inventory {
         }
     }
 
+    addItemAtIndex(slotIndex, quantity) {
+        this.addItem(this.slots[slotIndex].item, quantity);
+    }
+
     addItem(item, quantity) {
         if (typeof item === 'string') {
             item = getItemByName(item);
             if (item == null) {
+                messageHandler.printError('Item with name ' + item + 'doesn\'t exist.');
                 return false;
             }
         }

@@ -1,10 +1,11 @@
 import Text from '../input/text/Text';
 import messageHandler from '../MessageHandler';
 import Window from './Window';
+import AlertWindow from './AlertWindow';
 
 export default class InventoryWindow extends Window {
     constructor(scene, x, y) {
-        super(scene, x, y, 500, 300);
+        super(scene, x, y, 500, 300, 'Inventory');
 
         let xOffset = -1 * this.width / 2 + this.paneMargin + 10;
         let yOffset = -1 * this.height / 2 + this.topBar.displayHeight + this.paneMargin;
@@ -27,12 +28,22 @@ export default class InventoryWindow extends Window {
         this.itemValueText = new Text(this.scene, valueXOffset, yOffset, 'Value');
         this.add(this.itemValueText);
 
+        let sellXOffset = valueXOffset + 80;
+        this.itemValueText = new Text(this.scene, sellXOffset, yOffset, 'Sell');
+        this.add(this.itemValueText);
+
+        /*
+        let sellXOffset = buyXOffset + 40;
+        this.itemValueText = new Text(this.scene, sellXOffset, yOffset, 'Sell');
+        this.add(this.itemValueText);
+        */
+
         let colDistance = 20;
         this.itemRows = 10;
 
         this.itemNameTexts = this.createTextCol(xOffset, yOffset + colDistance, colDistance, 'Battleaxe', this.itemRows);
         this.itemQuantityTexts = this.createTextCol(quantityXOffset, yOffset + colDistance, colDistance, 10, this.itemRows);
-        this.itemPriceTexts = this.createTextCol(priceXOffset, yOffset + colDistance, colDistance, '$11111111', this.itemRows);
+        this.itemPriceTexts = this.createTextCol(priceXOffset, yOffset + colDistance, colDistance, '$11111', this.itemRows);
 
         // special input field
         this.itemDealQuantityTexts = this.createInputTextCol(dealQuantityXOffset, yOffset + colDistance, colDistance, 0, this.itemRows, 32);
@@ -40,12 +51,42 @@ export default class InventoryWindow extends Window {
         this.itemValueTexts = this.createTextCol(valueXOffset, yOffset + colDistance, colDistance, '$10000000', this.itemRows);
 
         // special button
-        this.buyButtons = this.createButtonCol(valueXOffset + 80, 2 + yOffset + colDistance, colDistance, 15, 15, 'Buy', this.itemRows);
-        this.buyButtons.forEach((button) => {
+        let buttonPadding = 2;
+        this.sellButtons = this.createButtonCol(buttonPadding + sellXOffset, buttonPadding + yOffset + colDistance, colDistance, 15, 15, this.itemRows, 'item-sell-btn', 'item-sell-btn-down', 'item-sell-btn-over');
+        // TODO this probably shouldn't go in this file
+        this.sellButtons.forEach((button) => {
             button.setOrigin(0, 0);
+            button.on('pointerclicked', () => {
+                let index = this.sellButtons.indexOf(button);
+                this.trySellSlot(index);
+            });
         });
         
         this.updateList.push(...this.itemDealQuantityTexts);
+
+        this.updateWithUserValues();
+        this.scene.player.updateInventoryCallback = () => { this.updateWithUserValues(); };
+    }
+
+    trySellSlot(slotIndex) {
+        let slot = this.scene.player.inventory.slots[slotIndex];
+        let quantityOwned = slot.quantity;
+        let quantityOffered = this.itemDealQuantityTexts[slotIndex].trueText;
+        if (quantityOffered == '') {
+            return;
+        } else {
+            quantityOffered = parseInt(quantityOffered);
+        }
+        if (quantityOffered == 0) return;
+        if (quantityOffered > quantityOwned) {
+            new AlertWindow(this.scene, this.scene.screenWidth / 2, this.scene.screenHeight / 3, 'You do not have the quantity offered to sell.');
+            return;
+        }
+        let isSold = this.scene.player.removeItemAtIndex(slotIndex, quantityOffered);
+        console.log(isSold);
+        if (isSold) {
+            this.itemDealQuantityTexts[slotIndex].trueText = '';
+        }
     }
 
     showRow(index) {
@@ -53,8 +94,9 @@ export default class InventoryWindow extends Window {
         this.itemQuantityTexts[index].setVisible(true);
         this.itemPriceTexts[index].setVisible(true);
         this.itemDealQuantityTexts[index].setVisible(true);
+        
         this.itemValueTexts[index].setVisible(true);
-        this.buyButtons[index].setVisible(true);
+        this.sellButtons[index].setVisible(true);
     }
 
     hideRow(index) {
@@ -63,13 +105,13 @@ export default class InventoryWindow extends Window {
         this.itemPriceTexts[index].setVisible(false);
         this.itemDealQuantityTexts[index].setVisible(false);
         this.itemValueTexts[index].setVisible(false);
-        this.buyButtons[index].setVisible(false);
+        this.sellButtons[index].setVisible(false);
     }
 
     update() {
         super.update();
         if (this.beingDestroyed) return;
-        this.updateWithUserValues();
+        // could make these callbacks
         this.updateInputTexts();
         this.updateDealQuantityValue();
     }

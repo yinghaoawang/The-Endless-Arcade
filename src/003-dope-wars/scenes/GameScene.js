@@ -17,6 +17,15 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('window-close-btn', 'assets/window/window-close-btn.png');
         this.load.image('window-close-btn-over', 'assets/window/window-close-btn-over.png');
         this.load.image('window-close-btn-down', 'assets/window/window-close-btn-down.png');
+        this.load.image('window-close-btn', 'assets/window/window-close-btn.png');
+        this.load.image('window-close-btn-over', 'assets/window/window-close-btn-over.png');
+        this.load.image('window-close-btn-down', 'assets/window/window-close-btn-down.png');
+        this.load.image('item-buy-btn', 'assets/window/item-buy-btn.png');
+        this.load.image('item-buy-btn-over', 'assets/window/item-buy-btn-over.png');
+        this.load.image('item-buy-btn-down', 'assets/window/item-buy-btn-down.png');
+        this.load.image('item-sell-btn', 'assets/window/item-sell-btn.png');
+        this.load.image('item-sell-btn-over', 'assets/window/item-sell-btn-over.png');
+        this.load.image('item-sell-btn-down', 'assets/window/item-sell-btn-down.png');
     }
 
     create() {

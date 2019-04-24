@@ -4,7 +4,7 @@ import Text from '../input/text/Text';
 import NumberTextField from '../input/text/NumberField';
 
 export default class Window extends Phaser.GameObjects.Container {
-    constructor(scene, x, y, width, height) {
+    constructor(scene, x, y, width, height, name) {
         super(scene, x, y);
         if (typeof width == 'undefined') {
             width = 400;
@@ -64,6 +64,12 @@ export default class Window extends Phaser.GameObjects.Container {
         });
         */
 
+       if (typeof name != 'undefined') {
+            this.name = name;
+            this.nameText = new Text(scene, -1 * this.width / 2 + this.paneMargin + 5, -1 * this.height / 2 + 5, this.name);
+            this.add(this.nameText);
+        }
+
         this.closeBtn = new Button(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 30, 30, 'window-close-btn', 'window-close-btn-down', 'window-close-btn-over');
         this.closeBtn.setOrigin(1, 0);
         this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
@@ -75,6 +81,8 @@ export default class Window extends Phaser.GameObjects.Container {
         this.add(this.closeBtn);
 
         scene.add.existing(this);
+
+        bringWindowToTop(this);
     }
 
     update() {
@@ -121,18 +129,10 @@ export default class Window extends Phaser.GameObjects.Container {
         return texts;
     }
 
-    createButtonCol(xOffset, yOffset, colSpacing, width, height, messages, colCount) {
-        if (!Array.isArray(messages)) messages = [messages];
-        if (typeof colCount == 'undefined') {
-            colCount = messages.length;
-        } 
+    createButtonCol(xOffset, yOffset, colSpacing, width, height, colCount, pointerUpTexture, pointerDownTexture, pointerOverTexture) {
         let buttons = [];
-        let message = '';
         for (let i = 0; i < colCount; ++i) {
-            if (i < messages.length) {
-                message = messages[i];
-            }  
-            let button = new Button(this.scene, xOffset, yOffset + colSpacing * i, width, height, 'window-close-btn', 'window-close-btn-down', 'window-close-btn-over');
+            let button = new Button(this.scene, xOffset, yOffset + colSpacing * i, width, height, pointerUpTexture, pointerDownTexture, pointerOverTexture);
             buttons.push(button);
             this.add(button);
         }
