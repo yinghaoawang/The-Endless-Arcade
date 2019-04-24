@@ -3,7 +3,7 @@ import Phaser from 'phaser3';
 import Text from './Text';
 import { numberInputListener, backspaceInputListener, enterInputListener } from '../keyboard/keyboardInput';
 
-export default class TextField extends Text {
+export default class NumberTextField extends Text {
     constructor(scene, x, y, width, parentContainer, maxTrueText, text) {
         super(scene, x, y, text);
         this.trueText = text;
@@ -24,15 +24,10 @@ export default class TextField extends Text {
         this.parentContainer.add(this.backgroundRect);
         this.parentContainer.moveDown(this.backgroundRect);
 
-        this.setpointerdown(() => {
+        this.on('pointerdown', () => {
             this.scene.selectedInput = this;
             if (this.trueText == '0') this.trueText = '';
         });
-    }
-
-    setpointerdown(callback) {
-        this.onpointerdown = callback;
-        this.on('pointerdown', this.onpointerdown);
     }
 
     setVisible(value) {

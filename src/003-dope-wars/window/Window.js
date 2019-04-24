@@ -1,4 +1,5 @@
 import Phaser from 'phaser3';
+import Button from '../input/button/Button';
 
 export default class Window extends Phaser.GameObjects.Container {
     constructor(scene, x, y, width, height) {
@@ -58,25 +59,11 @@ export default class Window extends Phaser.GameObjects.Container {
         });
         */
 
-        this.closeBtn = new Phaser.GameObjects.Image(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 'window-close-btn');
+        this.closeBtn = new Button(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 'window-close-btn');
         this.closeBtn.setOrigin(1, 0);
         this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
-        this.closeBtn.setInteractive();
-        this.closeBtn.on('pointerdown', function() {
-            this.clicked = true;
-        });
-        this.closeBtn.on('pointerover', function() {
-            this.setTexture('window-close-btn-hover');
-        });
-        this.closeBtn.on('pointerout', function() {
-            this.setTexture('window-close-btn');
-            this.clicked = false;
-        });
-        this.closeBtn.on('pointerup', () => {
-            if (this.closeBtn.clicked) {
-                this.close();
-            }
-        });
+        this.closeBtn.on('pointerclicked', () => { this.close(); });
+        
         this.add(this.closeBtn);
 
         scene.add.existing(this);

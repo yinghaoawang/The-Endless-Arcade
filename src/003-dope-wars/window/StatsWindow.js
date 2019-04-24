@@ -1,5 +1,5 @@
 import Window from './Window';
-import Text from '../text/Text';
+import Text from '../input/text//Text';
 
 export default class StatsWindow extends Window {
     constructor(scene, x, y, user) {

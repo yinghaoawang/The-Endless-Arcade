@@ -1,7 +1,7 @@
 import Phaser from 'phaser3';
 import Player from '../unit/Player';
 import InventoryWindow from '../window/InventoryWindow';
-import { setKeySchemes } from '../keyboard/keyboardInput';
+import { setKeySchemes } from '../input/keyboard/keyboardInput';
 import StatsWindow from '../window/StatsWindow';
 
 export default class GameScene extends Phaser.Scene {
