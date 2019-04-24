@@ -1,5 +1,7 @@
 import Phaser from 'phaser3';
 import Button from '../input/button/Button';
+import Text from '../input/text/Text';
+import NumberTextField from '../input/text/NumberTextField';
 
 export default class Window extends Phaser.GameObjects.Container {
     constructor(scene, x, y, width, height) {
@@ -36,13 +38,13 @@ export default class Window extends Phaser.GameObjects.Container {
             this.y = pointer.y - this.dragDistY
         });
 
-        this.backgroundImage.setAlpha(.9);
+        this.backgroundImage.setAlpha(.85);
         this.add(this.backgroundImage);
 
         this.topBar = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2, 'window-top-bar');
         this.topBar.setOrigin(.5, 0)
         this.topBar.setDisplaySize(this.width, 30);
-        this.topBar.setAlpha(.7);
+        this.topBar.setAlpha(.85);
         this.add(this.topBar);
 
         this.paneMargin = 10;
@@ -66,6 +68,9 @@ export default class Window extends Phaser.GameObjects.Container {
         this.closeBtn.setOrigin(1, 0);
         this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
         this.closeBtn.on('pointerclicked', () => { this.close(); });
+        this.closeBtn.on('pointerdown', () => {
+            bringWindowToTop(this);
+        });
         
         this.add(this.closeBtn);
 
@@ -97,6 +102,48 @@ export default class Window extends Phaser.GameObjects.Container {
         this.destroy();
         
     }
+
+    createTextCol(xOffset, yOffset, colSpacing, messages, colCount) {
+        if (!Array.isArray(messages)) messages = [messages];
+        if (typeof colCount == 'undefined') {
+            colCount = messages.length;
+        } 
+        let texts = [];
+        let message = '';
+        for (let i = 0; i < colCount; ++i) {
+            if (i < messages.length) {
+                message = messages[i];
+            }  
+            let text = new Text(this.scene, xOffset, yOffset + colSpacing * i, message);
+            texts.push(text);
+            this.add(text);
+        }
+        return texts;
+    }
+
+    createInputTextCol(xOffset, yOffset, colSpacing, messages, colCount, textWidth) {
+        if (!Array.isArray(messages)) messages = [messages];
+        if (typeof colCount == 'undefined') {
+            colCount = messages.length;
+        } 
+        let texts = [];
+        let message = '';
+        for (let i = 0; i < colCount; ++i) {
+            if (i < messages.length) {
+                message = messages[i];
+            }  
+            let inputText = new NumberTextField(this.scene, xOffset, yOffset + colSpacing * i, textWidth, this, 4, message);
+            inputText.on('pointerdown', () => {
+                bringWindowToTop(this);
+            });
+            texts.push(inputText);
+            this.add(inputText);
+        }
+        return texts;
+
+    }
+
+    
 }
 
 export function bringWindowToTop(target) {

@@ -1,5 +1,4 @@
 import Window from './Window';
-import Text from '../input/text//Text';
 
 export default class StatsWindow extends Window {
     constructor(scene, x, y, user) {
@@ -11,25 +10,10 @@ export default class StatsWindow extends Window {
 
         let colSpacing = 20;
         
-        this.createTextCol(10, xOffset, yOffset, colSpacing, ['Name', 'Gold', 'Days', ''])
-        
+        this.textLabels = this.createTextCol(xOffset, yOffset, colSpacing, ['Name', 'Gold', 'Days'], 10);
     }
 
-    createTextCol(colCount, colXOffset, colYOffset, colDistance, messages) {
-        let texts = [];
-        if (typeof messages === 'string') {
-            messages = [messages];
-        }
-
-        let message = '';
-        for (let i = 0; i < colCount; ++i) {
-            if (i < messages.length) message = messages[i];  
-            let text = new Text(this.scene, colXOffset, colYOffset + colDistance * i, message);
-            texts.push(text);
-            this.add(text);
-        }
-        return texts;
-    }
+    
 
     update() {
         super.update();

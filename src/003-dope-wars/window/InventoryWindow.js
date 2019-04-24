@@ -1,41 +1,39 @@
-import Window, { bringWindowToTop } from './Window';
 import Text from '../input/text/Text';
-import NumberTextField from '../input/text/TextField';
 import messageHandler from '../MessageHandler';
+import Window from './Window';
 
 export default class InventoryWindow extends Window {
     constructor(scene, x, y) {
         super(scene, x, y, 500, 300);
 
-        let itemRowXOffset = -1 * this.width / 2 + this.paneMargin + 10;
-        let itemRowYOffset = -1 * this.height / 2 + this.topBar.displayHeight + this.paneMargin;
-        this.itemNameText = new Text(this.scene, itemRowXOffset, itemRowYOffset, 'Name');
+        let xOffset = -1 * this.width / 2 + this.paneMargin + 10;
+        let yOffset = -1 * this.height / 2 + this.topBar.displayHeight + this.paneMargin;
+        this.itemNameText = new Text(this.scene, xOffset, yOffset, 'Name');
         this.add(this.itemNameText);
 
-        let quantityXOffset = itemRowXOffset + 100;
-        this.itemQuantityText = new Text(this.scene, quantityXOffset, itemRowYOffset, 'Qty.');
+        let quantityXOffset = xOffset + 100;
+        this.itemQuantityText = new Text(this.scene, quantityXOffset, yOffset, 'Qty.');
         this.add(this.itemQuantityText);
 
         let priceXOffset = quantityXOffset + 60;
-        this.itemPriceText = new Text(this.scene, priceXOffset, itemRowYOffset, 'Price');
+        this.itemPriceText = new Text(this.scene, priceXOffset, yOffset, 'Price');
         this.add(this.itemPriceText);
 
         let dealQuantityXOffset = priceXOffset + 80;
-        this.itemDealQuantityText = new Text(this.scene, dealQuantityXOffset, itemRowYOffset, 'Deal');
+        this.itemDealQuantityText = new Text(this.scene, dealQuantityXOffset, yOffset, 'Deal');
         this.add(this.itemDealQuantityText);
 
         let valueXOffset = dealQuantityXOffset + 50;
-        this.itemValueText = new Text(this.scene, valueXOffset, itemRowYOffset, 'Value');
+        this.itemValueText = new Text(this.scene, valueXOffset, yOffset, 'Value');
         this.add(this.itemValueText);
 
-        this.itemRows = 10;
-        let itemColDistance = 20;
+        let colDistance = 20;
 
-        this.itemNameTexts = this.createTextCol(itemRowXOffset, itemRowYOffset, itemColDistance, 'Battleaxe');
-        this.itemQuantityTexts = this.createTextCol(quantityXOffset, itemRowYOffset, itemColDistance, 10);
-        this.itemPriceTexts = this.createTextCol(priceXOffset, itemRowYOffset, itemColDistance, '$11111111');
-        this.itemDealQuantityTexts = this.createInputTextCol(dealQuantityXOffset, itemRowYOffset, itemColDistance, 32, '0');
-        this.itemValueTexts = this.createTextCol(valueXOffset, itemRowYOffset, itemColDistance, '$10000000');
+        this.itemNameTexts = this.createTextCol(xOffset, yOffset + colDistance, colDistance, 'Battleaxe', 10);
+        this.itemQuantityTexts = this.createTextCol(quantityXOffset, yOffset + colDistance, colDistance, 10, 10);
+        this.itemPriceTexts = this.createTextCol(priceXOffset, yOffset + colDistance, colDistance, '$11111111', 10);
+        this.itemDealQuantityTexts = this.createInputTextCol(dealQuantityXOffset, yOffset + colDistance, colDistance, 0, 10, 32);
+        this.itemValueTexts = this.createTextCol(valueXOffset, yOffset + colDistance, colDistance, '$10000000', 10);
         
         this.updateList.push(...this.itemDealQuantityTexts);
     }
@@ -95,28 +93,5 @@ export default class InventoryWindow extends Window {
             let itemValue = itemDealQuantityText * itemPrice;
             this.itemValueTexts[i].setText('$' + itemValue);
         }
-    }
-
-    createTextCol(colXOffset, colYOffset, colDistance, message) {
-        let texts = [];
-        for (let i = 0; i < this.itemRows; ++i) {
-            let text = new Text(this.scene, colXOffset, colYOffset + colDistance * (i + 1), message);
-            texts.push(text);
-            this.add(text);
-        }
-        return texts;
-    }
-
-    createInputTextCol(colXOffset, colYOffset, colDistance, textWidth, message) {
-        let texts = [];
-        for (let i = 0; i < this.itemRows; ++i) {
-            let inputText = new NumberTextField(this.scene, colXOffset, colYOffset + colDistance * (i + 1), textWidth, this, 4, message);
-            inputText.on('pointerdown', () => {
-                bringWindowToTop(this);
-            });
-            texts.push(inputText);
-            this.add(inputText);
-        }
-        return texts;
     }
 }
