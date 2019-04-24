@@ -1,7 +1,7 @@
 import Phaser from 'phaser3';
 
 import Text from './Text';
-import { numberInputListener, backspaceInputListener, enterInputListener } from '../keyboard/KeyboardInput';
+import { numberInputListener, backspaceInputListener, enterInputListener } from '../keyboard/keyboardInput';
 
 export default class TextField extends Text {
     constructor(scene, x, y, width, parentContainer, maxTrueText, text) {

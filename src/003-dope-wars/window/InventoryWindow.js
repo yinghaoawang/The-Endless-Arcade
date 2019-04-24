@@ -29,13 +29,13 @@ export default class InventoryWindow extends Window {
         this.add(this.itemValueText);
 
         this.itemRows = 10;
-        let itemRowDistance = 20;
+        let itemColDistance = 20;
 
-        this.itemNameTexts = this.createTextRow(itemRowXOffset, itemRowYOffset, itemRowDistance, 'Battleaxe');
-        this.itemQuantityTexts = this.createTextRow(quantityXOffset, itemRowYOffset, itemRowDistance, 10);
-        this.itemPriceTexts = this.createTextRow(priceXOffset, itemRowYOffset, itemRowDistance, '$11111111');
-        this.itemDealQuantityTexts = this.createInputTextRow(dealQuantityXOffset, itemRowYOffset, itemRowDistance, 32, '0');
-        this.itemValueTexts = this.createTextRow(valueXOffset, itemRowYOffset, itemRowDistance, '$10000000');
+        this.itemNameTexts = this.createTextCol(itemRowXOffset, itemRowYOffset, itemColDistance, 'Battleaxe');
+        this.itemQuantityTexts = this.createTextCol(quantityXOffset, itemRowYOffset, itemColDistance, 10);
+        this.itemPriceTexts = this.createTextCol(priceXOffset, itemRowYOffset, itemColDistance, '$11111111');
+        this.itemDealQuantityTexts = this.createInputTextCol(dealQuantityXOffset, itemRowYOffset, itemColDistance, 32, '0');
+        this.itemValueTexts = this.createTextCol(valueXOffset, itemRowYOffset, itemColDistance, '$10000000');
         
         this.updateList.push(...this.itemDealQuantityTexts);
     }
@@ -58,6 +58,7 @@ export default class InventoryWindow extends Window {
 
     update() {
         super.update();
+        if (this.beingDestroyed) return;
         this.syncUserInventory();
         this.updateDealQuantityValue();
     }
@@ -96,20 +97,20 @@ export default class InventoryWindow extends Window {
         }
     }
 
-    createTextRow(rowXOffset, rowYOffset, rowDistance, message) {
+    createTextCol(colXOffset, colYOffset, colDistance, message) {
         let texts = [];
         for (let i = 0; i < this.itemRows; ++i) {
-            let text = new Text(this.scene, rowXOffset, rowYOffset + rowDistance * (i + 1), message);
+            let text = new Text(this.scene, colXOffset, colYOffset + colDistance * (i + 1), message);
             texts.push(text);
             this.add(text);
         }
         return texts;
     }
 
-    createInputTextRow(rowXOffset, rowYOffset, rowDistance, rowWidth, message) {
+    createInputTextCol(colXOffset, colYOffset, colDistance, textWidth, message) {
         let texts = [];
         for (let i = 0; i < this.itemRows; ++i) {
-            let inputText = new TextField(this.scene, rowXOffset, rowYOffset + rowDistance * (i + 1), rowWidth, this, 4, message);
+            let inputText = new TextField(this.scene, colXOffset, colYOffset + colDistance * (i + 1), textWidth, this, 4, message);
             inputText.name = 'input-text-' + i;
             texts.push(inputText);
             this.add(inputText);

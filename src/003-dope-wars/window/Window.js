@@ -3,12 +3,22 @@ import Phaser from 'phaser3';
 export default class Window extends Phaser.GameObjects.Container {
     constructor(scene, x, y, width, height) {
         super(scene, x, y);
+
         if (typeof width == 'undefined') {
             width = 400;
         }
         if (typeof height == 'undefined') {
             height = 300;
         }
+
+        if (typeof scene.windows == 'undefined') {
+            scene.windows = [];
+        }
+        scene.windows.unshift(this);
+
+        this.beingDestroyed = false;
+
+        scene.add.existing(this);
 
         this.updateList = [];
 
@@ -18,14 +28,14 @@ export default class Window extends Phaser.GameObjects.Container {
         this.backgroundImage = new Phaser.GameObjects.Image(scene, 0, 0, 'window-bg');
         this.backgroundImage.setDisplaySize(this.width, this.height);
         this.backgroundImage.setInteractive({ draggable: true });
-        this.backgroundImage.on('dragstart', function(pointer) {
+        this.backgroundImage.on('dragstart', (pointer) => {
             this.dragDistX = pointer.x - this.x;
             this.dragDistY = pointer.y - this.y;
-        }.bind(this));
-        this.backgroundImage.on('drag', function(pointer) {
+        });
+        this.backgroundImage.on('drag', (pointer) => {
             this.x = pointer.x - this.dragDistX,
             this.y = pointer.y - this.dragDistY
-        }.bind(this));
+        });
         this.add(this.backgroundImage);
 
         this.topBar = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2, 'window-top-bar');
@@ -38,6 +48,9 @@ export default class Window extends Phaser.GameObjects.Container {
         this.innerPane.setOrigin(.5, 0);
         this.innerPane.setDisplaySize(this.width - this.paneMargin * 2, this.height - this.paneMargin - this.topBar.displayHeight);
         this.innerPane.setInteractive();
+        this.innerPane.on('pointerdown', () => {
+            bringWindowToTop(this);
+        });
         this.add(this.innerPane);
 
         this.closeBtn = new Phaser.GameObjects.Image(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 'window-close-btn');
@@ -54,19 +67,27 @@ export default class Window extends Phaser.GameObjects.Container {
             this.setTexture('window-close-btn');
             this.clicked = false;
         });
-        this.closeBtn.on('pointerup', function() {
+        this.closeBtn.on('pointerup', () => {
             if (this.closeBtn.clicked) {
                 this.close();
             }
-        }.bind(this));
+        });
         this.add(this.closeBtn);
+        this.setInteractive();
     }
 
     update() {
+        if (this.beingDestroyed) return;
         for (let i = 0; i < this.updateList.length; ++i) {
             let updateItem = this.updateList[i];
             updateItem.update();
         }
+    }
+
+    destroy() {
+        this.beingDestroyed = true;
+        this.scene.windows.splice(this.scene.windows.indexOf(this), 1);
+        super.destroy();
     }
 
     close() {
@@ -78,5 +99,13 @@ export default class Window extends Phaser.GameObjects.Container {
         }
         this.destroy();
         
+    }
+}
+
+export function bringWindowToTop(target) {
+    target.scene.windows.splice(target.scene.windows.indexOf(target), 1);
+    target.scene.windows.push(target);
+    for (let i = 0; i < target.scene.windows.length; ++i) {
+        target.scene.windows[i].depth = i;
     }
 }

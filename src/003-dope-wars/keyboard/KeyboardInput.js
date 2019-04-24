@@ -28,7 +28,6 @@ function numberInputListener(scene) {
         let key = numberKeysArray[i];
         if (Phaser.Input.Keyboard.JustDown(scene.numberScheme[key])) {
             let numberValue = numberKeysArray.indexOf(key);
-            console.log(key, numberValue);
             return numberValue;
         }
     }
