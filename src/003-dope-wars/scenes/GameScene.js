@@ -15,7 +15,8 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('window-top-bar', 'assets/window/window-top-bar.png');
         this.load.image('window-inner-pane', 'assets/window/window-inner-pane.png');
         this.load.image('window-close-btn', 'assets/window/window-close-btn.png');
-        this.load.image('window-close-btn-hover', 'assets/window/window-close-btn-hover.png');
+        this.load.image('window-close-btn-over', 'assets/window/window-close-btn-over.png');
+        this.load.image('window-close-btn-down', 'assets/window/window-close-btn-down.png');
     }
 
     create() {

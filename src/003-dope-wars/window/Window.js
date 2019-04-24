@@ -35,11 +35,14 @@ export default class Window extends Phaser.GameObjects.Container {
             this.x = pointer.x - this.dragDistX,
             this.y = pointer.y - this.dragDistY
         });
+
+        this.backgroundImage.setAlpha(.9);
         this.add(this.backgroundImage);
 
         this.topBar = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2, 'window-top-bar');
         this.topBar.setOrigin(.5, 0)
         this.topBar.setDisplaySize(this.width, 30);
+        this.topBar.setAlpha(.7);
         this.add(this.topBar);
 
         this.paneMargin = 10;
@@ -59,7 +62,7 @@ export default class Window extends Phaser.GameObjects.Container {
         });
         */
 
-        this.closeBtn = new Button(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 'window-close-btn');
+        this.closeBtn = new Button(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 'window-close-btn', 'window-close-btn-down', 'window-close-btn-over');
         this.closeBtn.setOrigin(1, 0);
         this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
         this.closeBtn.on('pointerclicked', () => { this.close(); });
@@ -84,6 +87,7 @@ export default class Window extends Phaser.GameObjects.Container {
     }
 
     close() {
+        this.closeBtn.destroy();
         for (let i = 0; i < this.updateList.length; ++i) {
             let updateItem = this.updateList[i];
             updateItem.destroy();
