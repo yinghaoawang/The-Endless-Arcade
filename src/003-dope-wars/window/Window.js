@@ -3,31 +3,29 @@ import Phaser from 'phaser3';
 export default class Window extends Phaser.GameObjects.Container {
     constructor(scene, x, y, width, height) {
         super(scene, x, y);
-
         if (typeof width == 'undefined') {
             width = 400;
         }
         if (typeof height == 'undefined') {
             height = 300;
         }
+        this.width = width;
+        this.height = height;
 
         if (typeof scene.windows == 'undefined') {
             scene.windows = [];
         }
         scene.windows.unshift(this);
-
         this.beingDestroyed = false;
-
-        scene.add.existing(this);
-
+        
         this.updateList = [];
-
-        this.width = width;
-        this.height = height;
 
         this.backgroundImage = new Phaser.GameObjects.Image(scene, 0, 0, 'window-bg');
         this.backgroundImage.setDisplaySize(this.width, this.height);
         this.backgroundImage.setInteractive({ draggable: true });
+        this.backgroundImage.on('pointerdown', () => {
+            bringWindowToTop(this);
+        });
         this.backgroundImage.on('dragstart', (pointer) => {
             this.dragDistX = pointer.x - this.x;
             this.dragDistY = pointer.y - this.y;
@@ -53,6 +51,13 @@ export default class Window extends Phaser.GameObjects.Container {
         });
         this.add(this.innerPane);
 
+        /* Doesn't work. I want this to work.
+        this.setInteractive(new Phaser.Geom.Rectangle(-1 * this.width / 2, -1 * this.height / 2, this.width / 2, this.height / 2), Phaser.Geom.Rectangle.Contains);
+        this.on('pointerdown', () => {
+            bringWindowToTop(this);
+        });
+        */
+
         this.closeBtn = new Phaser.GameObjects.Image(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 'window-close-btn');
         this.closeBtn.setOrigin(1, 0);
         this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
@@ -73,7 +78,8 @@ export default class Window extends Phaser.GameObjects.Container {
             }
         });
         this.add(this.closeBtn);
-        this.setInteractive();
+
+        scene.add.existing(this);
     }
 
     update() {

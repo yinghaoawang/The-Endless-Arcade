@@ -1,4 +1,4 @@
-import Window from './Window';
+import Window, { bringWindowToTop } from './Window';
 import Text from '../text/Text';
 import TextField from '../text/TextField';
 import messageHandler from '../MessageHandler';
@@ -111,7 +111,13 @@ export default class InventoryWindow extends Window {
         let texts = [];
         for (let i = 0; i < this.itemRows; ++i) {
             let inputText = new TextField(this.scene, colXOffset, colYOffset + colDistance * (i + 1), textWidth, this, 4, message);
-            inputText.name = 'input-text-' + i;
+            inputText.setpointerdown((() => {
+                let oldcallback = inputText.onpointerdown;
+                return () => {
+                    bringWindowToTop(this);
+                    oldcallback();
+                }
+            })());
             texts.push(inputText);
             this.add(inputText);
         }

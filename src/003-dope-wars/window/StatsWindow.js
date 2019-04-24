@@ -13,7 +13,6 @@ export default class StatsWindow extends Window {
         
         this.createTextCol(10, xOffset, yOffset, colSpacing, ['Name', 'Gold', 'Days', ''])
         
-        
     }
 
     createTextCol(colCount, colXOffset, colYOffset, colDistance, messages) {

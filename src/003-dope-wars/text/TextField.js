@@ -24,10 +24,15 @@ export default class TextField extends Text {
         this.parentContainer.add(this.backgroundRect);
         this.parentContainer.moveDown(this.backgroundRect);
 
-        this.on('pointerdown', function() {
+        this.setpointerdown(() => {
             this.scene.selectedInput = this;
             if (this.trueText == '0') this.trueText = '';
         });
+    }
+
+    setpointerdown(callback) {
+        this.onpointerdown = callback;
+        this.on('pointerdown', this.onpointerdown);
     }
 
     setVisible(value) {
