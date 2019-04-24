@@ -20,8 +20,6 @@ export default class Window extends Phaser.GameObjects.Container {
         }
         scene.windows.unshift(this);
         this.beingDestroyed = false;
-        
-        this.updateList = [];
 
         this.backgroundImage = new Phaser.GameObjects.Image(scene, 0, 0, 'window-bg');
         this.backgroundImage.setDisplaySize(this.width, this.height);
@@ -87,10 +85,6 @@ export default class Window extends Phaser.GameObjects.Container {
 
     update() {
         if (this.beingDestroyed) return;
-        for (let i = 0; i < this.updateList.length; ++i) {
-            let updateItem = this.updateList[i];
-            updateItem.update();
-        }
     }
 
     destroy() {
@@ -101,12 +95,6 @@ export default class Window extends Phaser.GameObjects.Container {
 
     close() {
         this.closeBtn.destroy();
-        for (let i = 0; i < this.updateList.length; ++i) {
-            let updateItem = this.updateList[i];
-            updateItem.destroy();
-            this.updateList.splice(i, 1);
-            --i;
-        }
         this.destroy();
         
     }

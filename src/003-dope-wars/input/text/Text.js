@@ -13,5 +13,27 @@ export default class Text extends Phaser.GameObjects.Text {
         }
 
         this.setOrigin(0);
+        this.propertyChangeListeners = [];
     }
+
+    setText(value) {
+        
+        if (typeof this.propertyChangeListeners != 'undefined') { 
+            this.triggerEvent('propertychange');
+        }
+        super.setText(value);
+    }
+
+    addPropertyChangeListener(listener) {
+        this.propertyChangeListeners.push(listener);
+    }
+
+    triggerEvent(event) {
+        if (event == 'propertychange') {
+            this.propertyChangeListeners.forEach((fn) => {
+                fn();
+            });
+        }
+    }
+    
 }

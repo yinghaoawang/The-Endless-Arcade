@@ -28,14 +28,44 @@ export default class NumberTextField extends Text {
             this.scene.selectedInput = this;
             if (this.trueText == '0') this.trueText = '';
         });
-    }
 
-    setVisible(value) {
-        this.backgroundRect.setVisible(value);
-        super.setVisible(value);
-    }
+        this.scene.input.on('keydown', (event) => {
+            console.log(event);
+            if (this.scene.selectedInput === this) {
+                /*
+                let numberPressed = numberInputListener(this.scene);
+                let letterPressed = letterInputListener(this.scene);
+                let backspaceInput = backspaceInputListener(this.scene);
+                let enterInput = enterInputListener(this.scene);
+                
+                if (letterPressed != null && this.trueText.length < this.maxTrueText) {
+                    this.trueText += letterPressed;
+                }
+                if (numberPressed != null && this.trueText.length < this.maxTrueText) {
+                    this.trueText += numberPressed;
+                }
+                if (backspaceInput) {
+                    if (this.trueText.length > 0) {
+                        this.trueText = this.trueText.substring(0, this.trueText.length - 1);
+                    }
+                }
+                if (enterInput) {
+                    this.scene.selectedInput = null;
+                }
+    
+                if (this.trueText.length < this.maxTrueText) {
+                    this.setText(this.trueText + '_');
+                } else {
+                    this.setText(this.trueText);
+                }
+            } else {
+                this.setText(this.trueText);
+            }
+            */
+            }
+        });
 
-    update() {
+        /*
         if (this.scene.selectedInput === this) {
             let numberPressed = numberInputListener(this.scene);
             let letterPressed = letterInputListener(this.scene);
@@ -65,7 +95,12 @@ export default class NumberTextField extends Text {
         } else {
             this.setText(this.trueText);
         }
-        
+        */
+    }
+
+    setVisible(value) {
+        this.backgroundRect.setVisible(value);
+        super.setVisible(value);
     }
 
 }

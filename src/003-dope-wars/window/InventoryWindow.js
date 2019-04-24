@@ -61,15 +61,26 @@ export default class InventoryWindow extends Window {
                 this.trySellSlot(index);
             });
         });
-        
-        this.updateList.push(...this.itemDealQuantityTexts);
 
+        this.scene.player.addPropertyChangeListener(() => {
+            this.updateWithUserValues();
+        });
         this.updateWithUserValues();
-        this.scene.player.updateInventoryCallback = () => { this.updateWithUserValues(); };
+
+        this.itemDealQuantityTexts.forEach((textField) => {
+            textField.addPropertyChangeListener(() => {
+                this.updateInputTexts();
+                this.updateDealQuantityValue();
+            });
+        });
+        this.updateInputTexts();
+        this.updateDealQuantityValue();
     }
 
     trySellSlot(slotIndex) {
         let slot = this.scene.player.inventory.slots[slotIndex];
+        // TODO PRICE IS PLACEHOLDER
+        let price = 11111;
         let quantityOwned = slot.quantity;
         let quantityOffered = this.itemDealQuantityTexts[slotIndex].trueText;
         if (quantityOffered == '') {
@@ -83,7 +94,7 @@ export default class InventoryWindow extends Window {
             return;
         }
         let isSold = this.scene.player.removeItemAtIndex(slotIndex, quantityOffered);
-        console.log(isSold);
+        this.scene.player.addGold(quantityOffered * price);
         if (isSold) {
             this.itemDealQuantityTexts[slotIndex].trueText = '';
         }
@@ -110,10 +121,6 @@ export default class InventoryWindow extends Window {
 
     update() {
         super.update();
-        if (this.beingDestroyed) return;
-        // could make these callbacks
-        this.updateInputTexts();
-        this.updateDealQuantityValue();
     }
 
     updateInputTexts() {
