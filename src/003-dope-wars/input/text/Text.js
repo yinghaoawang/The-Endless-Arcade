@@ -17,7 +17,6 @@ export default class Text extends Phaser.GameObjects.Text {
     }
 
     setText(value) {
-        
         if (typeof this.propertyChangeListeners != 'undefined') { 
             this.triggerEvent('propertychange');
         }

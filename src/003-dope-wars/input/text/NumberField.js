@@ -40,7 +40,7 @@ export default class NumberTextField extends Text {
             }
         });
 
-        this.scene.input.on('pointerdown', (pointer) => {
+        this.scenePointerListener = (pointer) => {
             if (this.scene.selectedInput === this) {
                 let absX = this.parentContainer.x + this.x;
                 let absY = this.parentContainer.y + this.y;
@@ -59,9 +59,10 @@ export default class NumberTextField extends Text {
                 this.trueText = '0';
                 this.setText(this.trueText + '');
             }
-        });
+        };
+        this.scene.input.on('pointerdown', this.scenePointerListener);
 
-        this.scene.input.keyboard.on('keydown', (event) => {
+        this.sceneKeyDownListener = (event) => {
             if (this.scene.selectedInput === this) {
                 let key = event.key;
                 let charCode = key.charCodeAt(0);
@@ -84,43 +85,18 @@ export default class NumberTextField extends Text {
                     this.setText(this.trueText + '');
                 }
             }
-        });
+        };
+        
+        this.scene.input.keyboard.on('keydown', this.sceneKeyDownListener);
+    }
+
+    destroy() {
+        this.scene.input.off('pointerdown', this.scenePointerListener);
+        this.scene.input.keyboard.off('keydown', this.sceneKeyDownListener);
     }
 
     setVisible(value) {
         this.backgroundRect.setVisible(value);
         super.setVisible(value);
     }
-
-        /*
-        if (this.scene.selectedInput === this) {
-            this.trueText += '';
-            let numberPressed = numberInputListener(this.scene);
-            let backspaceInput = backspaceInputListener(this.scene);
-            let enterInput = enterInputListener(this.scene);
-            
-            if (numberPressed != null && this.trueText.length < this.maxTrueText) {
-                this.trueText += numberPressed;
-            }
-            if (backspaceInput) {
-                if (this.trueText.length > 0) {
-                    this.trueText = this.trueText.substring(0, this.trueText.length - 1);
-                }
-            }
-            if (enterInput) {
-                this.scene.selectedInput = null;
-            }
-
-            if (this.trueText.length < this.maxTrueText) {
-                this.setText(this.trueText + '_');
-            } else {
-                this.setText(this.trueText);
-            }
-        } else {
-            if (this.trueText.length == 0) this.trueText = '0';
-            this.setText(this.trueText);
-        }
-        */
-
-
 }
