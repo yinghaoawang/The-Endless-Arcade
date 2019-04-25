@@ -93,10 +93,23 @@ export default class InventoryWindow extends Window {
             new AlertWindow(this.scene, this.scene.screenWidth / 2, this.scene.screenHeight / 3, 'You do not have the quantity offered to sell.');
             return;
         }
+        let isRowRemoved = this.scene.player.inventory.slots[slotIndex].quantity == quantityOffered;
         let isSold = this.scene.player.removeItemAtIndex(slotIndex, quantityOffered);
-        this.scene.player.addGold(quantityOffered * price);
+        
         if (isSold) {
-            this.itemDealQuantityTexts[slotIndex].trueText = '';
+            if (isRowRemoved) {
+                this.shiftUpOfferQuantityValues(slotIndex);
+            } else {
+                this.itemDealQuantityTexts[slotIndex].trueText = '';
+            }
+            this.scene.player.addGold(quantityOffered * price);
+        }
+        
+    }
+
+    shiftUpOfferQuantityValues(index) {
+        for (let i = index; i < this.itemRows - 1; ++i) {
+            this.itemDealQuantityTexts[i].setText(this.itemDealQuantityTexts[i + 1].text);
         }
     }
 
