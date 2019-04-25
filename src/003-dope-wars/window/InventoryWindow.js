@@ -63,18 +63,16 @@ export default class InventoryWindow extends Window {
         });
 
         this.scene.player.addPropertyChangeListener(() => {
-            this.updateWithUserValues();
+            this.update();
         });
-        this.updateWithUserValues();
 
         this.itemDealQuantityTexts.forEach((textField) => {
             textField.addPropertyChangeListener(() => {
-                this.updateInputTexts();
-                this.updateDealQuantityValue();
+                this.update();
             });
         });
-        this.updateInputTexts();
-        this.updateDealQuantityValue();
+
+        this.update();
     }
 
     trySellSlot(slotIndex) {
@@ -82,7 +80,7 @@ export default class InventoryWindow extends Window {
         // TODO PRICE IS PLACEHOLDER
         let price = 11111;
         let quantityOwned = slot.quantity;
-        let quantityOffered = this.itemDealQuantityTexts[slotIndex].trueText;
+        let quantityOffered = this.itemDealQuantityTexts[slotIndex].value;
         if (quantityOffered == '') {
             return;
         } else {
@@ -99,12 +97,16 @@ export default class InventoryWindow extends Window {
         if (isSold) {
             if (isRowRemoved) {
                 this.shiftUpOfferQuantityValues(slotIndex);
+                this.itemDealQuantityTexts[slotIndex].value = '0';
             } else {
-                this.itemDealQuantityTexts[slotIndex].trueText = '';
+                this.itemDealQuantityTexts[slotIndex].value = '';
+                this.scene.selectedInput = this.itemDealQuantityTexts[slotIndex];
             }
+            
             this.scene.player.addGold(quantityOffered * price);
         }
-        
+
+        this.update();
     }
 
     shiftUpOfferQuantityValues(index) {
@@ -134,13 +136,18 @@ export default class InventoryWindow extends Window {
 
     update() {
         super.update();
+        this.updateWithUserValues();
+        this.updateInputTexts();
+        this.updateDealQuantityValue();
     }
 
     updateInputTexts() {
         for (let i = 0; i < this.itemDealQuantityTexts.length; ++i) {
-            if (parseInt(this.itemDealQuantityTexts[i].trueText) > parseInt(this.itemQuantityTexts[i].text)) {
-                this.itemDealQuantityTexts[i].trueText = this.itemQuantityTexts[i].text;
+            if (parseInt(this.itemDealQuantityTexts[i].value) > parseInt(this.itemQuantityTexts[i].text)) {
+                this.itemDealQuantityTexts[i].value = this.itemQuantityTexts[i].text;
+                
             }
+            this.itemDealQuantityTexts[i].update();
         }
     }
 
@@ -159,7 +166,7 @@ export default class InventoryWindow extends Window {
 
     updateDealQuantityValue() {
         for (let i = 0; i < this.itemRows; ++i) {
-            let itemDealQuantityText = this.itemDealQuantityTexts[i].trueText;
+            let itemDealQuantityText = this.itemDealQuantityTexts[i].value;
             
             let itemPrice = this.itemPriceTexts[i].text;
             if (itemPrice[0] != '$') {

@@ -5,7 +5,7 @@ import Text from './Text';
 export default class NumberTextField extends Text {
     constructor(scene, x, y, width, parentContainer, maxTrueText, text) {
         super(scene, x, y, text);
-        this.trueText = text;
+        this.value = (text);
         this.trueWidth = width;
         this.trueHeight = this.height;
         this.maxTrueText = maxTrueText;
@@ -27,37 +27,24 @@ export default class NumberTextField extends Text {
 
         this.on('pointerdown', () => {
             if (this.scene.selectedInput != null) {
-                if (this.scene.selectedInput.trueText.length == 0) this.scene.selectedInput.trueText = '0';
-                this.scene.selectedInput.setText(this.scene.selectedInput.trueText);
+                if (this.scene.selectedInput.value.length == 0) this.scene.selectedInput.value = ('0');
+                this.scene.selectedInput.setText(this.scene.selectedInput.value);
             }
             this.scene.selectedInput = this;
-            if (this.trueText == '0') this.trueText = '';
-            
-            if (this.trueText.length < this.maxTrueText) {
-                this.setText(this.trueText + '_');
-            } else {
-                this.setText(this.trueText + '');
-            }
+            this.update();
         });
 
         this.scenePointerListener = (pointer) => {
             if (this.scene.selectedInput === this) {
                 let absX = this.parentContainer.x + this.x;
                 let absY = this.parentContainer.y + this.y;
-                if (pointer.x >= absX && pointer.x <= absX + this.trueWidth && pointer.y >= absY && pointer.y <= absY + this.trueHeight) {
-                    // do nothing
-                    
-                } else {
-                    // if pointer up 
-                    this.scene.selectedInput = null;
-                    if (this.trueText.length == 0) {
-                        this.trueText = '0';
-                    }
-                    this.setText(this.trueText + '');
+                // if clicked outside, and is currently selected then 
+                if (pointer.x < absX || pointer.x > absX + this.trueWidth || pointer.y < absY || pointer.y > absY + this.trueHeight) {
+                    this.deselect();
                 }
-            } else if (this.trueText.length == 0) {
-                this.trueText = '0';
-                this.setText(this.trueText + '');
+            } else if (this.value.length == 0) {
+                this.value = ('0');
+                this.setText(this.value + '');
             }
         };
         this.scene.input.on('pointerdown', this.scenePointerListener);
@@ -67,27 +54,64 @@ export default class NumberTextField extends Text {
                 let key = event.key;
                 let charCode = key.charCodeAt(0);
                 if (charCode >= '0'.charCodeAt(0) && charCode <= '9'.charCodeAt(0)) {
-                    if (this.trueText.length < this.maxTrueText) {
-                        this.trueText += key;
+                    if (this.value.length < this.maxValue) {
+                        this.value = (this.value + key);
                     }
                 } else if (key == 'Backspace') {
-                    if (this.trueText.length > 0) {
-                        this.trueText = this.trueText.substring(0, this.trueText.length - 1);
+                    if (this.value.length > 0) {
+                        this.value = (this.value.substring(0, this.value.length - 1));
                     }
                 } else if (key == 'Enter') {
                     this.scene.selectedInput = null;
-                    if (this.trueText.length == 0) this.trueText = '0';
+                    if (this.value.length == 0) this.value = ('0');
                 }
                     
-                if (this.scene.selectedInput != null && (this.trueText.length < this.maxTrueText)) {
-                    this.setText(this.trueText + '_');
+                if (this.scene.selectedInput != null && (this.value.length < this.maxValue)) {
+                    this.setText(this.value + '_');
                 } else {
-                    this.setText(this.trueText + '');
+                    this.setText(this.value + '');
                 }
             }
         };
         
         this.scene.input.keyboard.on('keydown', this.sceneKeyDownListener);
+    }
+
+    deselect() {
+        this.scene.selectedInput = null;
+        if (this.value.length == 0) {
+            this.value = ('0');
+        }
+        this.setText(this.value + '');
+    }
+
+    update() {
+        if (this.scene.selectedInput === this) {
+            if (this.value == '0') this.value = '';
+            
+            if (this.value.length < this.maxValue) {
+                this.setText(this.value + '_');
+            } else {
+                this.setText(this.value + '');
+            }
+        } else {
+            this.setText(this.value + '');
+        }
+    }
+
+    get value() {
+        return this.trueText;
+    }
+
+    get maxValue() {
+        return this.maxTrueText;
+    }
+
+    set value(value) {
+        this.trueText = value;
+        if (typeof this.propertyChangeListeners != 'undefined') { 
+            this.triggerEvent('propertychange');
+        }
     }
 
     destroy() {

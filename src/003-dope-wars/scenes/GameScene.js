@@ -50,6 +50,5 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update() {
-        this.inventoryWindow.update();
     }
 }
