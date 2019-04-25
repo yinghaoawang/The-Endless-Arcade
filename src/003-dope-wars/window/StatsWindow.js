@@ -13,8 +13,9 @@ export default class StatsWindow extends Window {
         this.textLabels = this.createTextCol(xOffset, yOffset, colSpacing, ['Name', 'Gold', 'Days']);
         this.textValues = this.createTextCol(xOffset + 40, yOffset, colSpacing, [this.scene.player.name, this.scene.player.gold, 'Days']);
         this.scene.player.addPropertyChangeListener(() => {
-            this.updateStats();
+            this.update();
         });
+        
     }
 
     updateStats() {
@@ -25,5 +26,6 @@ export default class StatsWindow extends Window {
 
     update() {
         super.update();
+        this.updateStats();
     }
 }

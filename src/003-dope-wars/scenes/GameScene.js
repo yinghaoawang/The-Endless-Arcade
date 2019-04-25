@@ -2,6 +2,7 @@ import Phaser from 'phaser3';
 import Player from '../unit/Player';
 import InventoryWindow from '../window/InventoryWindow';
 import { setKeySchemes } from '../input/keyboard/keyboardInput';
+import Window from '../window/Window';
 import StatsWindow from '../window/StatsWindow';
 
 export default class GameScene extends Phaser.Scene {
@@ -39,8 +40,10 @@ export default class GameScene extends Phaser.Scene {
         this.player.addItem('shield', 1);
         this.player.addItem('bow', 1);
 
-        this.inventoryWindow = new InventoryWindow(this, this.screenWidth / 2, this.screenHeight / 2);
-        this.statsWindow = new StatsWindow(this, 350, 180, this.player);
+        this.testWindow = new Window(this, this.screenWidth / 2, this.screenHeight / 2, 200, 200, 'Window');
+        this.testWindow2 = new Window(this, this.screenWidth / 2, this.screenHeight / 2, 200, 200, 'Window');
+        //this.inventoryWindow = new InventoryWindow(this, this.screenWidth / 2, this.screenHeight / 2);
+        //this.statsWindow = new StatsWindow(this, 350, 180, this.player);
 
         this.backgroundImage = this.add.image(this.screenWidth / 2, this.screenHeight / 2, 'game-bg');
         this.backgroundImage.setDisplaySize(this.screenWidth, this.screenHeight);

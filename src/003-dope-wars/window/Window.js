@@ -1,163 +1,72 @@
 import Phaser from 'phaser3';
-import Button from '../input/button/Button';
-import Text from '../input/text/Text';
-import NumberTextField from '../input/text/NumberField';
+import WindowFrame from './WindowFrame';
 
-export default class Window extends Phaser.GameObjects.Container {
+export default class Window extends Phaser.GameObjects.Group {
     constructor(scene, x, y, width, height, name) {
-        super(scene, x, y);
+        super(scene);
+        this.scene = scene;
         if (typeof width == 'undefined') {
             width = 400;
         }
         if (typeof height == 'undefined') {
             height = 300;
         }
-        this.width = width;
-        this.height = height;
 
         if (typeof scene.windows == 'undefined') {
             scene.windows = [];
         }
         scene.windows.unshift(this);
         this.beingDestroyed = false;
-
-        this.backgroundImage = new Phaser.GameObjects.Image(scene, 0, 0, 'window-bg');
-        this.backgroundImage.setDisplaySize(this.width, this.height);
-        this.backgroundImage.setInteractive({ draggable: true });
-        this.backgroundImage.on('pointerdown', () => {
-            bringWindowToTop(this);
-        });
-        this.backgroundImage.on('dragstart', (pointer) => {
-            this.dragDistX = pointer.x - this.x;
-            this.dragDistY = pointer.y - this.y;
-        });
-        this.backgroundImage.on('drag', (pointer) => {
-            this.x = pointer.x - this.dragDistX,
-            this.y = pointer.y - this.dragDistY
-        });
-
-        this.backgroundImage.setAlpha(.85);
-        this.add(this.backgroundImage);
-
-        this.topBar = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2, 'window-top-bar');
-        this.topBar.setOrigin(.5, 0)
-        this.topBar.setDisplaySize(this.width, 30);
-        this.topBar.setAlpha(.85);
-        this.add(this.topBar);
-
-        this.paneMargin = 10;
-        this.innerPane = new Phaser.GameObjects.Image(scene, 0, -1 * this.height / 2 + this.topBar.displayHeight, 'window-inner-pane');
-        this.innerPane.setOrigin(.5, 0);
-        this.innerPane.setDisplaySize(this.width - this.paneMargin * 2, this.height - this.paneMargin - this.topBar.displayHeight);
-        this.innerPane.setInteractive();
-        this.innerPane.on('pointerdown', () => {
-            bringWindowToTop(this);
-        });
-        this.add(this.innerPane);
-
-        /* Doesn't work. I want this to work.
-        this.setInteractive(new Phaser.Geom.Rectangle(-1 * this.width / 2, -1 * this.height / 2, this.width / 2, this.height / 2), Phaser.Geom.Rectangle.Contains);
-        this.on('pointerdown', () => {
-            bringWindowToTop(this);
-        });
-        */
-
-       if (typeof name != 'undefined') {
-            this.name = name;
-            this.nameText = new Text(scene, -1 * this.width / 2 + this.paneMargin + 5, -1 * this.height / 2 + 5, this.name);
-            this.add(this.nameText);
-        }
-
-        this.closeBtn = new Button(scene, this.width / 2 - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 30, 30, 'window-close-btn', 'window-close-btn-down', 'window-close-btn-over');
-        this.closeBtn.setOrigin(1, 0);
-        this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
-        this.closeBtn.on('pointerclicked', () => { this.close(); });
-        this.closeBtn.on('pointerdown', () => {
-            bringWindowToTop(this);
-        });
         
-        this.add(this.closeBtn);
+        this.windowMoveListeners = [];
 
-        scene.add.existing(this);
+        this.windowFrame = new WindowFrame(scene, this, x, y, this.width, this.height, name);
+        this.add(this.windowFrame);
 
-        bringWindowToTop(this);
-    }
-
-    update() {
-        if (this.beingDestroyed) return;
-    }
-
-    destroy() {
-        this.beingDestroyed = true;
-        this.scene.windows.splice(this.scene.windows.indexOf(this), 1);
-        super.destroy();
-    }
-
-    close() {
-        this.closeBtn.destroy();
-        this.destroy();
-        
-    }
-
-    createTextCol(xOffset, yOffset, colSpacing, messages, colCount) {
-        if (!Array.isArray(messages)) messages = [messages];
-        if (typeof colCount == 'undefined') {
-            colCount = messages.length;
-        } 
-        let texts = [];
-        let message = '';
-        for (let i = 0; i < colCount; ++i) {
-            if (i < messages.length) {
-                message = messages[i];
-            }  
-            let text = new Text(this.scene, xOffset, yOffset + colSpacing * i, message);
-            texts.push(text);
-            this.add(text);
+        this._contentCoords = {
+            x: this.windowFrame.paneMargin,
+            y: this.windowFrame.topBar.height,
+            width: this.windowFrame.width - this.windowFrame.paneMargin * 2,
+            height: this.windowFrame.height - this.windowFrame.paneMargin * 2,
         }
-        return texts;
     }
 
-    createButtonCol(xOffset, yOffset, colSpacing, width, height, colCount, pointerUpTexture, pointerDownTexture, pointerOverTexture) {
-        let buttons = [];
-        for (let i = 0; i < colCount; ++i) {
-            let button = new Button(this.scene, xOffset, yOffset + colSpacing * i, width, height, pointerUpTexture, pointerDownTexture, pointerOverTexture);
-            buttons.push(button);
-            this.add(button);
-        }
-        return buttons;
-
-        
+    get contentCoords() {
+        return this._contentCoords;
     }
 
-    createInputTextCol(xOffset, yOffset, colSpacing, messages, colCount, textWidth) {
-        if (!Array.isArray(messages)) messages = [messages];
-        if (typeof colCount == 'undefined') {
-            colCount = messages.length;
-        } 
-        let texts = [];
-        let message = '';
-        for (let i = 0; i < colCount; ++i) {
-            if (i < messages.length) {
-                message = messages[i];
-            }  
-            let inputText = new NumberTextField(this.scene, xOffset, yOffset + colSpacing * i, textWidth, this, 4, message);
-            inputText.on('pointerdown', () => {
-                bringWindowToTop(this);
-            });
-            texts.push(inputText);
-            this.add(inputText);
-        }
-        return texts;
-
+    get x() {
+        return this.windowFrame.x;
     }
 
-    
+    get y() {
+        return this.windowFrame.y;
+    }
+
+    set x(value) {
+        this.windowFrame.x = value;
+    }
+
+    set y(value) {
+        this.windowFrame.y = value;
+    }
+
+    setPosition(x, y) {
+        this.x = x;
+        this.y = y;
+    }
 }
 
 export function bringWindowToTop(target) {
+    if (target instanceof WindowFrame) {
+        target = target.parentWindow;
+    }
     target.scene.windows.splice(target.scene.windows.indexOf(target), 1);
     target.scene.windows.push(target);
-    for (let i = 0; i < target.scene.windows.length; ++i) {
-        target.scene.windows[i].depth = i;
-    }
+    let z = 0;
+    target.scene.windows.forEach((window) => {
+        window.getChildren().forEach((child) => {
+            child.setDepth(z++);
+        })
+    })
 }
