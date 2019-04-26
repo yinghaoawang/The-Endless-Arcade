@@ -1,27 +1,28 @@
 import Window from './Window';
 
 export default class StatsWindow extends Window {
-    constructor(scene, x, y, user) {
+    constructor(scene, game, x, y) {
         super(scene, x, y, 300, 300, 'Stats');
-        this.user = user;
+        this.game = game;
+        this.targetUnit = game.player;
 
         let xOffset = 10;
         let yOffset = 5;
 
         let colSpacing = 20;
         
-        this.textLabels = this.windowContent.createTextCol(xOffset, yOffset, colSpacing, ['Name', 'Gold', 'Days']);
-        this.textValues = this.windowContent.createTextCol(xOffset + 40, yOffset, colSpacing, [this.scene.player.name, this.scene.player.gold, 'Days']);
-        this.scene.player.addPropertyChangeListener(() => {
+        this.textLabels = this.windowContent.createTextCol(xOffset, yOffset, colSpacing, ['Name', 'Gold', 'Day']);
+        this.textValues = this.windowContent.createTextCol(xOffset + 40, yOffset, colSpacing, [this.targetUnit.name, this.targetUnit.gold, this.game.day]);
+        this.targetUnit.addPropertyChangeListener(() => {
             this.update();
         });
         
     }
 
     updateStats() {
-        this.textValues[0].setText(this.scene.player.name);
-        this.textValues[1].setText(this.scene.player.gold);
-        this.textValues[2].setText(this.textValues[2].text + 's');
+        this.textValues[0].setText(this.targetUnit.name);
+        this.textValues[1].setText(this.targetUnit.gold);
+        this.textValues[2].setText(this.game.day);
     }
 
     update() {

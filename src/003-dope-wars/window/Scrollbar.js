@@ -14,6 +14,7 @@ export default class Scrollbar extends Phaser.GameObjects.Container {
         this.backgroundImage = new Phaser.GameObjects.Image(scene, 0, 0, 'scrollbar-bg');
         this.backgroundImage.setDisplaySize(this.width, this.height);
         this.backgroundImage.setOrigin(0);
+        this.backgroundImage.setInteractive();
         this.add(this.backgroundImage);
 
         this.barMargin = 2;

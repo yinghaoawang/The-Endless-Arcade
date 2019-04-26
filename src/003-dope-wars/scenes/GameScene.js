@@ -1,10 +1,10 @@
 import Phaser from 'phaser3';
-import Player from '../unit/Player';
 import InventoryWindow from '../window/InventoryWindow';
 import { setKeySchemes } from '../input/keyboard/keyboardInput';
 import Window from '../window/Window';
 import AlertWindow from '../window/AlertWindow';
 import StatsWindow from '../window/StatsWindow';
+import Game from '../Game';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -42,28 +42,19 @@ export default class GameScene extends Phaser.Scene {
 
         setKeySchemes(this);
 
-        this.player = new Player('Jonah');
-        this.player.addItem('arrow', 3212);
-        this.player.addItem('arrow', 2);
-        this.player.addItem('sword', 2);
-        this.player.addItem('shield', 1);
-        this.player.addItem('bow', 1);
-
+        this.gameInstance = new Game();
+        
         this.testWindow = new Window(this, this.screenWidth / 2, this.screenHeight / 2, 400, 300, 'Window');
-        this.alertWindow = new AlertWindow(this, this.screenWidth / 2, this.screenHeight / 2, 'Mingmong mingmong ming mong mingmin gmingmongmongmin 123 123 123 1231231 g???!?! ?!@?! ?!?!? !?');
-        this.inventoryWindow = new InventoryWindow(this, this.screenWidth / 2, this.screenHeight / 2);
-        this.statsWindow = new StatsWindow(this, 350, 180, this.player);
+        this.alertWindow = new AlertWindow(this, this.screenWidth / 2 -150, this.screenHeight / 2 -150, 'Mingmong mingmong ming mong mingmin gmingmongmongmin 123 123 123 1231231 g???!?! ?!@?! ?!?!? !?');
+        this.inventoryWindow = new InventoryWindow(this, this.gameInstance, this.screenWidth / 2, this.screenHeight / 2);
+        this.statsWindow = new StatsWindow(this, this.gameInstance, 350, 180);
 
         this.backgroundImage = this.add.image(this.screenWidth / 2, this.screenHeight / 2, 'game-bg');
         this.backgroundImage.setDisplaySize(this.screenWidth, this.screenHeight);
         this.backgroundImage.depth = -1000;
 
-        this.onUpdateListeners = [];
     }
   
     update() {
-        this.onUpdateListeners.forEach((fn) => {
-            fn();
-        });
     }
 }

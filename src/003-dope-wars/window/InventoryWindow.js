@@ -4,8 +4,11 @@ import Window from './Window';
 import AlertWindow from './AlertWindow';
 
 export default class InventoryWindow extends Window {
-    constructor(scene, x, y) {
+    constructor(scene, game, x, y) {
         super(scene, x, y, 500, 300, 'Inventory');
+
+        this.game = game;
+        this.targetUnit = game.player;
 
         let xOffset = 10;
         let yOffset = 5;
@@ -62,7 +65,7 @@ export default class InventoryWindow extends Window {
             });
         });
 
-        this.scene.player.addPropertyChangeListener(() => {
+        this.targetUnit.addPropertyChangeListener(() => {
             this.update();
         });
 
@@ -76,7 +79,7 @@ export default class InventoryWindow extends Window {
     }
 
     trySellSlot(slotIndex) {
-        let slot = this.scene.player.inventory.slots[slotIndex];
+        let slot = this.targetUnit.inventory.slots[slotIndex];
         // TODO PRICE IS PLACEHOLDER
         let price = 11111;
         let quantityOwned = slot.quantity;
@@ -91,8 +94,8 @@ export default class InventoryWindow extends Window {
             new AlertWindow(this.scene, this.scene.screenWidth / 2, this.scene.screenHeight / 3, 'You do not have the quantity offered to sell.');
             return;
         }
-        let isRowRemoved = this.scene.player.inventory.slots[slotIndex].quantity == quantityOffered;
-        let isSold = this.scene.player.removeItemAtIndex(slotIndex, quantityOffered);
+        let isRowRemoved = this.targetUnit.inventory.slots[slotIndex].quantity == quantityOffered;
+        let isSold = this.targetUnit.removeItemAtIndex(slotIndex, quantityOffered);
         
         if (isSold) {
             if (isRowRemoved) {
@@ -104,7 +107,7 @@ export default class InventoryWindow extends Window {
             }
             
             this.scene.sound.play('item-sell');
-            this.scene.player.addGold(quantityOffered * price);
+            this.targetUnit.addGold(quantityOffered * price);
         }
 
         this.update();
@@ -153,7 +156,7 @@ export default class InventoryWindow extends Window {
     }
 
     updateWithUserValues() {
-        let playerInventory = this.scene.player.inventory;
+        let playerInventory = this.targetUnit.inventory;
         for (let i = 0; i < playerInventory.slots.length; ++i) {
             let slot = playerInventory.slots[i];
             this.itemNameTexts[i].setText(slot.item.name);

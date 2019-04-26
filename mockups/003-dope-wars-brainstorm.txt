@@ -1,0 +1,70 @@
+Economy -> Price & quantity mean
+City -> Items -> Diff Prices/Quantities standard deviations
+
+Player	-> Wants to make gold in under a certain time frame
+		-> Why?
+			Because he will die in time frame,
+			child has terminal illness and needs a certain amount of gold to live, idk.
+			Maybe play NG as child
+
+		-> How?
+			Purchase goods for less from different cities,
+			sell goods for more in different cities
+
+		-> Things can do
+			Buy (+avg) 				0 time
+			Sell (-avg)				0 time
+			Heal at Doctor 			0 time
+			Sleep at Inn			1 time
+			Travel to other city	1 time
+			
+		-> Drawbacks
+			Tiredness, Health,
+			Item deterioration,
+			Random events,
+				- Attacked by bandits (give flat gold or -health & -gold)
+				- City tax (% gold or exiled & -health)
+				- Increase in doctor price
+				- Increase in Inn price
+				- Doctor missing, healing removed
+				- Inn full, sleep in Inn changed to sleep on ground (heals miniscule tiredness)
+				- Bad weather, (deteriorate items heavily)
+				
+		-> Stats
+			Gold		0
+			Health		100/100
+			Tiredness 	0/100
+			
+		-> Strategies and game responses
+			Hold onto items < Combatted by item deterioration & events requiring gold but not items
+			Hold onto gold < Combatted by % gold event & inflation
+			Hold onto HP < Combatted by chance of being killed in random event
+			Hold onto tiredness < Combatted by -health depending on severity of exhaustion
+
+Begin	->
+		Chance of good event 10-30%
+		Chance of bad event 10-30%
+		Initialize city price mean
+			
+Turn	-> 
+		Chance of bad event, then reset to 10%
+		otherwise increase chance of bad event	+2%
+		Chance of good event, then reset to 10%
+		otherwise increase chance of good event	+2%
+		
+		Increase cost of all items by 2%
+		
+		foreach city
+			foreach item
+				Normalize item quantities based on min items, max items, and average price
+				Adjust Prices
+					If price below mean, then higher chance to increase by its city's std. dev
+					if price above mean, then higher chance to decrease by its city's std. dev
+					
+					Do same for Inn & doctor
+				
+				
+Classes
+	Event
+	Economy
+	City
