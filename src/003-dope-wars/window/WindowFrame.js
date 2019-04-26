@@ -59,7 +59,7 @@ export default class WindowFrame extends WindowComponent {
             this.add(this.nameText, true);
         }
 
-        this.closeBtn = new Button(scene, this.x + this.width - this.topBar.displayHeight / 4, -1 * this.height / 2 + this.topBar.displayHeight / 4, 30, 30, 'window-close-btn', 'window-close-btn-down', 'window-close-btn-over');
+        this.closeBtn = new Button(scene, this.x + this.width - this.topBar.displayHeight / 4, this.y + this.topBar.displayHeight / 4, 30, 30, 'window-close-btn', 'window-close-btn-down', 'window-close-btn-over');
         this.closeBtn.setOrigin(1, 0);
         this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
         this.closeBtn.on('pointerclicked', () => { this.parentWindow.close(); });
@@ -75,7 +75,6 @@ export default class WindowFrame extends WindowComponent {
 
         this.maskGraphics = scene.add.graphics();
         this.maskGraphics.fillRect(this.contentPos.x, this.contentPos.y, this.contentPos.width, this.contentPos.height);
-        this.maskGraphics.setAlpha(0);
         this.maskGraphics.x = this.x;
         this.maskGraphics.y = this.y;
         this.backgroundImage.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
@@ -93,7 +92,7 @@ export default class WindowFrame extends WindowComponent {
     }
 
     close() {
-        this.closeBtn.destroy();
+        this.closeBtn.destroy(true, true);
     }
 
     createTextCol(xOffset, yOffset, colSpacing, messages, colCount) {

@@ -39,9 +39,9 @@ export default class WindowComponent extends Phaser.GameObjects.Group {
         });
     }
 
-    destroy() {
+    destroy(removeFromScene, destroyChild) {
         this.beingDestroyed = true;
-        super.destroy();
+        super.destroy(removeFromScene, destroyChild);
     }
 
     triggerEvent(event) {

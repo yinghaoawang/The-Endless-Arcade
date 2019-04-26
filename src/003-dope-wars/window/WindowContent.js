@@ -8,26 +8,22 @@ import WindowComponent from './WindowComponent';
 export default class WindowContent extends WindowComponent {
     constructor(scene, parentWindow, x, y, width, height) {
         super(scene, parentWindow, x, y, width, height);
-        this.offset.y = this.parentWindow.contentPos.y + (this.height - this.parentWindow.height) / 2;
-        this.y += this.offset.y;
-        this.pane = new Phaser.GameObjects.Image(scene, 0, 0, 'window-inner-pane');
-        this.pane.setDisplaySize(this.width, this.height);
-        this.add(this.pane);
 
-        /*
+        this.pane = new Phaser.GameObjects.Image(scene, this.x + this.parentWindow.contentPos.x, this.y + this.parentWindow.contentPos.y, 'window-inner-pane');
+        this.pane.setOrigin(0);
+        this.pane.setDisplaySize(this.width, this.height);
+        this.add(this.pane, true);
+
         this.maskGraphics = scene.add.graphics();
-        this.maskGraphics.fillStyle('0x000000');
         this.maskGraphics.fillRect(0, 0, this.width, this.parentWindow.contentPos.height);
-        this.maskGraphics.setAlpha(0);
-        this.maskGraphics.x = this.x - this.width / 2;
-        this.maskGraphics.y = this.y - this.height / 2;
-        this.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
+        this.maskGraphics.x = this.pane.x;
+        this.maskGraphics.y = this.pane.y;
+        this.pane.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
         
         this.windowMoveListeners.push(() => {
-            this.maskGraphics.x = this.parentWindow.x - this.width / 2;
-            this.maskGraphics.y = this.parentWindow.y - this.height / 2;
+            this.maskGraphics.x = this.pane.x;
+            this.maskGraphics.y = this.pane.y;
         });
-        */
     }
 
     createTextCol(xOffset, yOffset, colSpacing, messages, colCount) {
@@ -43,7 +39,7 @@ export default class WindowContent extends WindowComponent {
             }  
             let text = new Text(this.scene, xOffset, yOffset + colSpacing * i, message);
             texts.push(text);
-            this.add(text);
+            this.pane.add(text);
         }
         return texts;
     }
@@ -53,7 +49,7 @@ export default class WindowContent extends WindowComponent {
         for (let i = 0; i < colCount; ++i) {
             let button = new Button(this.scene, xOffset, yOffset + colSpacing * i, width, height, pointerUpTexture, pointerDownTexture, pointerOverTexture);
             buttons.push(button);
-            this.add(button);
+            this.pane.add(button);
         }
         return buttons;
 
@@ -76,7 +72,7 @@ export default class WindowContent extends WindowComponent {
                 bringWindowToTop(this);
             });
             texts.push(inputText);
-            this.add(inputText);
+            this.pane.add(inputText);
         }
         return texts;
 

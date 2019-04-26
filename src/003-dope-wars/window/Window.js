@@ -6,6 +6,8 @@ import WindowComponent from './WindowComponent';
 export default class Window extends Phaser.GameObjects.Group {
     constructor(scene, x, y, width, height, name) {
         super(scene);
+        this.x = x;
+        this.y = y;
         this.scene = scene;
         this.width = width;
         this.height = height;
@@ -18,15 +20,14 @@ export default class Window extends Phaser.GameObjects.Group {
         
         this.windowMoveListeners = [];
 
-        this.windowFrame = new WindowFrame(scene, this, x, y, this.width, this.height, name);
-        //this.add(this.windowFrame);
+        this.windowFrame = new WindowFrame(scene, this, this.x, this.y, this.width, this.height, name);
 
         this.contentHeight = this.contentPos.height * 1.5;
-        //this.windowContent = new WindowContent(scene, this, this.x, this.y, this.contentPos.width, this.contentHeight)
-        //this.add(this.windowContent);
+        this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentPos.width, this.contentHeight)
 
+        console.log(this.windowContent);
 
-        this.windowComponents = [/*this.windowContent,*/ this.windowFrame, ]
+        this.windowComponents = [ this.windowContent, this.windowFrame, ]
 
         bringWindowToTop(this);
     }
@@ -34,29 +35,13 @@ export default class Window extends Phaser.GameObjects.Group {
     get contentPos() {
         return this.windowFrame.contentPos;
     }
-
-    get x() {
-        return this.windowFrame.x;
-    }
-
-    get y() {
-        return this.windowFrame.y;
-    }
-
-    set x(value) {
-        this.windowFrame.x = value;
-    }
-
-    set y(value) {
-        this.windowFrame.y = value;
-    }
-
     setPosition(x, y) {
         this.x = x;
         this.y = y;
     }
 
     onpointerdown() {
+        if (this.beingDestroyed) return;
         bringWindowToTop(this);
     }
 
@@ -79,17 +64,16 @@ export default class Window extends Phaser.GameObjects.Group {
     }
 
     close() {
-        this.destroy();
+        this.destroy(true, true);
     }
     
-    destroy() {
+    destroy(removeFromScene, destroyChild) {
         this.windowComponents.forEach((component) => {
-            component.destroy();
+            component.destroy(removeFromScene, destroyChild);
         });
         this.scene.windows.splice(this.scene.windows.indexOf(this), 1);
-        super.destroy();
+        super.destroy(removeFromScene, destroyChild);
     }
-    
 }
 
 export function bringWindowToTop(target) {
