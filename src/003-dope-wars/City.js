@@ -4,6 +4,13 @@ export default class City {
         this.name = name;
 
         this.itemListings = this.createItemListings();
+        console.log(this.name + ': ', this.itemListings);
+    }
+
+    inflatePrices() {
+        this.itemListings.forEach(itemListing => {
+            itemListing.price *= this.economy.inflationRate + 1;
+        })
     }
 
     createItemListings() {
