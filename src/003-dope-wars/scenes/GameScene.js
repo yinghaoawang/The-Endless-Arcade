@@ -12,6 +12,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio('alert', 'assets/sounds/alert.wav');
+        this.load.audio('window-close', 'assets/sounds/window-close.wav');
+        this.load.audio('item-buy', 'assets/sounds/item-purchase.wav');
+        this.load.audio('item-sell', 'assets/sounds/item-purchase.wav');
         this.load.image('game-bg', 'assets/backgrounds/game-background.png');
         this.load.image('window-bg', 'assets/window/window-background.png');
         this.load.image('window-top-bar', 'assets/window/window-top-bar.png');

@@ -77,6 +77,7 @@ export default class Window extends Phaser.GameObjects.Group {
     }
 
     close() {
+        this.scene.sound.play('window-close');
         this.destroy(true, true);
     }
     

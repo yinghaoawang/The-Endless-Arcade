@@ -5,13 +5,14 @@ export default class Text extends Phaser.GameObjects.Container {
         super(scene, x, y);
         this._text = text;
 
-        this._width = width;
+        
         this.height = height;
         this.textObject = new Phaser.GameObjects.Text(this.scene, 0, 0, text);
         this.textObject.setStyle({
             color: '#000000',
             fontFamily: 'VT323',
         });
+        this.width = width;
         this.textObject.setPadding(2.5, 0, 2.5, 0);
         this.textObject.setOrigin(0);
         this.add(this.textObject);

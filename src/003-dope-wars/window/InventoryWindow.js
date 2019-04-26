@@ -103,6 +103,7 @@ export default class InventoryWindow extends Window {
                 this.scene.selectedInput = this.itemDealQuantityTexts[slotIndex];
             }
             
+            this.scene.sound.play('item-sell');
             this.scene.player.addGold(quantityOffered * price);
         }
 
