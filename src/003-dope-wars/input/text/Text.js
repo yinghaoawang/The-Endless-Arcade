@@ -29,7 +29,7 @@ export default class Text extends Phaser.GameObjects.Container {
     }
 
     set width(value) {
-        this.textObject.setWordWrapWidth(value, false);
+        this.textObject.setWordWrapWidth(value, true);
         this._width = value;
     }
 

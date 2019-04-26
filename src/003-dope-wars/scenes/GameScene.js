@@ -34,6 +34,8 @@ export default class GameScene extends Phaser.Scene {
         this.screenWidth = this.cameras.main.width;
         this.screenHeight = this.cameras.main.height;
 
+        setKeySchemes(this);
+
         this.player = new Player('Jonah');
         this.player.addItem('arrow', 3212);
         this.player.addItem('arrow', 2);
@@ -50,9 +52,12 @@ export default class GameScene extends Phaser.Scene {
         this.backgroundImage.setDisplaySize(this.screenWidth, this.screenHeight);
         this.backgroundImage.depth = -1000;
 
-        setKeySchemes(this);
+        this.onUpdateListeners = [];
     }
-
+  
     update() {
+        this.onUpdateListeners.forEach((fn) => {
+            fn();
+        });
     }
 }

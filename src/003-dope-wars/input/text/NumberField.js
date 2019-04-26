@@ -56,7 +56,7 @@ export default class NumberTextField extends Text {
                     this.scene.selectedInput = null;
                     if (this.text.length == 0) this.text = ('0');
                 }
-                    
+
                 if (this.scene.selectedInput != null && (this.text.length < this.maxLength)) {
                     this.setText(this.text + '_');
                 } else {

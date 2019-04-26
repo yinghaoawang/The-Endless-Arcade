@@ -22,8 +22,9 @@ export default class Window extends Phaser.GameObjects.Group {
 
         this.windowFrame = new WindowFrame(scene, this, this.x, this.y, this.width, this.height, name);
 
-        this.contentHeight = this.contentPos.height * 1.5;
-        this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentPos.width, this.contentHeight)
+        this.contentHeight = this.viewportArea.height * 1.25;
+        this.contentWidth = this.viewportArea.width * 1.25;
+        this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentWidth, this.contentHeight)
 
         this.windowComponents = [ this.windowContent, this.windowFrame, ]
         //this.windowComponents = [ this.windowFrame , this.windowContent, ]
@@ -35,18 +36,25 @@ export default class Window extends Phaser.GameObjects.Group {
         
     }
 
-    get contentPos() {
-        return this.windowFrame.contentPos;
+    get isSelected() {
+        return this.scene.selectedWindow === this;
     }
+
+    get viewportArea() {
+        return this.windowFrame.viewportArea;
+    }
+
+
     setPosition(x, y) {
         this.x = x;
         this.y = y;
     }
 
     onpointerdown() {
-        if (this.beingDestroyed) return;
-        this.scene.selectedWindow = this;
-        bringWindowToTop(this);
+        let windowGroup = this.parentWindow;
+        if (windowGroup.beingDestroyed) return;
+        this.scene.selectedWindow = windowGroup;
+        bringWindowToTop(windowGroup);
     }
 
     ondragstart(pointer) {

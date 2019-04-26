@@ -7,6 +7,7 @@ const letterKeysCSV = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z';
 
 
 function setKeySchemes(scene) {
+    scene.cursorKeys = scene.input.keyboard.createCursorKeys();
     scene.numberScheme = scene.input.keyboard.addKeys(numberKeysCSV);
     scene.letterScheme = scene.input.keyboard.addKeys(letterKeysCSV);
     scene.backspaceKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);

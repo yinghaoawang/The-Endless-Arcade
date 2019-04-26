@@ -66,7 +66,7 @@ export default class WindowFrame extends WindowComponent {
         this.closeBtn.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
         this.add(this.closeBtn, true);
 
-        this.contentPos = {
+        this.viewportArea = {
             x: this.paneMargin,
             y: this.topBar.displayHeight,
             width: this.width - this.paneMargin * 2,
@@ -74,7 +74,7 @@ export default class WindowFrame extends WindowComponent {
         }
 
         this.maskGraphics = scene.add.graphics();
-        this.maskGraphics.fillRect(this.contentPos.x, this.contentPos.y, this.contentPos.width, this.contentPos.height);
+        this.maskGraphics.fillRect(this.viewportArea.x, this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
         this.maskGraphics.setAlpha(0);
         this.maskGraphics.x = this.x;
         this.maskGraphics.y = this.y;
