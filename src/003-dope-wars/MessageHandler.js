@@ -13,13 +13,16 @@ class MessageHandler {
     }
     printError(message) {
         this.lastError = message;
-        if (this.debugMove) {
+        if (this.debugMode) {
             console.error('DEBUG: ' + message);
         }
     }
     print(message) {
         this.lastMessage = message;
         console.log(message);
+    }
+    getLastLog() {
+        return this.lastLog();
     }
     getLastMessage() {
         return this.lastMessage();

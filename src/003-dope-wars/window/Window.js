@@ -22,8 +22,9 @@ export default class Window extends Phaser.GameObjects.Group {
 
         this.windowFrame = new WindowFrame(scene, this, this.x, this.y, this.width, this.height, name);
 
-        this.contentHeight = this.viewportArea.height * 1.25;
         this.contentWidth = this.viewportArea.width * 1.25;
+        this.contentHeight = this.viewportArea.height * 10.25;
+
         this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentWidth, this.contentHeight)
 
         this.windowComponents = [ this.windowContent, this.windowFrame, ]
