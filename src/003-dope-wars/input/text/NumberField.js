@@ -3,36 +3,27 @@ import Phaser from 'phaser3';
 import Text from './Text';
 
 export default class NumberTextField extends Text {
-    constructor(scene, x, y, width, parentContainer, maxTrueText, text) {
-        super(scene, x, y, text);
-        this.value = (text);
-        this.trueWidth = width;
-        this.trueHeight = this.height;
-        this.maxTrueText = maxTrueText;
-        this.setWordWrapWidth(width);
+    constructor(scene, x, y, width, height, maxLength, text) {
+        super(scene, x, y, width, height, text);
+        this.text = text;
+        this.maxLength = maxLength;
         
-        this.setMaxLines(1);
-        this.setBackgroundColor('#ffffff');
-        this.setPadding(2.5, 0, 2.5, 0);
-        
-        this.setSize(width - this.padding.left - this.padding.right, this.height - this.padding.top - this.padding.bottom);
-        this.backgroundRect = new Phaser.GameObjects.Rectangle(scene, this.x, this.y, this.trueWidth, this.trueHeight);
+        this.backgroundRect = new Phaser.GameObjects.Rectangle(scene, 0, 0, this.width, this.height);
         this.backgroundRect.setFillStyle('0xffffff');
-        this.backgroundRect.setOrigin(0, 0);
-        this.setInteractive();
-        parentContainer.add(this);
-        
-        this.parentContainer.add(this.backgroundRect);
-        this.parentContainer.moveDown(this.backgroundRect);
+        this.backgroundRect.setOrigin(0);
+        this.backgroundRect.setInteractive();
+        this.add(this.backgroundRect, true);
+        this.moveUp(this.textObject);
 
-        this.on('pointerdown', () => {
+        this.backgroundRect.on('pointerdown', () => {
             if (this.scene.selectedInput != null) {
-                if (this.scene.selectedInput.value.length == 0) this.scene.selectedInput.value = ('0');
-                this.scene.selectedInput.setText(this.scene.selectedInput.value);
+                if (this.scene.selectedInput.text.length == 0) this.scene.selectedInput.text = ('0');
+                this.scene.selectedInput.setText(this.scene.selectedInput.text);
             }
             this.scene.selectedInput = this;
             this.update();
         });
+        
 
         this.scenePointerListener = (pointer) => {
             if (this.scene.selectedInput === this) {
@@ -42,9 +33,9 @@ export default class NumberTextField extends Text {
                 if (pointer.x < absX || pointer.x > absX + this.trueWidth || pointer.y < absY || pointer.y > absY + this.trueHeight) {
                     this.deselect();
                 }
-            } else if (this.value.length == 0) {
-                this.value = ('0');
-                this.setText(this.value + '');
+            } else if (this.text.length == 0) {
+                this.text = ('0');
+                this.setText(this.text + '');
             }
         };
         this.scene.input.on('pointerdown', this.scenePointerListener);
@@ -54,22 +45,22 @@ export default class NumberTextField extends Text {
                 let key = event.key;
                 let charCode = key.charCodeAt(0);
                 if (charCode >= '0'.charCodeAt(0) && charCode <= '9'.charCodeAt(0)) {
-                    if (this.value.length < this.maxValue) {
-                        this.value = (this.value + key);
+                    if (this.text.length < this.maxLength) {
+                        this.text = (this.text + key);
                     }
                 } else if (key == 'Backspace') {
-                    if (this.value.length > 0) {
-                        this.value = (this.value.substring(0, this.value.length - 1));
+                    if (this.text.length > 0) {
+                        this.text = (this.text.substring(0, this.text.length - 1));
                     }
                 } else if (key == 'Enter') {
                     this.scene.selectedInput = null;
-                    if (this.value.length == 0) this.value = ('0');
+                    if (this.text.length == 0) this.text = ('0');
                 }
                     
-                if (this.scene.selectedInput != null && (this.value.length < this.maxValue)) {
-                    this.setText(this.value + '_');
+                if (this.scene.selectedInput != null && (this.text.length < this.maxLength)) {
+                    this.setText(this.text + '_');
                 } else {
-                    this.setText(this.value + '');
+                    this.setText(this.text + '');
                 }
             }
         };
@@ -79,38 +70,23 @@ export default class NumberTextField extends Text {
 
     deselect() {
         this.scene.selectedInput = null;
-        if (this.value.length == 0) {
-            this.value = ('0');
+        if (this.text.length == 0) {
+            this.text = ('0');
         }
-        this.setText(this.value + '');
+        this.setText(this.text + '');
     }
 
     update() {
         if (this.scene.selectedInput === this) {
-            if (this.value == '0') this.value = '';
+            if (this.text == '0') this.text = '';
             
-            if (this.value.length < this.maxValue) {
-                this.setText(this.value + '_');
+            if (this.text.length < this.maxLength) {
+                this.setText(this.text + '_');
             } else {
-                this.setText(this.value + '');
+                this.setText(this.text + '');
             }
         } else {
-            this.setText(this.value + '');
-        }
-    }
-
-    get value() {
-        return this.trueText;
-    }
-
-    get maxValue() {
-        return this.maxTrueText;
-    }
-
-    set value(value) {
-        this.trueText = value;
-        if (typeof this.propertyChangeListeners != 'undefined') { 
-            this.triggerEvent('propertychange');
+            this.setText(this.text + '');
         }
     }
 

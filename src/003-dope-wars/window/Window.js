@@ -25,11 +25,14 @@ export default class Window extends Phaser.GameObjects.Group {
         this.contentHeight = this.contentPos.height * 1.5;
         this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentPos.width, this.contentHeight)
 
-        console.log(this.windowContent);
-
         this.windowComponents = [ this.windowContent, this.windowFrame, ]
+        //this.windowComponents = [ this.windowFrame , this.windowContent, ]
 
         bringWindowToTop(this);
+    }
+
+    update() {
+        
     }
 
     get contentPos() {
@@ -42,6 +45,7 @@ export default class Window extends Phaser.GameObjects.Group {
 
     onpointerdown() {
         if (this.beingDestroyed) return;
+        this.scene.selectedWindow = this;
         bringWindowToTop(this);
     }
 

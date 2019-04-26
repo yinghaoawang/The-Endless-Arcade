@@ -55,7 +55,7 @@ export default class WindowFrame extends WindowComponent {
 
        if (typeof name != 'undefined') {
             this.name = name;
-            this.nameText = new Text(scene, this.x + this.paneMargin + 5, this.y + 5, this.name);
+            this.nameText = new Text(scene, this.x + this.paneMargin + 5, this.y + 5, null, null, this.name);
             this.add(this.nameText, true);
         }
 
@@ -75,6 +75,7 @@ export default class WindowFrame extends WindowComponent {
 
         this.maskGraphics = scene.add.graphics();
         this.maskGraphics.fillRect(this.contentPos.x, this.contentPos.y, this.contentPos.width, this.contentPos.height);
+        this.maskGraphics.setAlpha(0);
         this.maskGraphics.x = this.x;
         this.maskGraphics.y = this.y;
         this.backgroundImage.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
