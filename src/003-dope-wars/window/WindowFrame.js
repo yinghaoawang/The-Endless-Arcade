@@ -26,36 +26,41 @@ export default class WindowFrame extends WindowComponent {
 
         this.paneMargin = 10;
 
-        this.backgroundHitbox = new Phaser.Geom.Polygon([
-            0, this.topBar.displayHeight,
-            0, this.height,
-            this.backgroundImage.width, this.height,
-            this.backgroundImage.width, this.topBar.displayHeight,
-            this.backgroundImage.width - this.paneMargin, this.topBar.displayHeight,
-            this.backgroundImage.width - this.paneMargin, this.height - this.paneMargin,
-            this.paneMargin, this.height - this.paneMargin,
-            this.paneMargin, this.topBar.displayHeight
+        this.backgroundHitbox = new Phaser.GameObjects.Polygon(scene, this.x, this.y + this.topBar.displayHeight, [
+            0, 0,
+            0, this.height - this.topBar.displayHeight,
+            this.width, this.height - this.topBar.displayHeight,
+            this.width, 0,
+            this.width - this.paneMargin, 0,
+            this.width - this.paneMargin, this.height - this.paneMargin - this.topBar.displayHeight,
+            this.paneMargin, this.height - this.paneMargin - this.topBar.displayHeight,
+            this.paneMargin, 0
         ]);
+        this.backgroundHitbox.setOrigin(0);
 
-        this.backgroundImage.setInteractive({
-            hitArea: this.backgroundHitbox,
-            hitAreaCallback: Phaser.Geom.Polygon.Contains,
+        this.backgroundHitbox.setInteractive({
             draggable: true,
             useHandCursor: true,
-        })
+        });
+        this.add(this.backgroundHitbox, true);
 
+        
         this.topBar.setInteractive({
             draggable: true,
             useHandCursor: true,
-        })
+        });
 
-        this.backgroundImage.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
-        this.backgroundImage.on('dragstart', this.parentWindow.ondragstart.bind(this));
-        this.backgroundImage.on('drag', this.parentWindow.ondrag.bind(this));
+
+        this.backgroundHitbox.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
+        this.backgroundHitbox.on('dragstart', this.parentWindow.ondragstart.bind(this));
+        this.backgroundHitbox.on('drag', this.parentWindow.ondrag.bind(this));
+        
+        
         this.topBar.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
         this.topBar.on('dragstart', this.parentWindow.ondragstart.bind(this));
         this.topBar.on('drag', this.parentWindow.ondrag.bind(this));
 
+        
        if (typeof name != 'undefined') {
             this.name = name;
             this.nameText = new Text(scene, this.x + this.paneMargin + 5, this.y + 5, null, null, this.name);

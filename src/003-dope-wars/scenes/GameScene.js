@@ -45,6 +45,8 @@ export default class GameScene extends Phaser.Scene {
         this.gameInstance = new Game();
         
         this.testWindow = new Window(this, this.screenWidth / 2, this.screenHeight / 2, 400, 300, 'Window');
+        this.alertWindow = new AlertWindow(this, 350, 350, 'Mingm123 123213 213 231 ong?');
+        this.alertWindow = new AlertWindow(this, this.screenWidth / 2 -250, this.screenHeight / 2 -250, 'Mingmong?');
         this.alertWindow = new AlertWindow(this, this.screenWidth / 2 -150, this.screenHeight / 2 -150, 'Mingmong mingmong ming mong mingmin gmingmongmongmin 123 123 123 1231231 g???!?! ?!@?! ?!?!? !?');
         this.inventoryWindow = new InventoryWindow(this, this.gameInstance, this.screenWidth / 2, this.screenHeight / 2);
         this.statsWindow = new StatsWindow(this, this.gameInstance, 350, 180);
