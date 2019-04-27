@@ -18,7 +18,7 @@ export default class Economy {
             let itemListing = {
                 item: item,
                 meanPrice: Math.ceil(this.randomize(stackCost, .25, .5) / item.maxStack),
-                meanQuantity: Math.ceil(this.randomize(item.maxStack, .25, .5)),
+                meanQuantity: Math.ceil(this.randomize(item.maxStack, .25, .5))
             }
             updatedList.push(itemListing);
         });

@@ -10,6 +10,8 @@ export default class WindowContent extends WindowComponent {
     constructor(scene, parentWindow, x, y, width, height) {
         super(scene, parentWindow, x, y, width, height);
 
+        this._height = height;
+
         this.pane = new Phaser.GameObjects.Container(scene, this.x + this.viewportArea.x, this.y + this.viewportArea.y);
         this.add(this.pane, true);
 
@@ -35,18 +37,59 @@ export default class WindowContent extends WindowComponent {
         this.backgroundHitbox.setInteractive();
         this.add(this.backgroundHitbox);
 
-        this.backgroundHitbox.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
+        this.backgroundHitbox.on('pointerdown', () => {
+            this.parentWindow.onpointerdown();
+        });
 
+        if (this.height > this.viewportArea.height) {
+            this.addScrollbar();
+        }
+        
+    }
+
+    set height(value) {
+        this._height = value;
+        // if new height value exceeds viewport height, then add or update the scroll bar
+        if (this.height > this.viewportArea.height) {
+            if (this.scrollbar != null) {
+                this.removeScrollbar();
+            }
+            this.addScrollbar();
+        } else {
+            // if new height is less than viewport height then make pane fill the viewport, then remove the scrollbar
+            if (this.scrollbar != null) {
+                this.removeScrollbar();
+            }
+            this._height = this.viewportArea.height;
+            
+        }
+        if (this.backgroundImage) {
+            this.backgroundImage.setDisplaySize(this.width, this.height);
+        }
+    }
+
+    get height() {
+        return this._height;
+    }
+
+    removeScrollbar() {
+        this.scrollbar.destroy();
+        this.scrollbar = null;
+    }
+
+    addScrollbar() {
         let scrollbarArea = {
             margin: 0,
             width: 18,
         }
-        this.scrollbar = new Scrollbar(scene, this,
+        
+        this.scrollbar = new Scrollbar(this.scene, this,
             this.x + this.viewportArea.x + this.viewportArea.width - scrollbarArea.width - scrollbarArea.margin, this.y + this.viewportArea.y + scrollbarArea.margin,
             scrollbarArea.width, this.viewportArea.height - 2 * scrollbarArea.margin,
             this.viewportArea, { width: this.width, height: this.height },
             this.pane
         );
+
         this.add(this.scrollbar, true);
     }
 

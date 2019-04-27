@@ -1,41 +1,33 @@
-import Phaser from 'phaser3';
+import AbstractWindow from './AbstractWindow';
 import WindowFrame from './WindowFrame';
 import WindowContent from './WindowContent';
 import WindowComponent from './WindowComponent';
 
-export default class Window extends Phaser.GameObjects.Group {
+export default class Window extends AbstractWindow {
     constructor(scene, x, y, width, height, name) {
-        super(scene);
-        this.x = x;
-        this.y = y;
-        this.scene = scene;
-        this.width = width;
-        this.height = height;
-
+        super(scene, x, y, width, height);
+        
         if (typeof scene.windows == 'undefined') {
             scene.windows = [];
         }
         scene.windows.unshift(this);
-        this.beingDestroyed = false;
         
         this.windowMoveListeners = [];
 
         this.windowFrame = new WindowFrame(scene, this, this.x, this.y, this.width, this.height, name);
 
-        this.contentWidth = this.viewportArea.width * 1.25;
-        this.contentHeight = this.viewportArea.height * 10.25;
+        this.contentWidth = this.viewportArea.width;
+        this.contentHeight = this.viewportArea.height * 1.5;
 
         this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentWidth, this.contentHeight)
 
-        this.windowComponents = [ this.windowContent, this.windowFrame, ]
-        //this.windowComponents = [ this.windowFrame , this.windowContent, ]
+        this.windowComponents.push(this.windowContent);
+        this.windowComponents.push(this.windowFrame);
 
         bringWindowToTop(this);
     }
 
-    update() {
-        
-    }
+    
 
     get isSelected() {
         return this.scene.selectedWindow === this;
@@ -45,14 +37,17 @@ export default class Window extends Phaser.GameObjects.Group {
         return this.windowFrame.viewportArea;
     }
 
-
     setPosition(x, y) {
         this.x = x;
         this.y = y;
     }
 
     onpointerdown() {
-        let windowGroup = this.parentWindow;
+        let windowGroup = this;
+        if (this instanceof WindowComponent) {
+            windowGroup = this.parentWindow;
+        }
+          
         if (windowGroup.beingDestroyed) return;
         this.scene.selectedWindow = windowGroup;
         bringWindowToTop(windowGroup);
@@ -82,9 +77,6 @@ export default class Window extends Phaser.GameObjects.Group {
     }
     
     destroy(removeFromScene, destroyChild) {
-        this.windowComponents.forEach((component) => {
-            component.destroy(removeFromScene, destroyChild);
-        });
         this.scene.windows.splice(this.scene.windows.indexOf(this), 1);
         super.destroy(removeFromScene, destroyChild);
     }

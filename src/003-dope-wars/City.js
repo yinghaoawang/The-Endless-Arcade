@@ -22,12 +22,18 @@ export default class City {
             if (roll >= minChance && roll <= maxChance) {
                 let itemListing = {
                     item: itemInfo.item,
-                    price: itemInfo.meanPrice,
-                    quantity: itemInfo.meanQuantity,
+                    price: Math.ceil(this.randomize(itemInfo.meanPrice, .25, .5)),
+                    quantity: Math.ceil(this.randomize(itemInfo.meanQuantity, .25, .5)),
                 }
                 itemListings.push(itemListing);
             }
         });
         return itemListings;
+    }
+
+    randomize(value, randMin, randMax) {
+        let sign = (Math.random() > .5) ? 1 : -1;
+        let amount = value * (Math.random() * (randMax - randMin) + randMin);
+        return value + sign * amount;
     }
 }

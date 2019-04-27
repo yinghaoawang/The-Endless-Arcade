@@ -14,12 +14,24 @@ export default class Game {
         this.economy = new Economy(ItemList);
         this.cities = this.createCities(this.economy, 5);
         this.day = 1;
+        this.step();
+    }
+
+    step() {
+        this.player.tiredness = 40;
+        this.player.step();
+        this.economy.inflatePrices();
+        //this.cities.restock();
+        this.cities.forEach(city => {
+            city.inflatePrices();
+        });
+        ++this.day;
     }
 
     createCities(economy, cityCount) {
         let cities = [];
         for (let i = 0; i < cityCount; ++i) {
-            let city = new City(economy, 'City ' + Math.random() * 100);
+            let city = new City(economy, 'City ' + Math.ceil(Math.random() * 10000));
             cities.push(city);
         }
         return cities;
