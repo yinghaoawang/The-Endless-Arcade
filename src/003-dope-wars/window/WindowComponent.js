@@ -6,8 +6,8 @@ export default class WindowComponent extends Phaser.GameObjects.Group {
         this.parentWindow = parentWindow;
         this._x = x;
         this._y = y;
-        this.width = width;
-        this.height = height;
+        this._width = width;
+        this._height = height;
 
         this.beingDestroyed = false;
         this.windowMoveListeners = [];
@@ -18,9 +18,20 @@ export default class WindowComponent extends Phaser.GameObjects.Group {
     get y() {
         return this._y;
     }
-
     get x() {
         return this._x;
+    }
+    get width() {
+        return this._width;
+    }
+    get height() {
+        return this._height;
+    }
+    set width(value) {
+        this._width = value;
+    }
+    set height(value) {
+        this._height = value;
     }
 
     set x(value) {
@@ -29,6 +40,7 @@ export default class WindowComponent extends Phaser.GameObjects.Group {
         this.getChildren().forEach((child) => {
             child.x += diff;
         });
+        this.triggerEvent('windowmove');
     }
 
     set y(value) {
@@ -37,6 +49,12 @@ export default class WindowComponent extends Phaser.GameObjects.Group {
         this.getChildren().forEach((child) => {
             child.y += diff;
         });
+        this.triggerEvent('windowmove');
+    }
+
+    update() {
+        if (this.beingDestroyed) return;
+        super.update();
     }
 
     destroy(removeFromScene, destroyChild) {

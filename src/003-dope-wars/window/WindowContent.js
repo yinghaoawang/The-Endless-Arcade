@@ -2,15 +2,12 @@ import Phaser from 'phaser3';
 import Button from '../input/button/Button';
 import Text from '../input/text/Text';
 import NumberTextField from '../input/text/NumberField';
-import { bringWindowToTop } from './Window';
 import WindowComponent from './WindowComponent';
 import Scrollbar from './Scrollbar';
 
 export default class WindowContent extends WindowComponent {
     constructor(scene, parentWindow, x, y, width, height) {
         super(scene, parentWindow, x, y, width, height);
-
-        this._height = height;
 
         this.pane = new Phaser.GameObjects.Container(scene, this.x + this.viewportArea.x, this.y + this.viewportArea.y);
         this.add(this.pane, true);
@@ -38,15 +35,18 @@ export default class WindowContent extends WindowComponent {
         this.add(this.backgroundHitbox);
 
         this.backgroundHitbox.on('pointerdown', () => {
+            this.parentWindow.height += 100;
             this.parentWindow.onpointerdown();
         });
 
         if (this.height > this.viewportArea.height) {
             this.addScrollbar();
         }
-        
     }
 
+    get height() {
+        return this._height;
+    }
     set height(value) {
         this._height = value;
         // if new height value exceeds viewport height, then add or update the scroll bar
@@ -66,10 +66,6 @@ export default class WindowContent extends WindowComponent {
         if (this.backgroundImage) {
             this.backgroundImage.setDisplaySize(this.width, this.height);
         }
-    }
-
-    get height() {
-        return this._height;
     }
 
     removeScrollbar() {
@@ -144,7 +140,7 @@ export default class WindowContent extends WindowComponent {
             }  
             let inputText = new NumberTextField(this.scene, xOffset, yOffset + colSpacing * i, textWidth, 18, 4, message);
             inputText.on('pointerdown', () => {
-                bringWindowToTop(this);
+                this.focus();
             });
             texts.push(inputText);
             this.pane.add(inputText);

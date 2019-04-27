@@ -2,23 +2,26 @@ import Phaser from 'phaser3';
 import Button from '../input/button/Button';
 import Text from '../input/text/Text';
 import NumberTextField from '../input/text/NumberField';
-import { bringWindowToTop } from './Window';
 import WindowComponent from './WindowComponent';
 
 export default class WindowFrame extends WindowComponent {
     constructor(scene, parentWindow, x, y, width, height, name) {
         super(scene, parentWindow, x, y, width, height);
+
+        this._height = height;
+        this._width = width;
+        this.defaultAlpha = .75;
         
         this.backgroundImage = new Phaser.GameObjects.Image(scene, this.x, this.y, 'window-bg');
         this.backgroundImage.setOrigin(0);
         this.backgroundImage.setDisplaySize(this.width, this.height);
-        this.backgroundImage.setAlpha(.85);
+        this.backgroundImage.setAlpha(this.defaultAlpha);
         this.add(this.backgroundImage, true);
 
         this.topBar = new Phaser.GameObjects.Image(scene, this.x, this.y, 'window-top-bar');
         this.topBar.setOrigin(0)
         this.topBar.setDisplaySize(this.width, 30);
-        this.topBar.setAlpha(.85);
+        this.topBar.setAlpha(this.defaultAlpha);
         this.add(this.topBar, true);
 
         this.paneMargin = 10;
@@ -64,6 +67,7 @@ export default class WindowFrame extends WindowComponent {
         this.closeBtn.setDisplaySize(this.topBar.displayHeight / 2, this.topBar.displayHeight / 2);
         this.closeBtn.on('pointerclicked', () => { this.parentWindow.close(); });
         this.closeBtn.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
+        this.closeBtn.setAlpha(this.defaultAlpha);
         this.add(this.closeBtn, true);
 
         this.viewportArea = {
@@ -86,10 +90,6 @@ export default class WindowFrame extends WindowComponent {
             this.maskGraphics.y = this.y
         });
 
-    }
-
-    update() {
-        if (this.being1ed) return;
     }
 
     close() {
@@ -139,7 +139,7 @@ export default class WindowFrame extends WindowComponent {
             }  
             let inputText = new NumberTextField(this.scene, xOffset, yOffset + colSpacing * i, textWidth, this, 4, message);
             inputText.on('pointerdown', () => {
-                bringWindowToTop(this);
+                this.focus();
             });
             texts.push(inputText);
             this.add(inputText);

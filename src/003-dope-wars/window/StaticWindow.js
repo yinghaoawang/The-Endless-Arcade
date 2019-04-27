@@ -1,45 +1,39 @@
-import AbstractWindow from './AbstractWindow';
+import Phaser from 'phaser3';
 import WindowFrame from './WindowFrame';
 import WindowContent from './WindowContent';
 import WindowComponent from './WindowComponent';
 
-export default class Window extends AbstractWindow {
+export default class StaticWindow extends Phaser.GameObjects.Group {
     constructor(scene, x, y, width, height, name) {
-        super(scene, x, y, width, height);
-        
+        super(scene);
+        this.x = x;
+        this.y = y;
+        this.scene = scene;
+        this.width = width;
+        this.height = height;
+
         if (typeof scene.windows == 'undefined') {
             scene.windows = [];
         }
         scene.windows.unshift(this);
+        this.beingDestroyed = false;
         
         this.windowMoveListeners = [];
 
-        this.windowFrame = new WindowFrame(scene, this, this.x, this.y, width, height, name);
+        this.windowFrame = new WindowFrame(scene, this, this.x, this.y, this.width, this.height, name);
 
         this.contentWidth = this.viewportArea.width;
         this.contentHeight = this.viewportArea.height * 1.5;
 
         this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentWidth, this.contentHeight)
 
-        this.windowComponents.push(this.windowFrame);
-        this.windowComponents.push(this.windowContent);
-        
-        this.focus();
+        this.windowComponents = [ this.windowContent, this.windowFrame, ]
+
+        bringWindowToTop(this);
     }
 
-    get width() {
-        return this._width;
-    }
-    set width(value) {
-        this._width = value;
-        if (typeof windowFrame != 'undefined') this.windowFrame.width = value;
-    }
-    get height() {
-        return this._height;
-    }
-    set height(value) {
-        this._height = value;
-        if (typeof windowFrame != 'undefined') this.windowFrame.height = value;
+    update() {
+        
     }
 
     get isSelected() {
@@ -50,23 +44,10 @@ export default class Window extends AbstractWindow {
         return this.windowFrame.viewportArea;
     }
 
+
     setPosition(x, y) {
         this.x = x;
         this.y = y;
-    }
-
-    focus() {
-        if (this.scene.selectedWindow) {
-            this.scene.selectedWindow.windowFrame.closeBtn.setAlpha(this.scene.selectedWindow.windowFrame.defaultAlpha);
-            this.scene.selectedWindow.windowFrame.topBar.setAlpha(this.scene.selectedWindow.windowFrame.defaultAlpha);
-            this.scene.selectedWindow.windowFrame.backgroundImage.setAlpha(this.scene.selectedWindow.windowFrame.defaultAlpha);
-        }
-        this.scene.selectedWindow = this;
-        this.windowFrame.topBar.setAlpha(1);
-        this.windowFrame.backgroundImage.setAlpha(1);
-        this.windowFrame.closeBtn.setAlpha(1);
-
-        this.bringToTop();
     }
 
     onpointerdown() {
@@ -74,9 +55,10 @@ export default class Window extends AbstractWindow {
         if (this instanceof WindowComponent) {
             windowGroup = this.parentWindow;
         }
+          
         if (windowGroup.beingDestroyed) return;
-        
-        windowGroup.focus();
+        this.scene.selectedWindow = windowGroup;
+        bringWindowToTop(windowGroup);
     }
 
     ondragstart(pointer) {
@@ -103,22 +85,24 @@ export default class Window extends AbstractWindow {
     }
     
     destroy(removeFromScene, destroyChild) {
+        this.windowComponents.forEach((component) => {
+            component.destroy(removeFromScene, destroyChild);
+        });
         this.scene.windows.splice(this.scene.windows.indexOf(this), 1);
         super.destroy(removeFromScene, destroyChild);
     }
+}
 
-    bringToTop() {
-        let target = this;
-        if (target instanceof WindowComponent) {
-            target = target.parentWindow;
-        }
-        target.scene.windows.splice(target.scene.windows.indexOf(target), 1);
-        target.scene.windows.push(target);
-        let z = 0;
-        target.scene.windows.forEach((window) => {
-            window.windowComponents.forEach((component) => {
-                component.setDepth(z++);
-            })
-        })
+export function bringWindowToTop(target) {
+    if (target instanceof WindowComponent) {
+        target = target.parentWindow;
     }
+    target.scene.windows.splice(target.scene.windows.indexOf(target), 1);
+    target.scene.windows.push(target);
+    let z = 0;
+    target.scene.windows.forEach((window) => {
+        window.windowComponents.forEach((component) => {
+            component.setDepth(z++);
+        })
+    })
 }
