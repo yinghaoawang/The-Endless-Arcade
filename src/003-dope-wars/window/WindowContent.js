@@ -27,18 +27,14 @@ export default class WindowContent extends WindowComponent {
         this.backgroundHitbox = new Phaser.GameObjects.Rectangle(scene, this.x + this.viewportArea.x, this.y + this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
         this.backgroundHitbox.setOrigin(0);
         this.backgroundHitbox.setInteractive();
-        this.add(this.backgroundHitbox);
+        this.add(this.backgroundHitbox, true);
 
         this.backgroundHitbox.on('pointerdown', () => {
-            
             this.height += 10;
             this.parentWindow.onpointerdown();
-            
         });
 
-        if (this.height > this.viewportArea.height) {
-            this.addScrollbar();
-        }
+        this.updateScrollbar();
     }
 
     get height() {
@@ -50,7 +46,6 @@ export default class WindowContent extends WindowComponent {
         if (this.backgroundImage) {
             this.backgroundImage.setDisplaySize(this.width, this.height);
         }
-
         
         this.updateScrollbar();
     }
