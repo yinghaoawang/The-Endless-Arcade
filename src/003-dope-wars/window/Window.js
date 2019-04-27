@@ -17,7 +17,7 @@ export default class Window extends AbstractWindow {
         this.windowFrame = new WindowFrame(scene, this, this.x, this.y, width, height, name);
 
         this.contentWidth = this.viewportArea.width;
-        this.contentHeight = this.viewportArea.height * 1.25;
+        this.contentHeight = this.viewportArea.height;
 
         this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentWidth, this.contentHeight)
 

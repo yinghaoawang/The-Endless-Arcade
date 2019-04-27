@@ -9,20 +9,9 @@ export default class WindowContent extends WindowComponent {
     constructor(scene, parentWindow, x, y, width, height) {
         super(scene, parentWindow, x, y, width, height);
 
-        this.pane = new Phaser.GameObjects.Container(scene, this.x + this.viewportArea.x, this.y + this.viewportArea.y);
-        this.add(this.pane, true);
-
         this.backgroundImage = new Phaser.GameObjects.Image(scene, 0, 0, 'window-inner-pane');
         this.backgroundImage.setOrigin(0);
         this.backgroundImage.setDisplaySize(this.width, this.height);
-        this.pane.add(this.backgroundImage);
-
-        this.createNewMask();
-        
-        this.windowMoveListeners.push(() => {
-            this.maskGraphics.x = this.x + this.viewportArea.x;
-            this.maskGraphics.y = this.y + this.viewportArea.y;
-        });
 
         this.backgroundHitbox = new Phaser.GameObjects.Rectangle(scene, this.x + this.viewportArea.x, this.y + this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
         this.backgroundHitbox.setOrigin(0);
@@ -30,8 +19,18 @@ export default class WindowContent extends WindowComponent {
         this.add(this.backgroundHitbox, true);
 
         this.backgroundHitbox.on('pointerdown', () => {
-            this.parentWindow.height += 10;
+            //this.parentWindow.height += 10;
             this.parentWindow.onpointerdown();
+        });
+        
+        this.pane = new Phaser.GameObjects.Container(scene, this.x + this.viewportArea.x, this.y + this.viewportArea.y);
+        this.add(this.pane, true);
+        this.pane.add(this.backgroundImage);
+
+        this.createNewMask();
+        this.windowMoveListeners.push(() => {
+            this.maskGraphics.x = this.x + this.viewportArea.x;
+            this.maskGraphics.y = this.y + this.viewportArea.y;
         });
 
         this.updateScrollbar();
