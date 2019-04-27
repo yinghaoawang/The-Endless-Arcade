@@ -26,40 +26,16 @@ export default class WindowFrame extends WindowComponent {
 
         this.paneMargin = 10;
 
-        this.backgroundHitbox = new Phaser.GameObjects.Polygon(scene, this.x, this.y + this.topBar.displayHeight, [
-            0, 0,
-            0, this.height - this.topBar.displayHeight,
-            this.width, this.height - this.topBar.displayHeight,
-            this.width, 0,
-            this.width - this.paneMargin, 0,
-            this.width - this.paneMargin, this.height - this.paneMargin - this.topBar.displayHeight,
-            this.paneMargin, this.height - this.paneMargin - this.topBar.displayHeight,
-            this.paneMargin, 0
-        ]);
-        this.backgroundHitbox.setOrigin(0);
-
-        this.backgroundHitbox.setInteractive({
-            draggable: true,
-            useHandCursor: true,
-        });
-        this.add(this.backgroundHitbox, true);
-
-        
         this.topBar.setInteractive({
             draggable: true,
             useHandCursor: true,
         });
 
-
-        this.backgroundHitbox.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
-        this.backgroundHitbox.on('dragstart', this.parentWindow.ondragstart.bind(this));
-        this.backgroundHitbox.on('drag', this.parentWindow.ondrag.bind(this));
-        
-        
         this.topBar.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
         this.topBar.on('dragstart', this.parentWindow.ondragstart.bind(this));
         this.topBar.on('drag', this.parentWindow.ondrag.bind(this));
 
+        this.createNewBackgroundHitbox();
         
        if (typeof name != 'undefined') {
             this.name = name;
@@ -84,6 +60,19 @@ export default class WindowFrame extends WindowComponent {
 
     }
 
+    get polygonHitboxPoints() {
+        return [
+            0, 0,
+            0, this.height - this.topBar.displayHeight,
+            this.width, this.height - this.topBar.displayHeight,
+            this.width, 0,
+            this.width - this.paneMargin, 0,
+            this.width - this.paneMargin, this.height - this.paneMargin - this.topBar.displayHeight,
+            this.paneMargin, this.height - this.paneMargin - this.topBar.displayHeight,
+            this.paneMargin, 0
+        ]
+    }
+
     get viewportArea() {
         return {
             x: this.paneMargin,
@@ -100,12 +89,27 @@ export default class WindowFrame extends WindowComponent {
         console.log(value);
         this._height = value;
         this.backgroundImage.setDisplaySize(this.width, this.height);
+        this.backgroundHitbox.destroy();
+        this.createNewBackgroundHitbox();
         this.maskGraphics.destroy();
         this.createNewMask();
         
         let windowContent = this.parentWindow.windowContent;
         
         windowContent.updateViewport();
+    }
+
+    createNewBackgroundHitbox() {
+        this.backgroundHitbox = new Phaser.GameObjects.Polygon(this.scene, this.x, this.y + this.topBar.displayHeight, this.polygonHitboxPoints);
+        this.backgroundHitbox.setOrigin(0);
+        this.backgroundHitbox.setInteractive({
+            draggable: true,
+            useHandCursor: true,
+        });
+        this.backgroundHitbox.on('pointerdown', this.parentWindow.onpointerdown.bind(this));
+        this.backgroundHitbox.on('dragstart', this.parentWindow.ondragstart.bind(this));
+        this.backgroundHitbox.on('drag', this.parentWindow.ondrag.bind(this));
+        this.add(this.backgroundHitbox, true);
     }
 
     createNewMask() {

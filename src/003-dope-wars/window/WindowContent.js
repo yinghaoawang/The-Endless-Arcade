@@ -30,7 +30,7 @@ export default class WindowContent extends WindowComponent {
         this.add(this.backgroundHitbox, true);
 
         this.backgroundHitbox.on('pointerdown', () => {
-            this.height += 10;
+            this.parentWindow.height += 10;
             this.parentWindow.onpointerdown();
         });
 
