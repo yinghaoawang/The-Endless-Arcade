@@ -5,6 +5,7 @@ import Window from '../window/Window';
 import AlertWindow from '../window/AlertWindow';
 import StatsWindow from '../window/StatsWindow';
 import Game from '../Game';
+import StaticWindow from '../window/StaticWindow';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -43,6 +44,13 @@ export default class GameScene extends Phaser.Scene {
         setKeySchemes(this);
 
         this.gameInstance = new Game();
+
+        let abstractWindowArea = {
+            width: 500,
+            height: 200
+        }
+        this.abstractWindow = new StaticWindow(this, 0, this.screenHeight - abstractWindowArea.height, abstractWindowArea.width, abstractWindowArea. height);
+        this.abstractWindow.depth = 0;
         
         this.testWindow = new Window(this, this.screenWidth / 2, this.screenHeight / 2, 400, 300, 'Window');
         this.alertWindow = new AlertWindow(this, 350, 350, 'Mingm123 123213 213 231 ong?');

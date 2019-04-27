@@ -1,39 +1,43 @@
-import Phaser from 'phaser3';
-import WindowFrame from './WindowFrame';
+import AbstractWindow from './AbstractWindow';
+import StaticWindowFrame from './StaticWindowFrame';
 import WindowContent from './WindowContent';
-import WindowComponent from './WindowComponent';
 
-export default class StaticWindow extends Phaser.GameObjects.Group {
-    constructor(scene, x, y, width, height, name) {
-        super(scene);
-        this.x = x;
-        this.y = y;
-        this.scene = scene;
-        this.width = width;
-        this.height = height;
+export default class StaticWindow extends AbstractWindow {
+    constructor(scene, x, y, width, height) {
+        super(scene, x, y, width, height);
 
-        if (typeof scene.windows == 'undefined') {
-            scene.windows = [];
-        }
-        scene.windows.unshift(this);
+        this._depth = 0;
+
         this.beingDestroyed = false;
-        
-        this.windowMoveListeners = [];
 
-        this.windowFrame = new WindowFrame(scene, this, this.x, this.y, this.width, this.height, name);
+        this.windowFrame = new StaticWindowFrame(scene, this, this.x, this.y, this.width, this.height, name);
 
         this.contentWidth = this.viewportArea.width;
-        this.contentHeight = this.viewportArea.height * 1.5;
+        this.contentHeight = this.viewportArea.height;
 
         this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentWidth, this.contentHeight)
 
         this.windowComponents = [ this.windowContent, this.windowFrame, ]
+    }
 
-        bringWindowToTop(this);
+    onpointerdown() {
+    }
+
+    get depth() {
+        return this._depth;
+    }
+    set depth(value) {
+        this._depth = value;
+        this.windowComponents.forEach(component => {
+            component.setDepth(value);
+        })
+    }
+
+    setDepth(value) {
+        this.depth = value;
     }
 
     update() {
-        
     }
 
     get isSelected() {
@@ -44,44 +48,9 @@ export default class StaticWindow extends Phaser.GameObjects.Group {
         return this.windowFrame.viewportArea;
     }
 
-
     setPosition(x, y) {
         this.x = x;
         this.y = y;
-    }
-
-    onpointerdown() {
-        let windowGroup = this;
-        if (this instanceof WindowComponent) {
-            windowGroup = this.parentWindow;
-        }
-          
-        if (windowGroup.beingDestroyed) return;
-        this.scene.selectedWindow = windowGroup;
-        bringWindowToTop(windowGroup);
-    }
-
-    ondragstart(pointer) {
-        let windowGroup = this.parentWindow;
-        windowGroup.dragDistX = pointer.x - this.x;
-        windowGroup.dragDistY = pointer.y - this.y;
-    }
-
-    ondrag(pointer) {
-        let windowGroup = this.parentWindow;
-        windowGroup.windowComponents.forEach((component) => {
-            component.x = pointer.x - windowGroup.dragDistX;
-            component.y = pointer.y - windowGroup.dragDistY;
-            if (typeof component.windowMoveListeners != 'undefined') { 
-                component.triggerEvent('windowmove');
-            }
-        });
-        
-    }
-
-    close() {
-        this.scene.sound.play('window-close');
-        this.destroy(true, true);
     }
     
     destroy(removeFromScene, destroyChild) {
@@ -91,18 +60,4 @@ export default class StaticWindow extends Phaser.GameObjects.Group {
         this.scene.windows.splice(this.scene.windows.indexOf(this), 1);
         super.destroy(removeFromScene, destroyChild);
     }
-}
-
-export function bringWindowToTop(target) {
-    if (target instanceof WindowComponent) {
-        target = target.parentWindow;
-    }
-    target.scene.windows.splice(target.scene.windows.indexOf(target), 1);
-    target.scene.windows.push(target);
-    let z = 0;
-    target.scene.windows.forEach((window) => {
-        window.windowComponents.forEach((component) => {
-            component.setDepth(z++);
-        })
-    })
 }
