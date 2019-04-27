@@ -70,26 +70,47 @@ export default class WindowFrame extends WindowComponent {
         this.closeBtn.setAlpha(this.defaultAlpha);
         this.add(this.closeBtn, true);
 
-        this.viewportArea = {
-            x: this.paneMargin,
-            y: this.topBar.displayHeight,
-            width: this.width - this.paneMargin * 2,
-            height: this.height - this.paneMargin - this.topBar.displayHeight,
-        }
-
-        this.maskGraphics = scene.add.graphics();
-        this.maskGraphics.fillRect(this.viewportArea.x, this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
-        this.maskGraphics.setAlpha(0);
-        this.maskGraphics.x = this.x;
-        this.maskGraphics.y = this.y;
-        this.backgroundImage.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
-        this.backgroundImage.mask.invertAlpha = true;
+        this.createNewMask();
         
         this.windowMoveListeners.push(() => {
             this.maskGraphics.x = this.x;
             this.maskGraphics.y = this.y
         });
 
+    }
+
+    get viewportArea() {
+        return {
+            x: this.paneMargin,
+            y: this.topBar.displayHeight,
+            width: this.width - this.paneMargin * 2,
+            height: this.height - this.paneMargin - this.topBar.displayHeight,
+        }
+    }
+
+    get height() {
+        return this._height;
+    }
+    set height(value) {
+        console.log(value);
+        this._height = value;
+        this.backgroundImage.setDisplaySize(this.width, this.height);
+        this.maskGraphics.destroy();
+        this.createNewMask();
+        
+        let windowContent = this.parentWindow.windowContent;
+        
+        windowContent.updateViewport();
+    }
+
+    createNewMask() {
+        this.maskGraphics = this.scene.add.graphics();
+        this.maskGraphics.fillRect(this.viewportArea.x, this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
+        this.maskGraphics.setAlpha(0);
+        this.maskGraphics.x = this.x;
+        this.maskGraphics.y = this.y;
+        this.backgroundImage.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
+        this.backgroundImage.mask.invertAlpha = true;
     }
 
     close() {

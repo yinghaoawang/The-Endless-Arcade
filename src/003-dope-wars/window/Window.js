@@ -17,7 +17,7 @@ export default class Window extends AbstractWindow {
         this.windowFrame = new WindowFrame(scene, this, this.x, this.y, width, height, name);
 
         this.contentWidth = this.viewportArea.width;
-        this.contentHeight = this.viewportArea.height * 1.5;
+        this.contentHeight = this.viewportArea.height * 1.25;
 
         this.windowContent = new WindowContent(scene, this, this.x , this.y, this.contentWidth, this.contentHeight)
 
@@ -32,14 +32,14 @@ export default class Window extends AbstractWindow {
     }
     set width(value) {
         this._width = value;
-        if (typeof windowFrame != 'undefined') this.windowFrame.width = value;
+        if (typeof this.windowFrame != 'undefined') this.windowFrame.width = value;
     }
     get height() {
         return this._height;
     }
     set height(value) {
         this._height = value;
-        if (typeof windowFrame != 'undefined') this.windowFrame.height = value;
+        if (typeof this.windowFrame != 'undefined') this.windowFrame.height = value;
     }
 
     get isSelected() {

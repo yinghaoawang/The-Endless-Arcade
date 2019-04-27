@@ -17,26 +17,23 @@ export default class WindowContent extends WindowComponent {
         this.backgroundImage.setDisplaySize(this.width, this.height);
         this.pane.add(this.backgroundImage);
 
-        this.maskGraphics = scene.add.graphics();
-        this.maskGraphics.fillRect(0, 0, this.parentWindow.viewportArea.width, this.parentWindow.viewportArea.height);
-        this.maskGraphics.setAlpha(0);
-        this.maskGraphics.x = this.x + this.viewportArea.x;
-        this.maskGraphics.y = this.y + this.viewportArea.y;
-        this.pane.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
+        this.createNewMask();
         
         this.windowMoveListeners.push(() => {
             this.maskGraphics.x = this.x + this.viewportArea.x;
             this.maskGraphics.y = this.y + this.viewportArea.y;
         });
 
-        this.backgroundHitbox = new Phaser.GameObjects.Rectangle(scene, this.x + this.parentWindow.viewportArea.x, this.y + this.parentWindow.viewportArea.y, this.parentWindow.viewportArea.width, this.parentWindow.viewportArea.height);
+        this.backgroundHitbox = new Phaser.GameObjects.Rectangle(scene, this.x + this.viewportArea.x, this.y + this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
         this.backgroundHitbox.setOrigin(0);
         this.backgroundHitbox.setInteractive();
         this.add(this.backgroundHitbox);
 
         this.backgroundHitbox.on('pointerdown', () => {
-            this.parentWindow.height += 100;
+            
+            this.height += 10;
             this.parentWindow.onpointerdown();
+            
         });
 
         if (this.height > this.viewportArea.height) {
@@ -49,6 +46,27 @@ export default class WindowContent extends WindowComponent {
     }
     set height(value) {
         this._height = value;
+        
+        if (this.backgroundImage) {
+            this.backgroundImage.setDisplaySize(this.width, this.height);
+        }
+
+        
+        this.updateScrollbar();
+    }
+
+    updateViewport() {
+        if (this.height < this.viewportArea.height) {
+            this.height = this.viewportArea.height;
+        }
+        if (this.backgroundHitbox) {
+            this.backgroundHitbox.setDisplaySize(this.viewportArea.width, this.viewportArea.height);
+        }
+        this.createNewMask();
+        this.updateScrollbar();
+    }
+
+    updateScrollbar() {
         // if new height value exceeds viewport height, then add or update the scroll bar
         if (this.height > this.viewportArea.height) {
             if (this.scrollbar != null) {
@@ -61,11 +79,16 @@ export default class WindowContent extends WindowComponent {
                 this.removeScrollbar();
             }
             this._height = this.viewportArea.height;
-            
         }
-        if (this.backgroundImage) {
-            this.backgroundImage.setDisplaySize(this.width, this.height);
-        }
+    }
+
+    createNewMask() {
+        this.maskGraphics = this.scene.add.graphics();
+        this.maskGraphics.fillRect(0, 0, this.parentWindow.viewportArea.width, this.parentWindow.viewportArea.height);
+        this.maskGraphics.setAlpha(0);
+        this.maskGraphics.x = this.x + this.viewportArea.x;
+        this.maskGraphics.y = this.y + this.viewportArea.y;
+        this.pane.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
     }
 
     removeScrollbar() {
