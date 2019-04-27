@@ -5,7 +5,7 @@ import Window from '../window/Window';
 import AlertWindow from '../window/AlertWindow';
 import StatsWindow from '../window/StatsWindow';
 import Game from '../Game';
-import StaticWindow from '../window/StaticWindow';
+import StaticTextWindow from '../window/StaticTextWindow';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -13,6 +13,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio('message', 'assets/sounds/message.wav');
         this.load.audio('alert', 'assets/sounds/alert.wav');
         this.load.audio('window-close', 'assets/sounds/window-close.wav');
         this.load.audio('item-buy', 'assets/sounds/item-purchase.wav');
@@ -45,12 +46,12 @@ export default class GameScene extends Phaser.Scene {
 
         this.gameInstance = new Game();
 
-        let abstractWindowArea = {
+        let textWindow = {
             width: 500,
             height: 200
         }
-        this.abstractWindow = new StaticWindow(this, 0, this.screenHeight - abstractWindowArea.height, abstractWindowArea.width, abstractWindowArea. height);
-        this.abstractWindow.depth = 0;
+        this.textWindow = new StaticTextWindow(this, 0, this.screenHeight - textWindow.height, textWindow.width, textWindow. height);
+        this.textWindow.depth = 0;
         
         this.testWindow = new Window(this, this.screenWidth / 2, this.screenHeight / 2, 400, 300, 'Window');
         this.alertWindow = new AlertWindow(this, 350, 350, 'Mingm123 123213 213 231 ong?');

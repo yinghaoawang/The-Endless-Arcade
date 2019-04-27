@@ -11,6 +11,7 @@ export default class Text extends Phaser.GameObjects.Container {
         this.textObject.setStyle({
             color: '#000000',
             fontFamily: 'VT323',
+            fontSize: '16px',
         });
         this.width = width;
         this.textObject.setPadding(2.5, 0, 2.5, 0);

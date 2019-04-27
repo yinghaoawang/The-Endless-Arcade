@@ -19,15 +19,9 @@ export default class Scrollbar extends Phaser.GameObjects.Container {
 
         this.barMargin = 2;
 
-        this.barArea = {
-            x: this.barMargin,
-            y: 0,
-            width: this.width - this.barMargin * 2,
-            height: (this.viewportArea.height / this.totalArea.height) * this.height
-        }
+        this.barGraphics = new Phaser.GameObjects.Image(scene, this.barMargin, 0, 'scrollbar');
+        this.updateSize();
         
-        this.barGraphics = new Phaser.GameObjects.Image(scene, this.barArea.x, this.barArea.y, 'scrollbar');
-        this.barGraphics.setDisplaySize(this.barArea.width, this.barArea.height);
         this.barGraphics.setOrigin(0);
         this.add(this.barGraphics);
 
@@ -69,6 +63,39 @@ export default class Scrollbar extends Phaser.GameObjects.Container {
         super.destroy();
     }
 
+    updateSize(viewportArea, totalArea) {
+        if (typeof viewportArea != 'undefined')
+            this.viewportArea = viewportArea;
+        if (typeof totalArea != 'undefined')
+            this.totalArea = totalArea;
+
+        if (this.totalArea.width <= this.viewportArea.width) {
+            this.totalArea.width = this.viewportArea.width;
+        }
+        if (this.totalArea.height <= this.viewportArea.height) {
+            this.totalArea.height = this.viewportArea.height;
+
+            this.barGraphics.setVisible(false);
+        } else {
+            this.barGraphics.setVisible(true);
+        }
+
+        this.barArea = {
+            x: this.barMargin,
+            y: 0,
+            width: this.width - this.barMargin * 2,
+            height: (this.viewportArea.height / this.totalArea.height) * this.height
+        }
+        
+        this.barGraphics.setDisplaySize(this.barArea.width, this.barArea.height);
+        this.adjustBarPosition();
+    }
+    
+    adjustBarPosition() {
+        let paneDistanceRatio = (this.y - this.targetPane.y) / this.totalArea.height;
+        this.barGraphics.y = this.barArea.y + paneDistanceRatio * this.viewportArea.height;
+    }
+
     movePane(value, adjustBarGraphics) {
         if (this.targetPane.y + value > this.y)  {
             messageHandler.printLog('Tried scrolling pane above viewport, corrected the distance.');
@@ -81,8 +108,7 @@ export default class Scrollbar extends Phaser.GameObjects.Container {
         }
         
         if (adjustBarGraphics) {
-            let paneDistanceRatio = (this.y - this.targetPane.y) / this.totalArea.height;
-            this.barGraphics.y = this.barArea.y + paneDistanceRatio * this.viewportArea.height;
+            this.adjustBarPosition();
         }
     }
 

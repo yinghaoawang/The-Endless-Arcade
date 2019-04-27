@@ -4,6 +4,8 @@ import Text from '../input/text/Text';
 import NumberTextField from '../input/text/NumberField';
 import WindowComponent from './WindowComponent';
 import Scrollbar from './Scrollbar';
+import ContentComponent from './ContentComponent';
+import messageHandler from '../MessageHandler';
 
 export default class WindowContent extends WindowComponent {
     constructor(scene, parentWindow, x, y, width, height) {
@@ -34,6 +36,13 @@ export default class WindowContent extends WindowComponent {
         });
 
         this.updateScrollbar();
+    }
+
+    addComponent(component) {
+        if (!(component instanceof ContentComponent)) {
+            messageHandler.printError('WindowContent.addComponent() must add a ContentComponent. Component not added.');
+            return;
+        }
     }
 
     get height() {
