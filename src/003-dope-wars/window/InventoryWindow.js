@@ -1,6 +1,6 @@
 import Text from '../input/text/Text';
 import messageHandler from '../MessageHandler';
-import Window from './Window';
+import Window from './base/Window';
 import AlertWindow from './AlertWindow';
 
 export default class InventoryWindow extends Window {

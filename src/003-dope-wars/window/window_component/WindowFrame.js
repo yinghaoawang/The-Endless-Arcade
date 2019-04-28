@@ -1,7 +1,7 @@
 import Phaser from 'phaser3';
-import Button from '../input/button/Button';
-import Text from '../input/text/Text';
-import NumberTextField from '../input/text/NumberField';
+import Button from '../../input/button/Button';
+import Text from '../../input/text/Text';
+import NumberTextField from '../../input/text/NumberField';
 import WindowComponent from './WindowComponent';
 
 export default class WindowFrame extends WindowComponent {
@@ -52,12 +52,23 @@ export default class WindowFrame extends WindowComponent {
         this.add(this.closeBtn, true);
 
         this.createNewMask();
-        
-        this.windowMoveListeners.push(() => {
-            this.maskGraphics.x = this.x;
-            this.maskGraphics.y = this.y
-        });
 
+    }
+
+    get height() {
+        return this._height;
+    }
+    set height(value) {
+        this._height = value;
+        this.backgroundImage.setDisplaySize(this.width, this.height);
+        this.backgroundHitbox.destroy();
+        this.createNewBackgroundHitbox();
+        this.maskG.destroy();
+        this.createNewMask();
+        
+        let windowContent = this.parentWindow.windowContent;
+        
+        windowContent.updateViewport();
     }
 
     get polygonHitboxPoints() {
@@ -82,23 +93,6 @@ export default class WindowFrame extends WindowComponent {
         }
     }
 
-    get height() {
-        return this._height;
-    }
-    set height(value) {
-        console.log(value);
-        this._height = value;
-        this.backgroundImage.setDisplaySize(this.width, this.height);
-        this.backgroundHitbox.destroy();
-        this.createNewBackgroundHitbox();
-        this.maskGraphics.destroy();
-        this.createNewMask();
-        
-        let windowContent = this.parentWindow.windowContent;
-        
-        windowContent.updateViewport();
-    }
-
     createNewBackgroundHitbox() {
         this.backgroundHitbox = new Phaser.GameObjects.Polygon(this.scene, this.x, this.y + this.topBar.displayHeight, this.polygonHitboxPoints);
         this.backgroundHitbox.setOrigin(0);
@@ -113,17 +107,14 @@ export default class WindowFrame extends WindowComponent {
     }
 
     createNewMask() {
-        this.maskGraphics = this.scene.add.graphics();
-        this.maskGraphics.fillRect(this.viewportArea.x, this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
-        this.maskGraphics.setAlpha(0);
-        this.maskGraphics.x = this.x;
-        this.maskGraphics.y = this.y;
-        this.backgroundImage.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
+        this.maskG = this.scene.add.graphics();
+        this.maskG.fillRect(this.viewportArea.x, this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
+        this.maskG.setAlpha(0);
+        this.maskG.x = this.x;
+        this.maskG.y = this.y;
+        this.backgroundImage.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskG);
         this.backgroundImage.mask.invertAlpha = true;
-    }
-
-    close() {
-        this.closeBtn.destroy(true, true);
+        this.add(this.maskG);
     }
 
     createTextCol(xOffset, yOffset, colSpacing, messages, colCount) {

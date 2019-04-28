@@ -1,4 +1,4 @@
-import Window from './Window';
+import Window from './base/Window';
 
 export default class StatsWindow extends Window {
     constructor(scene, game, x, y) {
@@ -16,7 +16,6 @@ export default class StatsWindow extends Window {
         this.targetUnit.addPropertyChangeListener(() => {
             this.update();
         });
-        
     }
 
     updateStats() {

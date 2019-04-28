@@ -1,5 +1,6 @@
 import Phaser from 'phaser3';
 
+/** NOT MEANT TO BE DIRECTLY INSTANTIATED */
 export default class AbstractWindow extends Phaser.GameObjects.Group {
     constructor(scene, x, y, width, height) {
         super(scene);

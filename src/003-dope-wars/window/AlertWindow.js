@@ -1,4 +1,4 @@
-import Window from './Window';
+import Window from './base/Window';
 import Text from '../input/text/Text';
 
 export default class AlertWindow extends Window {

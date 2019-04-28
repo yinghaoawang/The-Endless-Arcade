@@ -1,23 +1,10 @@
 import Phaser from 'phaser3';
-import Scrollbar from './Scrollbar';
+import Scrollbar from '../Scrollbar';
 import ContentComponent from './ContentComponent';
 
-export default class TextArea extends ContentComponent {
+export default class TextAreaComponent extends ContentComponent {
     constructor(scene, parentWindow, x, y, width, height) {
         super(scene, parentWindow, x, y, width, height);
-        /*
-        this.boundGraphics = scene.add.graphics({
-            x: x,
-            y: y,
-            lineStyle: {
-                color: '0xfffffff',
-            },
-            add: true,
-        });
-        this.boundGraphics.strokeRect(0, 0, width, height);
-        */
-
-        
 
         this.displayRect = new Phaser.GameObjects.Rectangle(scene, this.x, this.y, width, height, '0xffffff', .5);
         this.displayRect.setOrigin(0);
@@ -48,9 +35,9 @@ export default class TextArea extends ContentComponent {
                 this.clearText();
             }
         }, 3000);
-        */
+        */        
+
         this.addScrollbar();
-        
     }
 
     clearText() {
@@ -79,7 +66,7 @@ export default class TextArea extends ContentComponent {
             });
         }
 
-        this.pane.y = 0;
+        this.pane.y = this.y;
     }
 
     get viewportArea() {
@@ -90,14 +77,15 @@ export default class TextArea extends ContentComponent {
     }
 
     createNewMask() {
-        this.maskGraphics = this.scene.add.graphics({
+        this.maskG = this.scene.add.graphics({
             x: this.x,
             y: this.y,
         });
-        this.maskGraphics.fillRect(0, 0, this.width, this.height);
-        this.maskGraphics.setAlpha(0);
+        this.maskG.fillRect(0, 0, this.width, this.height);
+        this.maskG.setAlpha(0);
+        this.add(this.maskG);
         
-        this.pane.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
+        this.pane.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskG);
     }
 
     removeScrollbar() {

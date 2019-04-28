@@ -9,9 +9,17 @@ export default class ContentComponent extends Phaser.GameObjects.Group {
         this._width = width;
         this._height = height;
 
+        this._depth = 0;
+
         this.beingDestroyed = false;
-    
+
         scene.add.existing(this);
+    }
+
+    get movingComponents() {
+        let components = [];
+        components.push(...this.getChildren());
+        return components;
     }
 
     get y() {
@@ -34,11 +42,21 @@ export default class ContentComponent extends Phaser.GameObjects.Group {
     }
 
     set x(value) {
+        let diff = value - this.x;
         this._x = value;
+
+        this.movingComponents.forEach(component => {
+            component.x += diff;
+        })
     }
 
     set y(value) {
+        let diff = value - this.y;
         this._y = value;
+
+        this.movingComponents.forEach(component => {
+            component.y += diff;
+        })
     }
 
     update() {

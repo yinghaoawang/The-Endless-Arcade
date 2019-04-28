@@ -7,7 +7,7 @@ export default class StaticWindowFrame extends WindowComponent {
 
         this._height = height;
         this._width = width;
-        this.defaultAlpha = .75;
+        this.defaultAlpha = 1;
         
         this.backgroundImage = new Phaser.GameObjects.Image(scene, this.x, this.y, 'window-bg');
         this.backgroundImage.setOrigin(0);
@@ -17,11 +17,6 @@ export default class StaticWindowFrame extends WindowComponent {
 
         this.paneMargin = 10;
         this.createNewMask();
-        
-        this.windowMoveListeners.push(() => {
-            this.maskGraphics.x = this.x;
-            this.maskGraphics.y = this.y
-        });
     }
 
     get viewportArea() {
@@ -39,7 +34,7 @@ export default class StaticWindowFrame extends WindowComponent {
     set height(value) {
         this._height = value;
         this.backgroundImage.setDisplaySize(this.width, this.height);
-        this.maskGraphics.destroy();
+        this.maskG.destroy();
         this.createNewMask();
         
         let windowContent = this.parentWindow.windowContent;
@@ -47,13 +42,14 @@ export default class StaticWindowFrame extends WindowComponent {
     }
 
     createNewMask() {
-        this.maskGraphics = this.scene.add.graphics();
-        this.maskGraphics.fillRect(this.viewportArea.x, this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
-        this.maskGraphics.setAlpha(0);
-        this.maskGraphics.x = this.x;
-        this.maskGraphics.y = this.y;
-        this.backgroundImage.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
+        this.maskG = this.scene.add.graphics();
+        this.maskG.fillRect(this.viewportArea.x, this.viewportArea.y, this.viewportArea.width, this.viewportArea.height);
+        this.maskG.setAlpha(0);
+        this.maskG.x = this.x;
+        this.maskG.y = this.y;
+        this.backgroundImage.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskG);
         this.backgroundImage.mask.invertAlpha = true;
+        this.add(this.maskG);
     }
 
     close() {

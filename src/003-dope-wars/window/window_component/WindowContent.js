@@ -1,11 +1,9 @@
 import Phaser from 'phaser3';
-import Button from '../input/button/Button';
-import Text from '../input/text/Text';
-import NumberTextField from '../input/text/NumberField';
+import Button from '../../input/button/Button';
+import Text from '../../input/text/Text';
+import NumberTextField from '../../input/text/NumberField';
 import WindowComponent from './WindowComponent';
-import Scrollbar from './Scrollbar';
-import ContentComponent from './ContentComponent';
-import messageHandler from '../MessageHandler';
+import Scrollbar from '../Scrollbar';
 
 export default class WindowContent extends WindowComponent {
     constructor(scene, parentWindow, x, y, width, height) {
@@ -21,7 +19,6 @@ export default class WindowContent extends WindowComponent {
         this.add(this.backgroundHitbox, true);
 
         this.backgroundHitbox.on('pointerdown', () => {
-            //this.parentWindow.height += 10;
             this.parentWindow.onpointerdown();
         });
         
@@ -30,19 +27,7 @@ export default class WindowContent extends WindowComponent {
         this.pane.add(this.backgroundImage);
 
         this.createNewMask();
-        this.windowMoveListeners.push(() => {
-            this.maskGraphics.x = this.x + this.viewportArea.x;
-            this.maskGraphics.y = this.y + this.viewportArea.y;
-        });
-
         this.updateScrollbar();
-    }
-
-    addComponent(component) {
-        if (!(component instanceof ContentComponent)) {
-            messageHandler.printError('WindowContent.addComponent() must add a ContentComponent. Component not added.');
-            return;
-        }
     }
 
     get height() {
@@ -86,12 +71,13 @@ export default class WindowContent extends WindowComponent {
     }
 
     createNewMask() {
-        this.maskGraphics = this.scene.add.graphics();
-        this.maskGraphics.fillRect(0, 0, this.parentWindow.viewportArea.width, this.parentWindow.viewportArea.height);
-        this.maskGraphics.setAlpha(0);
-        this.maskGraphics.x = this.x + this.viewportArea.x;
-        this.maskGraphics.y = this.y + this.viewportArea.y;
-        this.pane.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskGraphics);
+        this.maskG = this.scene.add.graphics();
+        this.maskG.fillRect(0, 0, this.parentWindow.viewportArea.width, this.parentWindow.viewportArea.height);
+        this.maskG.setAlpha(0);
+        this.maskG.x = this.x + this.viewportArea.x;
+        this.maskG.y = this.y + this.viewportArea.y;
+        this.pane.mask = new Phaser.Display.Masks.GeometryMask(this, this.maskG);
+        this.add(this.maskG);
     }
 
     removeScrollbar() {

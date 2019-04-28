@@ -10,8 +10,11 @@ export default class WindowComponent extends Phaser.GameObjects.Group {
         this._height = height;
 
         this.beingDestroyed = false;
-        this.windowMoveListeners = [];
-    
+
+        this.components = [];
+
+        this.depth = 0;
+
         scene.add.existing(this);
     }
 
@@ -34,22 +37,27 @@ export default class WindowComponent extends Phaser.GameObjects.Group {
         this._height = value;
     }
 
+    get movingComponents() {
+        let components = [];
+        components.push(...this.getChildren());
+        components.push(...this.components);
+        return components;
+    }
+
     set x(value) {
         let diff = value - this.x;
         this._x = value;
-        this.getChildren().forEach((child) => {
+        this.movingComponents.forEach((child) => {
             child.x += diff;
         });
-        this.triggerEvent('windowmove');
     }
 
     set y(value) {
         let diff = value - this.y;
         this._y = value;
-        this.getChildren().forEach((child) => {
+        this.movingComponents.forEach((child) => {
             child.y += diff;
         });
-        this.triggerEvent('windowmove');
     }
 
     update() {
@@ -62,12 +70,9 @@ export default class WindowComponent extends Phaser.GameObjects.Group {
         super.destroy(removeFromScene, destroyChild);
     }
 
+    /*
     triggerEvent(event) {
-        if (event == 'windowmove') {
-            this.windowMoveListeners.forEach((fn) => {
-                fn();
-            });
-        }
     }
+    */
 
 }

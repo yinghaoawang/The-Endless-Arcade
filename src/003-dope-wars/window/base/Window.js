@@ -1,7 +1,7 @@
 import AbstractWindow from './AbstractWindow';
-import WindowFrame from './WindowFrame';
-import WindowContent from './WindowContent';
-import WindowComponent from './WindowComponent';
+import WindowFrame from '../window_component/WindowFrame';
+import WindowContent from '../window_component/WindowContent';
+import WindowComponent from '../window_component/WindowComponent';
 
 export default class Window extends AbstractWindow {
     constructor(scene, x, y, width, height, name) {
@@ -11,8 +11,6 @@ export default class Window extends AbstractWindow {
             scene.windows = [];
         }
         scene.windows.unshift(this);
-        
-        this.windowMoveListeners = [];
 
         this.windowFrame = new WindowFrame(scene, this, this.x, this.y, width, height, name);
 
@@ -87,12 +85,10 @@ export default class Window extends AbstractWindow {
 
     ondrag(pointer) {
         let windowGroup = this.parentWindow;
+        
         windowGroup.windowComponents.forEach((component) => {
             component.x = pointer.x - windowGroup.dragDistX;
             component.y = pointer.y - windowGroup.dragDistY;
-            if (typeof component.windowMoveListeners != 'undefined') { 
-                component.triggerEvent('windowmove');
-            }
         });
         
     }
@@ -116,9 +112,12 @@ export default class Window extends AbstractWindow {
         target.scene.windows.push(target);
         let z = 0;
         target.scene.windows.forEach((window) => {
-            window.windowComponents.forEach((component) => {
-                component.setDepth(z++);
-            })
-        })
+            window.windowComponents.forEach((outerComponent) => {
+                outerComponent.setDepth(z++);
+                outerComponent.components.forEach(innerComponent => {
+                    innerComponent.setDepth(z++);
+                });
+            });
+        });
     }
 }

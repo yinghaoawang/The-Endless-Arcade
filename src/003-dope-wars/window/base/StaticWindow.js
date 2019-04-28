@@ -1,6 +1,6 @@
 import AbstractWindow from './AbstractWindow';
-import StaticWindowFrame from './StaticWindowFrame';
-import WindowContent from './WindowContent';
+import StaticWindowFrame from '../window_component/StaticWindowFrame';
+import WindowContent from '../window_component/WindowContent';
 
 export default class StaticWindow extends AbstractWindow {
     constructor(scene, x, y, width, height) {
