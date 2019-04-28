@@ -1,10 +1,10 @@
 import Phaser from 'phaser3';
 export default class Bullet extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, speed) {
+    constructor(scene, x, y, texture, speed, rotationPath) {
         super(scene, x, y, texture);
         this.speed = speed;
         this.t = 0;
-        this.rotationPath;
+        this.rotationPath = rotationPath;
     }
 
     update(time, delta) {
@@ -14,8 +14,7 @@ export default class Bullet extends Phaser.GameObjects.Sprite {
         if (typeof this.function != 'undefined') {
             this.x += Math.cos(this.rotationPath) * this.function.x(this.t);
             this.y += Math.sin(this.rotationPath) * this.function.y(this.t);
-            //this.rotation = this.t;
-            this.t += .1;
+            this.t += delta * .1;
         } 
     }
 }

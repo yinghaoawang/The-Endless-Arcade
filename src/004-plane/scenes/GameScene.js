@@ -1,7 +1,9 @@
 import Phaser from 'phaser3';
-import Plane from '../plane/Plane';
+import PlayerPlane from '../plane/PlayerPlane';
 import setKeySchemes from '../keyboard/keyboard';
 import GameStates from '../GameStates';
+import Gun from '../plane/Gun';
+import AutoPlane from '../plane/AutoPlane';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -9,8 +11,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        //this.load.audio('message', 'assets/sounds/message.wav');
         this.load.image('plane', 'assets/sprites/plane.png');
+        this.load.image('plane2', 'assets/sprites/plane2.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
         this.load.image('circle-bullet', 'assets/sprites/circle-bullet.png');
     }
@@ -25,6 +27,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.bullets = [];
         this.enemies = [];
+        this.spawnList = [];
 
         this.state = GameStates.PLAYING;
     }
@@ -43,18 +46,100 @@ export default class GameScene extends Phaser.Scene {
     }
 
     initPlaying() {
-        this.plane = new Plane(this, this.screenWidth / 2, this.screenHeight - 32, 32, 32, 'plane', 250);
-        this.plane.rotation -= Math.PI / 2;
+        this.plane = new PlayerPlane(this, this.screenWidth / 2, this.screenHeight - 32, 32, 32, 'plane', 250);
+
+        this.spawnSnake = (time) => {
+            for (let i = 0; i < 10; ++i) {
+                let autoPlane = new AutoPlane(this, 135, 0, 18, 18, 'plane2', 80, new Gun([{fireRate: .2, speed: 100, texture: 'bullet', bullets: [{}]}]), (t) => {
+                    return {
+                        x: 2 * Math.sin(2.5 * t),
+                        y: 1,
+                    }
+                });
+                this.spawnList.push({
+                    target: autoPlane,
+                    time: time + i * 500,
+                });
+            }
+        }
+
+        this.spawnHitNRun = (time) => {
+            for (let i = 0; i < 3; ++i) {
+                let screenWidth = this.screenWidth;
+                let timeSinceStop = 0;
+                let lastTime = 0;
+                let autoPlane = new AutoPlane(this, 0, 100, 18, 18, 'plane2', 200, new Gun([{fireRate: 0, speed: 100, texture: 'bullet', bullets: [{}]}]), function (t, gameObject) {
+                    let x = gameObject.x;
+                    let y = gameObject.y;
+                    if (x <= (screenWidth / 2) + 30 - 30 * i) {
+                        return {
+                            x: 1,
+                            y: 0
+                        }
+                    } else {
+                        timeSinceStop += (t - lastTime);
+                        lastTime = t;
+
+                        if (timeSinceStop < 3) {
+                            gameObject.fireRate = 2;
+                            return {
+                                x: 0,
+                                y: 0
+                            }
+                        } else {
+                            gameObject.fireRate = 0;
+                            return {
+                                x: 1,
+                                y: 0
+                            }
+                        }
+                        
+                    }
+                    
+                });
+                this.spawnList.push({
+                    target: autoPlane,
+                    time: time + i * 250,
+                });
+            }
+        }
+
+        this.spawnSnake(this.time.now);
+    
+        this.spawnHitNRun(this.time.now);
+
         this.add.existing(this.plane);
+        
     }
+    
 
     updatePlaying(time, delta) {
         // TODO not this v
         if (typeof this.plane == 'undefined') this.initPlaying();
         
-
         this.listenPlayerMovement(time, delta);
+        this.updateEnemies(time, delta);
         this.updateBullets(time, delta);
+
+        this.updateSpawn(time, delta);
+    }
+
+    updateSpawn(time, delta) {
+        for (let i = 0 ; i < this.spawnList.length; ++i) {
+            let instructions = this.spawnList[i];
+            if (time >= instructions.time) {
+                this.enemies.push(instructions.target);
+                this.add.existing(instructions.target);
+                this.spawnList.splice(i, 1);
+                --i;
+            }
+        };
+    }
+
+    updateEnemies(time, delta) {
+        this.enemies.forEach(enemy => {
+            enemy.update(time, delta);
+        });
     }
 
     updateBullets(time, delta) {
