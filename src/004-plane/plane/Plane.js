@@ -19,9 +19,11 @@ export default class Plane extends Phaser.GameObjects.Sprite {
 
     fire(time, delta) {
         if (time > this.lastFired + this.cooldown) {
-            this.gun.directions.forEach(angle => {
+            this.gun.patterns.forEach(pattern => {
                 let bullet = new Bullet(this.scene, this.x, this.y - this.displayHeight / 2, this.gun.bulletTexture, this.gun.bulletSpeed);
-                bullet.setRotation(this.rotation + angle);
+                bullet.rotationPath = this.rotation + pattern.direction * 2;
+                //bullet.t = pattern.direction;
+                bullet.function = pattern.function;
                 this.scene.bullets.push(bullet);
                 this.scene.add.existing(bullet);
                 this.lastFired = time;

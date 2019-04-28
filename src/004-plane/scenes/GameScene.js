@@ -59,7 +59,17 @@ export default class GameScene extends Phaser.Scene {
     updateBullets(time, delta) {
         this.bullets.forEach(bullet => {
             bullet.update(time, delta);
+            if (this.outOfBounds(bullet)) {
+                this.bullets.splice(this.bullets.indexOf(bullet), 1);
+                bullet.destroy();
+            }
         });
+    }
+
+    outOfBounds(object) {
+        return object.x > this.screenWidth ||
+            object.x < 0 || object.y < 0 ||
+            object. y > this.screenHeight;
     }
 
     listenPlayerMovement(time, delta) {
