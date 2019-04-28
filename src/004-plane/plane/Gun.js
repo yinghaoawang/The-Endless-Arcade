@@ -6,20 +6,20 @@ export default class Gun {
         this.bulletSpeed = bulletSpeed;
         this.patterns = [
             {
-                direction: 0,
+                rotation: 0,
             },
             {
-                direction: -Math.PI / 10,
+                rotation: -Math.PI / 12,
                 function: {
-                    x: (t) => { return 10 * Math.sin(t); },
-                    y: (t) => { return 10 * Math.cos(t); }
+                    x: (t) => { return 10 * Math.cos(t); },
+                    y: (t) => { return 10 * Math.sin(t); }
                 }
             },
             {
-                direction: Math.PI / 10,
+                rotation: Math.PI / 12,
                 function: {
-                    x: (t) => { return 10 * Math.sin(t); },
-                    y: (t) => { return 10 * Math.cos(t); }
+                    x: (t) => { return 10 * Math.cos(t); },
+                    y: (t) => { return 10 * Math.sin(t); }
                 }
             }    
         ];

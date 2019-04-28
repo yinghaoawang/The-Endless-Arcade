@@ -9,14 +9,13 @@ export default class Bullet extends Phaser.GameObjects.Sprite {
 
     update(time, delta) {
         this.rotation = this.rotationPath;
-        this.x += Math.cos(this.rotationPath) * ((this.speed/2 * delta) / 1000);
-        this.y += Math.sin(this.rotationPath) * ((this.speed/2  * delta) / 1000);
+        this.x += Math.cos(this.rotationPath) * ((this.speed * delta) / 1000);
+        this.y += Math.sin(this.rotationPath) * ((this.speed  * delta) / 1000);
         if (typeof this.function != 'undefined') {
             this.x += Math.cos(this.rotationPath) * this.function.x(this.t);
             this.y += Math.sin(this.rotationPath) * this.function.y(this.t);
-            console.log(this.x, this.y);
-            this.rotation = this.t;
-            this.t += .5;
+            //this.rotation = this.t;
+            this.t += .1;
         } 
     }
 }

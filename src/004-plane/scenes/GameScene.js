@@ -12,6 +12,7 @@ export default class GameScene extends Phaser.Scene {
         //this.load.audio('message', 'assets/sounds/message.wav');
         this.load.image('plane', 'assets/sprites/plane.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
+        this.load.image('circle-bullet', 'assets/sprites/circle-bullet.png');
     }
 
     create() {
