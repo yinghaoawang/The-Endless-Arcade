@@ -25,7 +25,7 @@ export default class Plane extends Phaser.Physics.Matter.Sprite {
 
     fire(time, delta) {
         if (time > this.lastFired + this.cooldown) {
-            this.gun.shoot(this.scene, this.x, this.y + Math.sin(this.rotation) * this.displayHeight / 2, this.rotation);
+            this.gun.shoot(this.scene, this.x, this.y + Math.sin(this.rotation) * this.displayHeight / 2, this.rotation, this);
             this.lastFired = time;
         }
     }

@@ -10,5 +10,12 @@ export default class PlayerPlane extends Plane {
         });
 
         this.on('pointerdown', this.gun.nextLevel.bind(this.gun));
+
+        this.setCollisionCategory(scene.allyCollCat);
+        this.setCollidesWith([scene.enemyCollCat, scene.enemyBulletCollCat]);
+        if (this.gun) {
+            this.gun.collisionCategory = scene.allyBulletCollCat;
+            this.gun.collidesWith = [scene.enemyBulletCollCat, scene.enemyCollCat];
+        }
     }
 }

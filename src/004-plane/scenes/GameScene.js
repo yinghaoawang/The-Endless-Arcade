@@ -31,6 +31,11 @@ export default class GameScene extends Phaser.Scene {
         this.spawnList = [];
 
         this.state = GameStates.PLAYING;
+
+        this.allyBulletCollCat = this.matter.world.nextCategory();
+        this.allyCollCat = this.matter.world.nextCategory();
+        this.enemyCollCat = this.matter.world.nextCategory();
+        this.enemyBulletCollCat = this.matter.world.nextCategory();
     }
   
     update(time, delta) {
@@ -133,9 +138,11 @@ export default class GameScene extends Phaser.Scene {
                     }
                     
                 });
+                console.log(autoPlane.body);
+                //autoPlane.body.checkCollision.none = true;
                 this.spawnList.push({
                     target: autoPlane,
-                    time: time + i * 250,
+                    time: 500 + time + i * 250,
                 });
             }
         }

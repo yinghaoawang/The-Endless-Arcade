@@ -38,7 +38,11 @@ export default class Gun {
             bullet.function = bulletPattern.function;
             scene.bullets.push(bullet);
             scene.add.existing(bullet);
+
+            console.log(this.collisionCategory, this.collidesWith);
             
+            bullet.setCollisionCategory(this.collisionCategory);
+            bullet.setCollidesWith(this.collidesWith);
         });
     }
 }
