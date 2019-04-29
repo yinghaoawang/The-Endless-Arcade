@@ -22,11 +22,13 @@ export default class Gun {
     shoot(scene, x, y, rotation) {
         this.firingPattern.bullets.forEach(bulletPattern => {
             let bulletDirection = 0;
+            let bulletDamage = this.firingPattern.damage;
             let bulletSpeed = this.firingPattern.speed;
             let bulletTexture = this.firingPattern.texture;
             let bulletOffset = { x: 0, y: 0 };
             if (typeof bulletPattern.direction != 'undefined') bulletDirection = bulletPattern.direction;
             if (typeof bulletPattern.speed != 'undefined') bulletSpeed = bulletPattern.speed;
+            if (typeof bulletPattern.damage != 'undefined') bulletDamage = bulletPattern.damage;
             if (typeof bulletPattern.texture != 'undefined') bulletTexture = bulletPattern.texture;
             if (typeof bulletPattern.offset != 'undefined') {
                 if (typeof bulletPattern.offset.x != 'undefined') bulletOffset.x = bulletPattern.offset.x;
@@ -34,7 +36,7 @@ export default class Gun {
             }
 
             let rotationPath = rotation + bulletDirection;
-            let bullet = new Bullet(scene, x + bulletOffset.x, y + Math.sin(rotation) * (bulletOffset.y), bulletTexture, bulletSpeed, rotationPath);
+            let bullet = new Bullet(scene, x + bulletOffset.x, y + Math.sin(rotation) * (bulletOffset.y), bulletDamage, bulletTexture, bulletSpeed, rotationPath);
             bullet.function = bulletPattern.function;
             scene.bullets.push(bullet);
             scene.add.existing(bullet);

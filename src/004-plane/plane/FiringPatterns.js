@@ -1,5 +1,6 @@
 export default {
     DEFAULT: {
+        damage: 1,
         fireRate: 7,
         speed: 500,
         texture: 'bullet',
@@ -10,6 +11,7 @@ export default {
         ],
     },
     DOUBLE_SHOT: {
+        damage: 1,
         fireRate: 5,
         speed: 500,
         texture: 'bullet',
@@ -29,6 +31,7 @@ export default {
         ]
     },
     TRIPLE_SHOT: {
+        damage: 1,
         fireRate: 7,
         speed: 500,
         texture: 'bullet',
@@ -51,6 +54,7 @@ export default {
         ],
     },
     QUAD_SHOT: {
+        damage: 1,
         fireRate: 5,
         speed: 500,
         texture: 'bullet',
@@ -84,6 +88,7 @@ export default {
         ],
     },
     PENTA_SHOT: {
+        damage: 1,
         fireRate: 5,
         speed: 500,
         texture: 'bullet',
@@ -115,6 +120,7 @@ export default {
         ],
     },
     FANCY_WHIRL: {
+        damage: 1,
         fireRate: 5,
         speed: 500,
         texture: 'circle-bullet',

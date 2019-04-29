@@ -3,6 +3,8 @@ import PlayerPlane from '../plane/PlayerPlane';
 import setKeySchemes from '../keyboard/keyboard';
 import GameStates from '../GameStates';
 import Gun from '../plane/Gun';
+import Plane from '../plane/Plane';
+import Bullet from '../plane/Bullet';
 import AutoPlane from '../plane/AutoPlane';
 
 export default class GameScene extends Phaser.Scene {
@@ -38,6 +40,55 @@ export default class GameScene extends Phaser.Scene {
         this.enemyBulletCollCat = this.matter.world.nextCategory();
         this.enemyDestructableBulletCollCat = this.matter.world.nextCategory();
 
+        this.matter.world.on('collisionstart', (event) => {
+            event.pairs.forEach(pairs => {
+                // that we have the top level body instead of a part of a larger compound body.
+                var bodyA = pairs.bodyA;
+                var bodyB = pairs.bodyB;
+
+                let bullet = null;
+                let other = null;
+                if (bodyA.gameObject instanceof Bullet) {
+                    bullet = bodyA.gameObject;
+                    other = bodyB.gameObject;
+                } else if (bodyB.gameObject instanceof Bullet) {
+                    bullet = bodyB.gameObject;
+                    other = bodyA.gameObject;
+                }
+
+                if (bullet != null) {
+                    other.health -= bullet.damage;
+                    
+                    this.destroyObject(bullet);
+                    if (other.health <= 0) {
+                        this.destroyObject(other);
+                    }
+                }
+
+                console.log();
+                /*
+                    
+                    */
+                /*
+                if ((bodyA.label === 'ball' && bodyB.label === 'dangerousTile') ||
+                    (bodyB.label === 'ball' && bodyA.label === 'dangerousTile')) {
+                    const ballBody = bodyA.label === 'ball' ? bodyA : bodyB;
+                    const ball = ballBody.gameObject;
+    
+                    // A body may collide with multiple other bodies in a step, so we'll use a flag to
+                    // only tween & destroy the ball once.
+                    if (ball.isBeingDestroyed) {
+                        continue;
+                    }
+                    ball.isBeingDestroyed = true;
+    
+                    this.matter.world.remove(ballBody);
+    
+                    
+                }
+                */
+            });
+        });
 
         this.scoreText = new Phaser.GameObjects.Text(this, 10, 10, ' ', {
             color: '#ffffff',
@@ -57,6 +108,18 @@ export default class GameScene extends Phaser.Scene {
     set score(value) {
         this._score = value;
         if (typeof this.scoreText != 'undefined') this.scoreText.setText('Score: ' + value);
+    }
+
+    destroyObject(object) {
+        if (object.beingDestroyed) return;
+        if (object instanceof Bullet) {
+            this.bullets.splice(this.bullets.indexOf(object), 1);
+        }
+        if (object instanceof AutoPlane) {
+            this.enemies.splice(this.enemies.indexOf(object), 1);
+        }
+        object.destroy();
+        object.beingDestroyed = true;
     }
   
     update(time, delta) {
@@ -134,7 +197,7 @@ export default class GameScene extends Phaser.Scene {
                 let timeSinceStop = 0;
                 let lastTime = 0;
                 let originalFireRate;
-                let autoPlane = new AutoPlane(this, 0, 100, 18, 18, 'plane2', 200, new Gun([{fireRate: 1.5, speed: 100, texture: 'tiny-bullet', bullets: [{}]}]), function (t, gameObject) {
+                let autoPlane = new AutoPlane(this, 0, 100, 18, 18, 'plane2', 200, new Gun([{damage: 1, fireRate: 1.5, speed: 100, texture: 'tiny-bullet', bullets: [{}]}]), function (t, gameObject) {
                     let x = gameObject.x;
                     let y = gameObject.y;
                     
