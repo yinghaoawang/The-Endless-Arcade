@@ -2,8 +2,9 @@ import Plane from './Plane';
 
 export default class PlayerPlane extends Plane {
     constructor(scene, x, y, width, height, texture, speed) {
-        super(scene, x, y, width, height, texture, speed);
+        super(scene, x, y, width, height, texture, speed, undefined, 5);
         this.rotation = -Math.PI / 2;
+        this._health = 5;
         this.setInteractive({
             pixelPerfect: true,
             useHandCursor: true
@@ -15,7 +16,20 @@ export default class PlayerPlane extends Plane {
         this.setCollidesWith([scene.enemyCollCat, scene.enemyBulletCollCat]);
         if (this.gun) {
             this.gun.collisionCategory = scene.allyBulletCollCat;
-            this.gun.collidesWith = [scene.enemyBulletCollCat, scene.enemyCollCat];
+            this.gun.collidesWith = [scene.enemyDestructableBulletCollCat, scene.enemyCollCat];
+        }
+
+        this.propertyChangeListeners = [];
+    }
+    get health() {
+        return this._health;
+    }
+    set health(value) {
+        this._health = value;
+        if (typeof this.propertyChangeListeners != 'undefined') {
+            this.propertyChangeListeners.forEach(fn => {
+                fn();
+            });
         }
     }
 }

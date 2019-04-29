@@ -9,7 +9,7 @@ export default class AutoPlane extends Plane {
         this.setCollidesWith([scene.allyCollCat, scene.allyBulletCollCat]);
         if (gun) {
             this.gun.collisionCategory = scene.enemyBulletCollCat;
-            this.gun.collidesWith = [scene.allyBulletCollCat, scene.allyCollCat];
+            this.gun.collidesWith = [scene.allyCollCat];
         }
     }
 

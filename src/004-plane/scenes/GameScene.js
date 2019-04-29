@@ -36,6 +36,27 @@ export default class GameScene extends Phaser.Scene {
         this.allyCollCat = this.matter.world.nextCategory();
         this.enemyCollCat = this.matter.world.nextCategory();
         this.enemyBulletCollCat = this.matter.world.nextCategory();
+        this.enemyDestructableBulletCollCat = this.matter.world.nextCategory();
+
+
+        this.scoreText = new Phaser.GameObjects.Text(this, 10, 10, ' ', {
+            color: '#ffffff',
+        });
+        this.add.existing(this.scoreText);
+
+        this.healthText = new Phaser.GameObjects.Text(this, 10, 10 + this.scoreText.height + 5, ' ', {
+            color: '#ffffff',
+        });
+        this.add.existing(this.healthText);
+    }
+
+    get score() {
+        return this._score;
+    }
+
+    set score(value) {
+        this._score = value;
+        if (typeof this.scoreText != 'undefined') this.scoreText.setText('Score: ' + value);
     }
   
     update(time, delta) {
@@ -51,8 +72,15 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
+    updateHealthText() {
+        this.healthText.setText('Health: ' + this.player.health);
+    }
+
     initPlaying() {
-        this.plane = new PlayerPlane(this, this.screenWidth / 2, this.screenHeight - 32, 32, 32, 'plane', 250);
+        this.score = 0;
+        this.player = new PlayerPlane(this, this.screenWidth / 2, this.screenHeight - 32, 32, 32, 'plane', 250);
+        this.player.propertyChangeListeners.push(this.updateHealthText.bind(this));
+        this.updateHealthText();
 
         this.uTurn = (time) => {
             let screenHeight = this.screenHeight;
@@ -138,8 +166,6 @@ export default class GameScene extends Phaser.Scene {
                     }
                     
                 });
-                console.log(autoPlane.body);
-                //autoPlane.body.checkCollision.none = true;
                 this.spawnList.push({
                     target: autoPlane,
                     time: 500 + time + i * 250,
@@ -151,14 +177,14 @@ export default class GameScene extends Phaser.Scene {
     
         this.spawnHitNRun(this.time.now);
 
-        this.add.existing(this.plane);
+        this.add.existing(this.player);
         
     }
     
 
     updatePlaying(time, delta) {
         // TODO not this v
-        if (typeof this.plane == 'undefined') this.initPlaying();
+        if (typeof this.player == 'undefined') this.initPlaying();
         
         this.listenPlayerMovement(time, delta);
         this.updateEnemies(time, delta);
@@ -214,12 +240,12 @@ export default class GameScene extends Phaser.Scene {
             if (scheme.right.isDown) rightPressed = true;
             if (scheme.fire.isDown) firePressed = true;
         })
-        if (upPressed && !downPressed) this.plane.y -= (this.plane.speed * delta) / 1000;
-        if (downPressed && !upPressed) this.plane.y += (this.plane.speed * delta) / 1000;
+        if (upPressed && !downPressed) this.player.y -= (this.player.speed * delta) / 1000;
+        if (downPressed && !upPressed) this.player.y += (this.player.speed * delta) / 1000;
 
-        if (leftPressed && !rightPressed) this.plane.x -= (this.plane.speed * delta) / 1000;
-        if (rightPressed && !leftPressed) this.plane.x += (this.plane.speed * delta) / 1000;
+        if (leftPressed && !rightPressed) this.player.x -= (this.player.speed * delta) / 1000;
+        if (rightPressed && !leftPressed) this.player.x += (this.player.speed * delta) / 1000;
 
-        if (firePressed)this.plane.fire(time, delta);
+        if (firePressed)this.player.fire(time, delta);
     }
 }
