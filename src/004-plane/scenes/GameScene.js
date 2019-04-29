@@ -57,11 +57,31 @@ export default class GameScene extends Phaser.Scene {
                 }
 
                 if (bullet != null) {
-                    other.health -= bullet.damage;
+                    if (other) {
+                        other.health -= bullet.damage;
+                    }
                     
                     this.destroyObject(bullet);
-                    if (other.health <= 0) {
+                    if (other && other.health <= 0) {
                         this.destroyObject(other);
+                    }
+                } else {
+                    let player = null;
+                    if (bodyA.gameObject instanceof PlayerPlane) {
+                        player = bodyA.gameObject;
+                        other = bodyB.gameObject;
+                    } else if (bodyB.gameObject instanceof PlayerPlane) {
+                        player = bodyB.gameObject;
+                        other = bodyA.gameObject;
+                    }
+
+                    if (player != null) {
+                        this.destroyObject(other);
+                        
+                        player.health--;
+                        if (player.health <= 0) {
+                            this.destroyObject(player);
+                        }
                     }
                 }
 
@@ -247,9 +267,9 @@ export default class GameScene extends Phaser.Scene {
 
     updatePlaying(time, delta) {
         // TODO not this v
-        if (typeof this.player == 'undefined') this.initPlaying();
+        if (!this.player) this.initPlaying();
         
-        this.listenPlayerMovement(time, delta);
+        if (this.player && !this.player.beingDestroyed) this.listenPlayerMovement(time, delta);
         this.updateEnemies(time, delta);
         this.updateBullets(time, delta);
 
@@ -303,6 +323,7 @@ export default class GameScene extends Phaser.Scene {
             if (scheme.right.isDown) rightPressed = true;
             if (scheme.fire.isDown) firePressed = true;
         })
+
         if (upPressed && !downPressed) this.player.y -= (this.player.speed * delta) / 1000;
         if (downPressed && !upPressed) this.player.y += (this.player.speed * delta) / 1000;
 

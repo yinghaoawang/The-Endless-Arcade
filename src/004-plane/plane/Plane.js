@@ -15,6 +15,8 @@ export default class Plane extends Phaser.Physics.Matter.Sprite {
         this.maxHealth = maxHealth;
         this.health = maxHealth;
 
+        this.setDensity(999999999)
+
         this.lastFired = 0;
     }
 
