@@ -15,6 +15,6 @@ export default class AutoPlane extends Plane {
         this.y += ((this.speed * delta) / 1000) * moveFn(this.t, this).y;
 
         this.t += delta / 1000;
-        this.fire(time, delta);
+        if (this.gun) this.fire(time, delta);
     }
 }

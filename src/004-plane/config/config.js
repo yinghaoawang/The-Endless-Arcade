@@ -9,9 +9,13 @@ export default {
         disableWebAudio: true
     },
     physics: {
-        default: 'arcade',
-        arcade: {
+        default: 'matter',
+        matter: {
             debug: true,
+            gravity: {
+                x: 0,
+                y: 0
+            }
         }
     },
 };

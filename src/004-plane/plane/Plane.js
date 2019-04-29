@@ -2,9 +2,10 @@ import Phaser from 'phaser3';
 import FiringSchemes from './FiringSchemes';
 import Gun from './Gun';
 
-export default class Plane extends Phaser.GameObjects.Sprite {
+export default class Plane extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, width, height, texture, speed, gun) {
-        super(scene, x, y, texture);
+        super(scene.matter.world, x, y, texture);
+        this.scene = scene;
         if (typeof speed == 'undefined') speed = 200;
         if (typeof gun == 'undefined') gun = new Gun(FiringSchemes.DEFAULT);
         this.setDisplaySize(width, height);

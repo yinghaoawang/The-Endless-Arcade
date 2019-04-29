@@ -15,6 +15,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('plane2', 'assets/sprites/plane2.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
         this.load.image('circle-bullet', 'assets/sprites/circle-bullet.png');
+        this.load.image('tiny-bullet', 'assets/sprites/tiny-bullet.png');
     }
 
     create() {
@@ -48,9 +49,40 @@ export default class GameScene extends Phaser.Scene {
     initPlaying() {
         this.plane = new PlayerPlane(this, this.screenWidth / 2, this.screenHeight - 32, 32, 32, 'plane', 250);
 
+        this.uTurn = (time) => {
+            let screenHeight = this.screenHeight;
+            let flipped = false;
+            let autoPlane = new AutoPlane(this, 150, 0, 18, 18, 'plane2', 130, null, (t, gameObject) => {
+                let x = gameObject.x;
+                let y = gameObject.y;
+                if (!flipped && y < screenHeight * .75) {
+                    return {
+                        x: 0,
+                        y: 1
+                    }
+                } else {
+                    if (!flipped) {
+                        gameObject.rotation += Math.PI;
+                        flipped = true;
+                    }
+                    return {
+                        x: 0,
+                        y: -1
+                    }
+                }
+                
+            });
+            this.spawnList.push({
+                target: autoPlane,
+                time: time,
+            });
+        }
+
+        this.uTurn(this.time.now);
+
         this.spawnSnake = (time) => {
             for (let i = 0; i < 10; ++i) {
-                let autoPlane = new AutoPlane(this, 135, 0, 18, 18, 'plane2', 80, new Gun([{fireRate: .2, speed: 100, texture: 'bullet', bullets: [{}]}]), (t) => {
+                let autoPlane = new AutoPlane(this, 135, 0, 18, 18, 'plane2', 80, null, (t) => {
                     return {
                         x: 2 * Math.sin(2.5 * t),
                         y: 1,
@@ -68,10 +100,14 @@ export default class GameScene extends Phaser.Scene {
                 let screenWidth = this.screenWidth;
                 let timeSinceStop = 0;
                 let lastTime = 0;
-                let autoPlane = new AutoPlane(this, 0, 100, 18, 18, 'plane2', 200, new Gun([{fireRate: 0, speed: 100, texture: 'bullet', bullets: [{}]}]), function (t, gameObject) {
+                let originalFireRate;
+                let autoPlane = new AutoPlane(this, 0, 100, 18, 18, 'plane2', 200, new Gun([{fireRate: 1.5, speed: 100, texture: 'tiny-bullet', bullets: [{}]}]), function (t, gameObject) {
                     let x = gameObject.x;
                     let y = gameObject.y;
+                    
+                    if (typeof originalFireRate == 'undefined') originalFireRate = gameObject.fireRate;
                     if (x <= (screenWidth / 2) + 30 - 30 * i) {
+                        gameObject.fireRate = 0;
                         return {
                             x: 1,
                             y: 0
@@ -81,7 +117,7 @@ export default class GameScene extends Phaser.Scene {
                         lastTime = t;
 
                         if (timeSinceStop < 3) {
-                            gameObject.fireRate = 2;
+                            gameObject.fireRate = originalFireRate;
                             return {
                                 x: 0,
                                 y: 0

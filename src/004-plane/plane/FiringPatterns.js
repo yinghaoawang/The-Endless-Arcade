@@ -1,6 +1,6 @@
 export default {
     DEFAULT: {
-        fireRate: 5,
+        fireRate: 7,
         speed: 500,
         texture: 'bullet',
         bullets: [
@@ -29,7 +29,7 @@ export default {
         ]
     },
     TRIPLE_SHOT: {
-        fireRate: 5,
+        fireRate: 7,
         speed: 500,
         texture: 'bullet',
         bullets: [

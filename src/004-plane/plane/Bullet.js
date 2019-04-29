@@ -1,7 +1,8 @@
 import Phaser from 'phaser3';
-export default class Bullet extends Phaser.GameObjects.Sprite {
+export default class Bullet extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, texture, speed, rotationPath) {
-        super(scene, x, y, texture);
+        super(scene.matter.world, x, y, texture);
+        this.scene = scene;
         this.speed = speed;
         this.t = 0;
         this.rotationPath = rotationPath;
