@@ -58,6 +58,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.matter.world.on('collisionstart', (event) => {
             event.pairs.forEach(pairs => {
+                pairs.isActive = false;
                 // that we have the top level body instead of a part of a larger compound body.
                 var bodyA = pairs.bodyA;
                 var bodyB = pairs.bodyB;
