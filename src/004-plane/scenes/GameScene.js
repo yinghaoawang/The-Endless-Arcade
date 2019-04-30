@@ -244,7 +244,7 @@ export default class GameScene extends Phaser.Scene {
             });
         }
 
-        this.uTurn(this.time.now);
+        
 
         this.spawnSnake = (time) => {
             for (let i = 0; i < 10; ++i) {
@@ -307,8 +307,12 @@ export default class GameScene extends Phaser.Scene {
         }
 
         this.spawnSnake(this.time.now);
-    
+        this.uTurn(this.time.now);
         this.spawnHitNRun(this.time.now);
+
+        this.spawnPatterns = [this.spawnSnake, this.uTurn, this.spawnHitNRun];
+        this.lastSpawned = this.time.now;
+        this.spawnRate = 1;
 
         this.add.existing(this.player);
         
@@ -338,6 +342,11 @@ export default class GameScene extends Phaser.Scene {
     }
 
     updateSpawn(time, delta) {
+        if (time > this.lastSpawned + 1000 / this.spawnRate) {
+            this.spawnPatterns[~~(Math.random() * this.spawnPatterns.length)](time);
+            this.lastSpawned = time;
+        }
+
         for (let i = 0 ; i < this.spawnList.length; ++i) {
             let instructions = this.spawnList[i];
             if (time >= instructions.time) {

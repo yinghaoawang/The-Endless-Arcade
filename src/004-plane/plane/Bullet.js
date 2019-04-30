@@ -7,8 +7,7 @@ export default class Bullet extends Phaser.Physics.Matter.Sprite {
         this.speed = speed;
         this.t = 0;
         this.rotationPath = rotationPath;
-        this.setDensity(.0000000001);
-        this.setMass(.0000000001);
+        
     }
 
     update(time, delta) {

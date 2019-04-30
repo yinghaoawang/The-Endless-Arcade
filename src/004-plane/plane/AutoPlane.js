@@ -13,6 +13,8 @@ export default class AutoPlane extends Plane {
         }
 
         this.soundName = 'enemy-shoot';
+
+        this.setStatic(true);
     }
 
     update(time, delta) {
