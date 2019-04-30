@@ -13,6 +13,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio('shoot', 'assets/sounds/shoot.wav');
         this.load.image('plane', 'assets/sprites/plane.png');
         this.load.image('plane2', 'assets/sprites/plane2.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
@@ -137,6 +138,7 @@ export default class GameScene extends Phaser.Scene {
         }
         if (object instanceof AutoPlane) {
             this.enemies.splice(this.enemies.indexOf(object), 1);
+            this.score += 50;
         }
         object.destroy();
         object.beingDestroyed = true;

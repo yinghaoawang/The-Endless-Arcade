@@ -20,8 +20,6 @@ export default class PlayerPlane extends Plane {
         }
 
         this.propertyChangeListeners = [];
-
-        this.density *= 999999999;
     }
     get health() {
         return this._health;
