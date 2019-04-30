@@ -15,16 +15,28 @@ export default class GameScene extends Phaser.Scene {
     preload() {
         this.load.audio('bg-music', 'assets/sounds/background-music.wav')
         this.load.audio('shoot', 'assets/sounds/shoot.wav');
+        this.load.audio('ship-die', 'assets/sounds/ship-die.wav');
         this.load.audio('enemy-shoot', 'assets/sounds/enemy-shoot.wav');
+        this.load.audio('take-damage', 'assets/sounds/take-damage.wav');
         this.load.image('plane', 'assets/sprites/plane.png');
         this.load.image('plane2', 'assets/sprites/plane2.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
         this.load.image('circle-bullet', 'assets/sprites/circle-bullet.png');
         this.load.image('tiny-bullet', 'assets/sprites/tiny-bullet.png');
         this.load.image('parallax-bg', 'assets/sprites/parallax-background.png');
+        this.load.spritesheet('explosion', 'assets/sprites/explosion.png', { frameWidth: 64, frameHeight: 64 }
+    );
     }
 
     create() {
+        
+        let explodeAnimConfig = {
+            key: 'explode',
+            frames: this.anims.generateFrameNumbers('explosion'),
+            frameRate: 30
+        };
+        this.anims.create(explodeAnimConfig);
+
         this.screenWidth = this.cameras.main.width;
         this.screenHeight = this.cameras.main.height;
 
@@ -63,11 +75,16 @@ export default class GameScene extends Phaser.Scene {
                 if (bullet != null) {
                     if (other) {
                         other.health -= bullet.damage;
+                        if (other instanceof PlayerPlane) this.sound.play('take-damage', { volume: .3, });
                     }
                     
+                    this.createExplosion(bullet.x, bullet.y, 16, 16);
                     this.destroyObject(bullet);
+                    
                     if (other && other.health <= 0) {
+                        this.createExplosion(other.x, other.y, other.displayWidth * 2, other.displayHeight * 2);
                         this.destroyObject(other);
+                        this.sound.play('ship-die', { volume: .4 });
                     }
                 } else {
                     let player = null;
@@ -80,11 +97,16 @@ export default class GameScene extends Phaser.Scene {
                     }
 
                     if (player != null) {
+                        this.createExplosion(other.x, other.y, other.displayWidth * 2, other.displayHeight * 2);
                         this.destroyObject(other);
+                        this.sound.play('take-damage', { volume: .3, });
+                        
                         
                         player.health--;
                         if (player.health <= 0) {
+                            this.createExplosion(player.x, player.y, player.displayWidth * 2, player.displayHeight * 2);
                             this.destroyObject(player);
+                            
                         }
                     }
                 }
@@ -110,16 +132,6 @@ export default class GameScene extends Phaser.Scene {
             
         });
 
-        this.scoreText = new Phaser.GameObjects.Text(this, 10, 10, ' ', {
-            color: '#ffffff',
-        });
-        this.add.existing(this.scoreText);
-
-        this.healthText = new Phaser.GameObjects.Text(this, 10, 10 + this.scoreText.height + 5, ' ', {
-            color: '#ffffff',
-        });
-        this.add.existing(this.healthText);
-
         this.parallaxBg1 = new Phaser.GameObjects.Image(this, 0, 0, 'parallax-bg');
         this.parallaxBg1.setDisplaySize(this.screenWidth, this.screenHeight);
         this.parallaxBg1.setOrigin(0);
@@ -129,6 +141,17 @@ export default class GameScene extends Phaser.Scene {
 
         this.add.existing(this.parallaxBg1);
         this.add.existing(this.parallaxBg2);
+
+        this.scoreText = new Phaser.GameObjects.Text(this, 10, 10, ' ', {
+            color: '#ffffff',
+        });
+        this.add.existing(this.scoreText);
+
+        this.healthText = new Phaser.GameObjects.Text(this, 10, 10 + this.scoreText.height + 5, ' ', {
+            color: '#ffffff',
+        });
+        this.add.existing(this.healthText);
+        
     }
 
     get score() {
@@ -138,6 +161,18 @@ export default class GameScene extends Phaser.Scene {
     set score(value) {
         this._score = value;
         if (typeof this.scoreText != 'undefined') this.scoreText.setText('Score: ' + value);
+    }
+
+    createExplosion(x, y, width, height) {
+        let explosion = new Phaser.GameObjects.Sprite(this, x, y, 'explosion');
+        explosion.setDisplaySize(width, height);
+        
+        explosion.anims.load('explode');
+        explosion.anims.play('explode');
+        explosion.once('animationcomplete', (anim, frame) => {
+            this.destroyObject(explosion);
+        });
+        this.add.existing(explosion);
     }
 
     destroyObject(object) {

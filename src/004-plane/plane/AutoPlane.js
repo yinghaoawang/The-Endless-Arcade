@@ -16,6 +16,7 @@ export default class AutoPlane extends Plane {
     }
 
     update(time, delta) {
+        if (this.beingDestroyed) return;
         let moveFn = this.moveFn;
         if (!this.moveFn) moveFn = (t) => { return { x: 0, y: 1 }; };
 
