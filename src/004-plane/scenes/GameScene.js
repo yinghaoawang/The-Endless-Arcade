@@ -13,12 +13,15 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.audio('bg-music', 'assets/sounds/background-music.wav')
         this.load.audio('shoot', 'assets/sounds/shoot.wav');
+        this.load.audio('enemy-shoot', 'assets/sounds/enemy-shoot.wav');
         this.load.image('plane', 'assets/sprites/plane.png');
         this.load.image('plane2', 'assets/sprites/plane2.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
         this.load.image('circle-bullet', 'assets/sprites/circle-bullet.png');
         this.load.image('tiny-bullet', 'assets/sprites/tiny-bullet.png');
+        this.load.image('parallax-bg', 'assets/sprites/parallax-background.png');
     }
 
     create() {
@@ -85,11 +88,6 @@ export default class GameScene extends Phaser.Scene {
                         }
                     }
                 }
-
-                console.log();
-                /*
-                    
-                    */
                 /*
                 if ((bodyA.label === 'ball' && bodyB.label === 'dangerousTile') ||
                     (bodyB.label === 'ball' && bodyA.label === 'dangerousTile')) {
@@ -104,11 +102,12 @@ export default class GameScene extends Phaser.Scene {
                     ball.isBeingDestroyed = true;
     
                     this.matter.world.remove(ballBody);
-    
                     
                 }
                 */
             });
+
+            
         });
 
         this.scoreText = new Phaser.GameObjects.Text(this, 10, 10, ' ', {
@@ -120,6 +119,16 @@ export default class GameScene extends Phaser.Scene {
             color: '#ffffff',
         });
         this.add.existing(this.healthText);
+
+        this.parallaxBg1 = new Phaser.GameObjects.Image(this, 0, 0, 'parallax-bg');
+        this.parallaxBg1.setDisplaySize(this.screenWidth, this.screenHeight);
+        this.parallaxBg1.setOrigin(0);
+        this.parallaxBg2 = new Phaser.GameObjects.Image(this, 0, -this.screenHeight, 'parallax-bg');
+        this.parallaxBg2.setDisplaySize(this.screenWidth, this.screenHeight);
+        this.parallaxBg2.setOrigin(0);
+
+        this.add.existing(this.parallaxBg1);
+        this.add.existing(this.parallaxBg2);
     }
 
     get score() {
@@ -162,6 +171,10 @@ export default class GameScene extends Phaser.Scene {
     }
 
     initPlaying() {
+        this.sound.play('bg-music', {
+            volume: .1,
+            loop: true,
+        });
         this.score = 0;
         this.player = new PlayerPlane(this, this.screenWidth / 2, this.screenHeight - 32, 32, 32, 'plane', 250);
         this.player.propertyChangeListeners.push(this.updateHealthText.bind(this));
@@ -276,6 +289,17 @@ export default class GameScene extends Phaser.Scene {
         this.updateBullets(time, delta);
 
         this.updateSpawn(time, delta);
+        this.updateParallax(time, delta);
+    }
+    updateParallax(time, delta) {
+        this.parallaxBg1.y++;
+        this.parallaxBg2.y++;
+        if (this.parallaxBg1.y > this.screenHeight) {
+            this.parallaxBg1.y -= this.screenHeight * 2;
+        }
+        if (this.parallaxBg2.y > this.screenHeight) {
+            this.parallaxBg2.y -= this.screenHeight * 2;
+        }
     }
 
     updateSpawn(time, delta) {

@@ -33,7 +33,8 @@ export default class Plane extends Phaser.Physics.Matter.Sprite {
         if (time > this.lastFired + this.cooldown) {
             this.gun.shoot(this.scene, this.x, this.y + Math.sin(this.rotation) * this.displayHeight / 2, this.rotation, this);
             this.lastFired = time;
-            this.scene.sound.play('shoot');
+            if (this.soundName) this.scene.sound.play(this.soundName, { volume: .4, });
+            
         }
     }
 

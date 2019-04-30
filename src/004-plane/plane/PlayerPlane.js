@@ -20,6 +20,7 @@ export default class PlayerPlane extends Plane {
         }
 
         this.propertyChangeListeners = [];
+        this.soundName = 'shoot';
     }
     get health() {
         return this._health;

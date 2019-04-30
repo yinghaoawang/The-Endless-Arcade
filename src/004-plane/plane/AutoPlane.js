@@ -11,6 +11,8 @@ export default class AutoPlane extends Plane {
             this.gun.collisionCategory = scene.enemyBulletCollCat;
             this.gun.collidesWith = [scene.allyCollCat];
         }
+
+        this.soundName = 'enemy-shoot';
     }
 
     update(time, delta) {
