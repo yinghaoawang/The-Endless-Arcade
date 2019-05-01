@@ -7,7 +7,7 @@ export default class EnemySpawnerFactory {
 
         this.snakeMove = (t) => {
             return {
-                x: 2 * Math.sin(2.5 * t),
+                x: 2 * Math.sin((2.5 * t) - Math.PI / 2),
                 y: 1,
             }
         };
@@ -53,7 +53,7 @@ export default class EnemySpawnerFactory {
                 gameObject.lastTime = t;
                 if (gameObject.timeSinceStop < 3) {
                     gameObject.fireRate = gameObject.originalFireRate;
-                    return {
+                    return { 
                         x: 0,
                         y: 0
                     }
@@ -126,72 +126,41 @@ export default class EnemySpawnerFactory {
             return gameObject.moveDirection;
         }
 
-        this.snakeParams = {
-            moveFn: this.snakeMove
-        }
-    
-        this.uTurnParams = {
-            speed: 200,
-            moveFn: this.uTurnMove,
-        }
-
-        this.strikeRoundParams = {
-            speed: 200, maxHealth: 6,
-            texture: 'plane3', width: 36, height: 24,
-            fireChance: .75, targetPlayer: true,
-            moveFn: this.roundUMove,
-        };
-    
-        this.hitAndRunParams = {
-            speed: 200,
-            moveFn: this.hitAndRunMove
-        };
-
-        this.dartCrashParams = {
-            speed: 750, maxHealth: 1,
-            texture: 'plane4', width: 27, height: 9,
-            moveFn: this.kamikazeMove,
-        }
-    }
-
-    spawnPremade(key, delay, xOffset, yOffset) {
-        let spawner = null;
-        switch (key) {
-            case 'default':
-                spawner = new EnemySpawner(this.scene, { }, null, 5, 500, delay);
-                break
-            case 'hitNRun':
-                spawner = new EnemySpawner(this.scene, Object.assign({}, this.hitAndRunParams), { fireRate: 2 }, 5, 500, delay);
-                break;
-            case 'snake':
-                spawner = new EnemySpawner(this.scene, Object.assign({}, this.snakeParams), null, 9, 400, delay);
-                break;
-            case 'uTurn':
-                spawner = new EnemySpawner(this.scene, Object.assign({}, this.uTurnParams), { fireRate: 1, targetPlayer:  true }, 3, 500, delay);
-                break;
-            case 'strikerRound':
-                spawner = new EnemySpawner(this.scene, Object.assign({}, this.strikeRoundParams), { fireRate: 2 }, 1, null, delay);
-                break;
-            case 'dartCrash':
-                spawner = new EnemySpawner(this.scene, Object.assign({}, this.dartCrashParams), null, 1, null, delay);
-                break;
-
-            default:
-                console.error('Invalid spawn key: ' + key);
-                spawner = null;
-                break;
-        }
-        
-        if (spawner != null) {
-            if (typeof xOffset != 'undefined') {
-                if (typeof spawner.planeParams.x == 'undefined') spawner.planeParams.x = 0;
-                spawner.planeParams.x += xOffset;
+        this.homingMove = (t, gameObject) => {
+            if (scene.player && !scene.player.beingDestroyed) {
+                gameObject.moveTarget = scene.player;
+            } else {
+                gameObject.moveTarget = {
+                    x: scene.screenWidth / 2,
+                    y: scene.screenHeight,
+                }
             }
-            if (typeof yOffset != 'undefined') {
-                if (typeof spawner.planeParams.y == 'undefined') spawner.planeParams.y = 0;
-                spawner.planeParams.y += yOffset;
+                
+            let targetDirection = {
+                x: gameObject.moveTarget.x - gameObject.x,
+                y: gameObject.moveTarget.y - gameObject.y,
+            };
+            gameObject.targetRotation = Math.atan2(targetDirection.y, targetDirection.x);
+            
+            if (!gameObject.notInitted) {
+                gameObject.rotation = gameObject.targetRotation;
+                gameObject.notInitted = true;
             }
-            this.spawnQueue.push(spawner);
+
+            let rotationalSpeed = 5 / 1000;
+            if ((gameObject.targetRotation < 0 && gameObject.rotation > 0) ||
+                (gameObject.targetRotation > 0 && gameObject.rotation < 0)) {
+                    gameObject.rotation -= rotationalSpeed;
+            } else if (gameObject.targetRotation - gameObject.rotation < 0) {
+                gameObject.rotation -= rotationalSpeed;
+            } else {
+                gameObject.rotation += rotationalSpeed;
+            }
+
+            return {
+                x: Math.cos(gameObject.rotation),
+                y: Math.sin(gameObject.rotation)
+            };
         }
     }
 
@@ -213,53 +182,18 @@ export default class EnemySpawnerFactory {
         this.spawnQueue.push(spawner);
     }
 
-    getMoveFunction(key) {
-        switch (key) {
-            case 'default':
-                return null;
-
-            case 'hitNRun':
-                return this.hitAndRunMove;
-
-            case 'kamikaze':
-                return this.kamikazeMove;
-
-            case 'roundU':
-                return this.roundUMove;
-
-            case 'uTurn':
-                return this.uTurnMove;
-
-            default:
-                console.error('Invalid move function type key: ' + key);
-                return null;
-        }
-    }
-
-    getFiringSchemeParams(key) {
-        switch (key) {
-            case 'default':
-                return null;
-
-            case 'striker':
-                return {
-                    fireRate: 2,
-                    texture: 'circle-bullet'
-                };
-
-            case 'dart':
-                return null;
-
-            default:
-                console.error('Invalid firing scheme key: ' + key);
-                return null;
-        }
-    }
-
     getPlaneParams(key) {
         switch (key) {
             case 'default':
                 return {};
+
+            case 'peashooter':
+                return {};
+            
+            case 'peastriker':
+                return {
+                    speed: 200,
+                }
 
             case 'striker':
                 return {
@@ -274,9 +208,85 @@ export default class EnemySpawnerFactory {
                     texture: 'plane4', width: 27, height: 9,
                 }
 
+            case 'homingDart':
+                return {
+                    speed: 200, maxHealth: 1, damage: 2,
+                    texture: 'plane4', width: 27, height: 9,
+                }
+
+            case null:
+                return {};
+
             default:
                 console.error('Invalid plane type key: ' + key);
                 return {};
+        }
+    }
+
+    getMoveFunction(key) {
+        switch (key) {
+            case 'default':
+                return null;
+
+            case 'snake':
+                return this.snakeMove;
+
+            case 'hitNRun':
+                return this.hitAndRunMove;
+
+            case 'kamikaze':
+                return this.kamikazeMove;
+
+            case 'roundU':
+                return this.roundUMove;
+
+            case 'uTurn':
+                return this.uTurnMove;
+               
+            case 'homing':
+                return this.homingMove;
+                
+            
+            case null:
+                return null;
+
+            default:
+                console.error('Invalid move function type key: ' + key);
+                return null;
+        }
+    }
+
+    getFiringSchemeParams(key) {
+        switch (key) {
+            case 'default':
+                return null;
+
+            case 'peashooter':
+                return {
+                    fireRate: 1
+                };
+
+            case 'peastriker':
+                return {
+                    fireRate: 1,
+                    targetPlayer: true
+                }
+
+            case 'striker':
+                return {
+                    fireRate: 2,
+                    texture: 'circle-bullet'
+                };
+
+            case 'dart':
+                return null;
+            
+            case null:
+                return null
+
+            default:
+                console.error('Invalid firing scheme key: ' + key);
+                return null;
         }
     }
     

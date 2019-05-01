@@ -124,7 +124,6 @@ export default class GameScene extends Phaser.Scene {
         }
         if (object instanceof AutoPlane) {
             this.enemies.splice(this.enemies.indexOf(object), 1);
-            this.score += 50;
         }
         object.destroy();
         object.beingDestroyed = true;
@@ -159,15 +158,20 @@ export default class GameScene extends Phaser.Scene {
         this.add.existing(this.player);
         this.updateHealthText();
         
+        this.enemySpawnerFactory.spawnFromParts('homingDart', 'homing', null, 1, null, 1000);
+        this.enemySpawnerFactory.spawnFromParts('homingDart', 'homing', null, 1, null, 1000, this.screenWidth);
+        this.enemySpawnerFactory.spawnFromParts('homingDart', 'homing', null, 1, null, 1000, 0, this.screenHeight);
+        this.enemySpawnerFactory.spawnFromParts('homingDart', 'homing', null, 1, null, 1000, this.screenWidth, this.screenHeight);
         this.enemySpawnerFactory.spawnFromParts('dart', 'kamikaze', 'dart', 1, null, 4500);
         this.enemySpawnerFactory.spawnFromParts('dart', 'kamikaze', 'dart', 1, null, 4500, .5 * this.screenWidth);
         this.enemySpawnerFactory.spawnFromParts('dart', 'kamikaze', 'dart', 1, null, 4500, this.screenWidth);
-        this.enemySpawnerFactory.spawnPremade('hitNRun', 2000, 0, .2 * this.screenHeight);
-        this.enemySpawnerFactory.spawnPremade('uTurn', 3000, .2 * this.screenWidth);
-        this.enemySpawnerFactory.spawnPremade('snake', 4000, .3 * this.screenWidth);
-        ///this.enemySpawnerFactory.spawnPremade('strikerRound', 150, .25 * this.screenWidth);
-
         this.enemySpawnerFactory.spawnFromParts('striker', 'roundU', 'striker', 3, 500, 0, 50);
+
+        this.enemySpawnerFactory.spawnFromParts('peashooter', 'hitNRun', 'peashooter', 5, 500, 0, 0, .5 * this.screenHeight);
+        this.enemySpawnerFactory.spawnFromParts('peastriker', 'uTurn', 'peastriker', 3, 500, 3000, .2 * this.screenWidth);
+        this.enemySpawnerFactory.spawnFromParts('peashooter', 'snake', 'peastriker', 9, 250, 4000, .5 * this.screenWidth);
+
+        
         
     }
 

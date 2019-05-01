@@ -23,15 +23,19 @@ export default class AutoPlane extends Plane {
         let moveFn = this.moveFn;
         if (!this.moveFn) moveFn = (t) => { return { x: 0, y: 1 }; };
 
-        this.x += ((this.speed * delta) / 1000) * moveFn(this.t, this).x;
-        this.y += ((this.speed * delta) / 1000) * moveFn(this.t, this).y;
+        let moveFnDist = Math.sqrt(moveFn(this.t, this).x * moveFn(this.t, this).x + moveFn(this.t, this).y * moveFn(this.t, this).y);
+        if (moveFnDist == 0) moveFnDist = 1;
+
+        this.x += ((this.speed * delta) / 1000) * (moveFn(this.t, this).x / moveFnDist);
+        this.y += ((this.speed * delta) / 1000) * (moveFn(this.t, this).y / moveFnDist);
 
         this.t += delta / 1000;
         if (this.scene.outOfBounds(this)) {
             this.timeOutOfBounds += delta / 1000;
-            if (this.timeOutOfBounds > 2000) this.scene.silentDestroyObject(this);
+            if (this.timeOutOfBounds > 5) this.scene.silentDestroyObject(this);
             return;
         } else if (this.gun) {
+            this.timeOutOfBounds = 0;
             if (this.targetPlayer && this.scene.player && !this.scene.player.beingDestroyed) {
                 let direction = {
                     x: this.scene.player.x - this.x,
@@ -40,6 +44,8 @@ export default class AutoPlane extends Plane {
                 this.gun.firingPattern.bullets[0].direction = Math.atan2(direction.y, direction.x) - this.rotation;
             }
             this.fire(time, delta);
+        } else {
+            this.timeOutOfBounds = 0;
         }
     }
 }
