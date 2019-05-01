@@ -10,7 +10,10 @@ export default class PlayerPlane extends Plane {
             useHandCursor: true
         });
 
-        this.on('pointerdown', this.gun.nextLevel.bind(this.gun));
+        this.on('pointerdown', () => {
+            this.gun.nextLevel();
+            this.rotation += Math.PI / 2;
+        });
 
         this.setCollisionCategory(scene.allyCollCat);
         this.setCollidesWith([scene.enemyCollCat, scene.enemyBulletCollCat]);

@@ -5,6 +5,8 @@ import Gun from '../gun/Gun';
 export default class Plane extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, width, height, texture, speed, gun, maxHealth) {
         super(scene.matter.world, x, y, texture);
+        this.timeCreated = scene.time.now;
+        this.timeOutOfBounds = 0;
         this.scene = scene;
         if (typeof speed == 'undefined') speed = 200;
         if (typeof gun == 'undefined') gun = new Gun(FiringSchemes.DEFAULT);
@@ -28,9 +30,12 @@ export default class Plane extends Phaser.Physics.Matter.Sprite {
 
     fire(time, delta) {
         if (time > this.lastFired + this.cooldown) {
-            this.gun.shoot(this.scene, this.x, this.y + Math.sin(this.rotation) * this.displayHeight / 2, this.rotation, this);
             this.lastFired = time;
-            if (this.soundName) this.scene.sound.play(this.soundName, { volume: .4, });
+
+            if (!this.fireChance || Math.random() < this.fireChance) {
+                this.gun.shoot(this.scene, this.x + Math.cos(this.rotation) * this.displayWidth / 2, this.y + Math.sin(this.rotation) * this.displayHeight / 2, this.rotation, this);
+                if (this.soundName) this.scene.sound.play(this.soundName, { volume: .4, });
+            }
             
         }
     }

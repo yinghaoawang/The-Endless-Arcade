@@ -19,11 +19,12 @@ export default class GameScene extends Phaser.Scene {
         this.load.audio('take-damage', 'assets/sounds/take-damage.wav');
         this.load.image('plane', 'assets/sprites/plane.png');
         this.load.image('plane2', 'assets/sprites/plane2.png');
+        this.load.image('plane3', 'assets/sprites/plane3.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
         this.load.image('circle-bullet', 'assets/sprites/circle-bullet.png');
         this.load.image('tiny-bullet', 'assets/sprites/tiny-bullet.png');
         this.load.image('parallax-bg', 'assets/sprites/parallax-background.png');
-        this.load.spritesheet('explosion', 'assets/sprites/explosion.png', { frameWidth: 64, frameHeight: 64 }
+        this.load.spritesheet('explosion', 'assets/sprites/explosion.png', { frameWidth: 16, frameHeight: 16 }
     );
     }
 
@@ -92,7 +93,7 @@ export default class GameScene extends Phaser.Scene {
 
     createExplosion(x, y, width, height) {
         let explosion = new Phaser.GameObjects.Sprite(this, x, y, 'explosion');
-        explosion.setDisplaySize(width, height);
+        explosion.setDisplaySize(Math.max(width, height), Math.max(width, height));
         
         explosion.anims.load('explode');
         explosion.anims.play('explode');
@@ -103,6 +104,19 @@ export default class GameScene extends Phaser.Scene {
     }
 
     destroyObject(object) {
+        if (object.beingDestroyed) return;
+        if (object instanceof Bullet) {
+            this.bullets.splice(this.bullets.indexOf(object), 1);
+        }
+        if (object instanceof AutoPlane) {
+            this.enemies.splice(this.enemies.indexOf(object), 1);
+            this.score += 50;
+        }
+        object.destroy();
+        object.beingDestroyed = true;
+    }
+
+    silentDestroyObject(object) {
         if (object.beingDestroyed) return;
         if (object instanceof Bullet) {
             this.bullets.splice(this.bullets.indexOf(object), 1);
@@ -141,14 +155,17 @@ export default class GameScene extends Phaser.Scene {
         this.score = 0;
         this.player = new PlayerPlane(this, this.screenWidth / 2, this.screenHeight - 32, 32, 32, 'plane', 250);
         this.player.propertyChangeListeners.push(this.updateHealthText.bind(this));
+        this.add.existing(this.player);
         this.updateHealthText();
+        
 
         this.enemySpawnerFactory.spawn('default', 500, .5 * this.screenWidth);
-        this.enemySpawnerFactory.spawn('hitNRun', 2000, 0, .2 * this.screenHeight);
-        this.enemySpawnerFactory.spawn('uTurn', 3000, .2 * this.screenWidth);
+        //this.enemySpawnerFactory.spawn('hitNRun', 2000, 0, .2 * this.screenHeight);
+        //this.enemySpawnerFactory.spawn('uTurn', 3000, .2 * this.screenWidth);
         this.enemySpawnerFactory.spawn('snake', 4000, .3 * this.screenWidth);
+        this.enemySpawnerFactory.spawn('strikerRound', 150, .25 * this.screenWidth);
 
-        this.add.existing(this.player);
+        
     }
 
     updatePlaying(time, delta) {

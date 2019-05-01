@@ -5,76 +5,120 @@ export default class EnemySpawnerFactory {
         this.scene = scene;
         this.spawnQueue = [];
 
-        this.snakeParams = {
-            moveFn: (t) => {
+        this.snakeMove = (t) => {
+            return {
+                x: 2 * Math.sin(2.5 * t),
+                y: 1,
+            }
+        };
+
+        this.uTurnMove = function (t, gameObject) {
+            if (typeof gameObject.flipped == 'undefined') gameObject.flipped = false;
+            let x = gameObject.x;
+            let y = gameObject.y;
+            if (!gameObject.flipped && y < scene.screenHeight * .75) {
                 return {
-                    x: 2 * Math.sin(2.5 * t),
-                    y: 1,
+                    x: 0,
+                    y: 1
                 }
-            },
-        }
-    
-        this.uTurnParams = {
-            speed: 200,
-            moveFn: function fn(t, gameObject) {
-                if (typeof fn.flipped == 'undefined') fn.flipped = [];
-                if (typeof fn.flipped[gameObject.index] == 'undefined') fn.flipped[gameObject.index] = false;
-                let x = gameObject.x;
-                let y = gameObject.y;
-                if (!fn.flipped[gameObject.index] && y < scene.screenHeight * .75) {
+            } else {
+                if (!gameObject.flipped) {
+                    gameObject.rotation += Math.PI;
+                    gameObject.flipped = true;
+                }
+                return {
+                    x: 0,
+                    y: -1
+                }
+            }
+        }.bind(scene);
+
+        this.hitAndRunMove = function (t, gameObject) {
+            let x = gameObject.x;
+            let screenWidth = scene.screenWidth;
+            let i = (typeof gameObject.index != 'undefined') ? gameObject.index : 1;
+            let iLen = (typeof gameObject.totalIndex != 'undefined') ? gameObject.totalIndex : 1;
+            
+            if (typeof gameObject.timeSinceStop == 'undefined') gameObject.timeSinceStop = 0;
+            if (typeof gameObject.originalFireRate == 'undefined') gameObject.originalFireRate = gameObject.fireRate;
+            if (x <= (screenWidth / 2) + (iLen - 1 - i) * gameObject.width * 1.2 - ((1.2 * gameObject.width ) * ((iLen - 1) / 2)))  {
+                gameObject.fireRate = 0;
+                return {
+                    x: 1,
+                    y: 0
+                }
+            } else {
+                if (typeof gameObject.lastTime == 'undefined') gameObject.lastTime = t;
+                gameObject.timeSinceStop += (t - gameObject.lastTime);
+                gameObject.lastTime = t;
+                if (gameObject.timeSinceStop < 3) {
+                    gameObject.fireRate = gameObject.originalFireRate;
                     return {
                         x: 0,
-                        y: 1
+                        y: 0
                     }
                 } else {
-                    if (!fn.flipped[gameObject.index]) {
-                        gameObject.rotation += Math.PI;
-                        fn.flipped[gameObject.index] = true;
-                    }
-                    return {
-                        x: 0,
-                        y: -1
-                    }
-                }
-            }.bind(scene),
-        }
-    
-        this.hitAndRunParams = {
-            speed: 200,
-            moveFn: function fn(t, gameObject) {
-                let x = gameObject.x;
-                let screenWidth = scene.screenWidth;
-                let i = (typeof gameObject.index != 'undefined') ? gameObject.index : 1;
-                let iLen = (typeof gameObject.totalIndex != 'undefined') ? gameObject.totalIndex : 1;
-                
-                if (typeof gameObject.timeSinceStop == 'undefined') gameObject.timeSinceStop = 0;
-                if (typeof gameObject.originalFireRate == 'undefined') gameObject.originalFireRate = gameObject.fireRate;
-                if (x <= (screenWidth / 2) + (iLen - 1 - i) * gameObject.width * 1.2 - ((1.2 * gameObject.width ) * ((iLen - 1) / 2)))  {
                     gameObject.fireRate = 0;
                     return {
                         x: 1,
                         y: 0
                     }
-                } else {
-                    if (typeof gameObject.lastTime == 'undefined') gameObject.lastTime = t;
-                    gameObject.timeSinceStop += (t - gameObject.lastTime);
-                    gameObject.lastTime = t;
-                    if (gameObject.timeSinceStop < 3) {
-                        gameObject.fireRate = gameObject.originalFireRate;
-                        return {
-                            x: 0,
-                            y: 0
-                        }
-                    } else {
-                        gameObject.fireRate = 0;
-                        return {
-                            x: 1,
-                            y: 0
-                        }
-                    }
-                    
                 }
-            }.bind(scene)
+                
+            }
+        }.bind(scene);
+
+        this.roundUMove = function (t, gameObject) {
+            let screenWidth = scene.screenWidth;
+            let screenHeight = scene.screenHeight;
+
+            if (typeof gameObject.flipped == 'undefined') gameObject.flipped = false;
+            if (typeof gameObject.oppositeX == 'undefined') gameObject.oppositeX = screenWidth - gameObject.x;
+            let x = gameObject.x;
+            let y = gameObject.y;
+
+            if (!gameObject.flipped) {
+                if (y < screenHeight * .6) {
+                    return {
+                        x: 0, y: 1
+                    }
+                } else {
+                    if (x >= gameObject.oppositeX) {
+                        gameObject.flipped = true;
+                    }
+                    gameObject.setRotation(0);
+                    return {
+                        x: 1, y: 0
+                    }
+                }
+            } else {
+                gameObject.setRotation(-1 * Math.PI / 2)
+                return {
+                    x: 0, y: -1
+                }
+            }
+            
+        }
+
+        this.snakeParams = {
+            moveFn: this.snakeMove
+        }
+    
+        this.uTurnParams = {
+            speed: 200,
+            moveFn: this.uTurnMove,
+        }
+
+        this.strikeRoundParams = {
+            y: 50, speed: 200, maxHealth: 6,
+            texture: 'plane3', width: 36, height: 24,
+            fireChance: .75, targetPlayer: true,
+            moveFn: this.roundUMove,
+        }
+    
+        this.hitAndRunParams = {
+            speed: 200,
+            moveFn: this.hitAndRunMove
         };
     }
 
@@ -93,8 +137,12 @@ export default class EnemySpawnerFactory {
             case 'uTurn':
                 spawner = new EnemySpawner(this.scene, this.uTurnParams, null, 3, 500, delay);
                 break;
-            
+            case 'strikerRound':
+                spawner = new EnemySpawner(this.scene, this.strikeRoundParams, { fireRate: 2 }, 1, null, delay);
+                break;
+
             default:
+                console.error('Invalid spawn key: ' + key);
                 spawner = null;
                 break;
         }
