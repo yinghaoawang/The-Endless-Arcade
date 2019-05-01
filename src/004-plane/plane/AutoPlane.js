@@ -1,6 +1,6 @@
 import Plane from './Plane';
 export default class AutoPlane extends Plane {
-    constructor(scene, x, y, width, height, texture, speed, gun, moveFn, fireChance) {
+    constructor(scene, x, y, width, height, texture, speed, moveFn, gun, fireChance) {
         super(scene, x, y, width, height, texture, speed, gun);
         this.rotation = Math.PI / 2;
         this.t = 0;
@@ -13,8 +13,6 @@ export default class AutoPlane extends Plane {
         }
 
         this.soundName = 'enemy-shoot';
-
-        this.setStatic(true);
     }
 
     update(time, delta) {

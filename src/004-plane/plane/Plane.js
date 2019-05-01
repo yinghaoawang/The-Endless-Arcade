@@ -1,6 +1,6 @@
 import Phaser from 'phaser3';
-import FiringSchemes from './FiringSchemes';
-import Gun from './Gun';
+import FiringSchemes from '../gun/FiringSchemes';
+import Gun from '../gun/Gun';
 
 export default class Plane extends Phaser.Physics.Matter.Sprite {
     constructor(scene, x, y, width, height, texture, speed, gun, maxHealth) {
