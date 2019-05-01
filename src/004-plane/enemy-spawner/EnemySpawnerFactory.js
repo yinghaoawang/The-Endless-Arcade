@@ -41,7 +41,7 @@ export default class EnemySpawnerFactory {
             
             if (typeof gameObject.timeSinceStop == 'undefined') gameObject.timeSinceStop = 0;
             if (typeof gameObject.originalFireRate == 'undefined') gameObject.originalFireRate = gameObject.fireRate;
-            if (x <= (screenWidth / 2) + (iLen - 1 - i) * gameObject.width * 1.2 - ((1.2 * gameObject.width ) * ((iLen - 1) / 2)))  {
+            if (x <= (screenWidth / 2) + (iLen - 1 - i) * gameObject.width * 2 - ((2 * gameObject.width ) * ((iLen - 1) / 2)))  {
                 gameObject.fireRate = 0;
                 return {
                     x: 1,
