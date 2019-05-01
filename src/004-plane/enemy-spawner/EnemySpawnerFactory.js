@@ -270,7 +270,7 @@ export default class EnemySpawnerFactory {
 
             case 'dart':
                 return {
-                    speed: 1000, maxHealth: 1, damage: 2,
+                    speed: 900, maxHealth: 1, damage: 2,
                     texture: 'plane4', width: 27, height: 9,
                 }
 

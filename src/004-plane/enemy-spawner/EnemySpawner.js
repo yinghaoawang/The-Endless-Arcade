@@ -41,7 +41,6 @@ export default class EnemySpawner {
         let targetPlayer = this.planeParams.targetPlayer || false;
         let maxHealth = this.planeParams.maxHealth || 1;
         let damage = this.planeParams.damage || 1;
-        console.log(this.planeParams.damage);
         
         let gun = null;
         if (this.firingSchemeParams != null) {

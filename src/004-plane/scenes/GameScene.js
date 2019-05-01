@@ -214,6 +214,7 @@ export default class GameScene extends Phaser.Scene {
         });
     }
 
+    // could tune this if needed
     outOfBounds(object) {
         return object.x > this.screenWidth ||
             object.x < 0 || object.y < 0 ||
