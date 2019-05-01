@@ -159,15 +159,15 @@ export default class GameScene extends Phaser.Scene {
         this.add.existing(this.player);
         this.updateHealthText();
         
-        this.enemySpawnerFactory.spawnPremade('dartCrash', 500);
-        this.enemySpawnerFactory.spawnPremade('dartCrash', 500, .5 * this.screenWidth);
-        this.enemySpawnerFactory.spawnPremade('dartCrash', 500, this.screenWidth);
+        this.enemySpawnerFactory.spawnFromParts('dart', 'kamikaze', 'dart', 1, null, 4500);
+        this.enemySpawnerFactory.spawnFromParts('dart', 'kamikaze', 'dart', 1, null, 4500, .5 * this.screenWidth);
+        this.enemySpawnerFactory.spawnFromParts('dart', 'kamikaze', 'dart', 1, null, 4500, this.screenWidth);
         this.enemySpawnerFactory.spawnPremade('hitNRun', 2000, 0, .2 * this.screenHeight);
-        //this.enemySpawnerFactory.spawnPremade('uTurn', 3000, .2 * this.screenWidth);
+        this.enemySpawnerFactory.spawnPremade('uTurn', 3000, .2 * this.screenWidth);
         this.enemySpawnerFactory.spawnPremade('snake', 4000, .3 * this.screenWidth);
         ///this.enemySpawnerFactory.spawnPremade('strikerRound', 150, .25 * this.screenWidth);
 
-        this.enemySpawnerFactory.spawnFromParts('striker', 'roundU', 'striker', 3, 500, 0, 50)
+        this.enemySpawnerFactory.spawnFromParts('striker', 'roundU', 'striker', 3, 500, 0, 50);
         
     }
 
@@ -270,6 +270,7 @@ export default class GameScene extends Phaser.Scene {
                 this.destroyObject(bullet);
                 
                 if (other && other.health <= 0) {
+                    other.health = 0;
                     this.createExplosion(other.x, other.y, other.displayWidth * 2, other.displayHeight * 2);
                     this.destroyObject(other);
                     this.sound.play('ship-die', { volume: .4 });
@@ -285,13 +286,15 @@ export default class GameScene extends Phaser.Scene {
                 }
 
                 if (player != null) {
-                    this.createExplosion(other.x, other.y, other.displayWidth * 2, other.displayHeight * 2);
+                    this.createExplosion(other.x, other.y, Math.max(other.displayWidth, other.displayHeight) * 2, Math.max(other.displayWidth, other.displayHeight) * 2);
+                    player.health -= other.damage;
                     this.destroyObject(other);
                     this.sound.play('take-damage', { volume: .3, });
                     
                     
-                    player.health--;
+                    
                     if (player.health <= 0) {
+                        player.health = 0;
                         this.createExplosion(player.x, player.y, player.displayWidth * 2, player.displayHeight * 2);
                         this.destroyObject(player);
                         

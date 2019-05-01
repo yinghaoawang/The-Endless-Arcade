@@ -167,7 +167,7 @@ export default class EnemySpawnerFactory {
                 spawner = new EnemySpawner(this.scene, Object.assign({}, this.snakeParams), null, 9, 400, delay);
                 break;
             case 'uTurn':
-                spawner = new EnemySpawner(this.scene, Object.assign({}, this.uTurnParams), null, 3, 500, delay);
+                spawner = new EnemySpawner(this.scene, Object.assign({}, this.uTurnParams), { fireRate: 1, targetPlayer:  true }, 3, 500, delay);
                 break;
             case 'strikerRound':
                 spawner = new EnemySpawner(this.scene, Object.assign({}, this.strikeRoundParams), { fireRate: 2 }, 1, null, delay);
@@ -243,7 +243,8 @@ export default class EnemySpawnerFactory {
 
             case 'striker':
                 return {
-                    fireRate: 2
+                    fireRate: 2,
+                    texture: 'circle-bullet'
                 };
 
             case 'dart':
@@ -269,8 +270,8 @@ export default class EnemySpawnerFactory {
 
             case 'dart':
                 return {
-                    speed: 750, maxHealth: 1,
-                texture: 'plane4', width: 27, height: 9,
+                    speed: 1000, maxHealth: 1, damage: 2,
+                    texture: 'plane4', width: 27, height: 9,
                 }
 
             default:

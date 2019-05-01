@@ -40,6 +40,8 @@ export default class EnemySpawner {
         let fireChance = this.planeParams.fireChance || .25;
         let targetPlayer = this.planeParams.targetPlayer || false;
         let maxHealth = this.planeParams.maxHealth || 1;
+        let damage = this.planeParams.damage || 1;
+        console.log(this.planeParams.damage);
         
         let gun = null;
         if (this.firingSchemeParams != null) {
@@ -48,13 +50,14 @@ export default class EnemySpawner {
                 fireRate: this.firingSchemeParams.fireRate || .5,
                 speed: this.firingSchemeParams.speed || 125,
                 texture: this.firingSchemeParams.texture || 'tiny-bullet',
+                targetPlayer: this.firingSchemeParams.targetPlayer || false,
                 
                 bullets: this.firingSchemeParams.bullets || [{ direction: 0 }],
             };
             gun = new Gun([ firingScheme ]);
         };
 
-        let enemyPlane = new AutoPlane(this.scene, x, y, width, height, texture, speed, maxHealth, moveFn, gun, fireChance, targetPlayer);
+        let enemyPlane = new AutoPlane(this.scene, x, y, width, height, texture, speed, maxHealth, damage, moveFn, gun, fireChance, targetPlayer);
         enemyPlane.index = this.currentPlaneIndex;
         enemyPlane.totalIndex = this.numberOfPlanes;
         

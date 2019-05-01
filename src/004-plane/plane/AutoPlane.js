@@ -1,7 +1,8 @@
 import Plane from './Plane';
 export default class AutoPlane extends Plane {
-    constructor(scene, x, y, width, height, texture, speed, maxHealth, moveFn, gun, fireChance, targetPlayer) {
+    constructor(scene, x, y, width, height, texture, speed, maxHealth, damage, moveFn, gun, fireChance, targetPlayer) {
         super(scene, x, y, width, height, texture, speed, gun, maxHealth);
+        this.damage = damage;
         this.fireChance = fireChance;
         this.targetPlayer = targetPlayer;
         this.rotation = Math.PI / 2;
