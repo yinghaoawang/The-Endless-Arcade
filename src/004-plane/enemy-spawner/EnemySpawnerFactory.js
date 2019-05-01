@@ -100,6 +100,32 @@ export default class EnemySpawnerFactory {
             
         }
 
+        this.kamikazeMove = (t, gameObject) => {
+            if (typeof gameObject.moveTarget == 'undefined') {
+                if (scene.player && !scene.player.beingDestroyed) {
+                    gameObject.moveTarget = {
+                        x: scene.player.x,
+                        y: scene.player.y
+                    }
+                } else {
+                    gameObject.moveTarget = {
+                        x: scene.screenWidth / 2,
+                        y: scene.screenHeight,
+                    }
+                }
+                gameObject.moveDirection = {
+                    x: gameObject.moveTarget.x - gameObject.x,
+                    y: gameObject.moveTarget.y - gameObject.y,
+                };
+                let distance = Math.sqrt(gameObject.moveDirection.x * gameObject.moveDirection.x + gameObject.moveDirection.y * gameObject.moveDirection.y);
+                gameObject.moveDirection.x /= distance;
+                gameObject.moveDirection.y /= distance;
+                gameObject.rotation = Math.atan2(gameObject.moveTarget.y - gameObject.y, gameObject.moveTarget.x - gameObject.x);;
+            }
+
+            return gameObject.moveDirection;
+        }
+
         this.snakeParams = {
             moveFn: this.snakeMove
         }
@@ -110,35 +136,44 @@ export default class EnemySpawnerFactory {
         }
 
         this.strikeRoundParams = {
-            y: 50, speed: 200, maxHealth: 6,
+            speed: 200, maxHealth: 6,
             texture: 'plane3', width: 36, height: 24,
             fireChance: .75, targetPlayer: true,
             moveFn: this.roundUMove,
-        }
+        };
     
         this.hitAndRunParams = {
             speed: 200,
             moveFn: this.hitAndRunMove
         };
+
+        this.dartCrashParams = {
+            speed: 750, maxHealth: 1,
+            texture: 'plane4', width: 27, height: 9,
+            moveFn: this.kamikazeMove,
+        }
     }
 
-    spawn(key, delay, xOffset, yOffset) {
+    spawnPremade(key, delay, xOffset, yOffset) {
         let spawner = null;
         switch (key) {
             case 'default':
                 spawner = new EnemySpawner(this.scene, { }, null, 5, 500, delay);
                 break
             case 'hitNRun':
-                spawner = new EnemySpawner(this.scene, this.hitAndRunParams, { fireRate: 2 }, 5, 500, delay);
+                spawner = new EnemySpawner(this.scene, Object.assign({}, this.hitAndRunParams), { fireRate: 2 }, 5, 500, delay);
                 break;
             case 'snake':
-                spawner = new EnemySpawner(this.scene, this.snakeParams, null, 9, 400, delay);
+                spawner = new EnemySpawner(this.scene, Object.assign({}, this.snakeParams), null, 9, 400, delay);
                 break;
             case 'uTurn':
-                spawner = new EnemySpawner(this.scene, this.uTurnParams, null, 3, 500, delay);
+                spawner = new EnemySpawner(this.scene, Object.assign({}, this.uTurnParams), null, 3, 500, delay);
                 break;
             case 'strikerRound':
-                spawner = new EnemySpawner(this.scene, this.strikeRoundParams, { fireRate: 2 }, 1, null, delay);
+                spawner = new EnemySpawner(this.scene, Object.assign({}, this.strikeRoundParams), { fireRate: 2 }, 1, null, delay);
+                break;
+            case 'dartCrash':
+                spawner = new EnemySpawner(this.scene, Object.assign({}, this.dartCrashParams), null, 1, null, delay);
                 break;
 
             default:
@@ -158,6 +193,28 @@ export default class EnemySpawnerFactory {
             }
             this.spawnQueue.push(spawner);
         }
+    }
+
+    getPlaneParams(key) {
+        let planeParams = null;
+        switch (key) {
+            case 'default':
+                spawner = new EnemySpawner(this.scene, { }, null, 5, 500, delay);
+                break
+            case 'striker':
+                spawner = new EnemySpawner(this.scene, this.hitAndRunParams, { fireRate: 2 }, 5, 500, delay);
+                break;
+            case 'dart':
+                spawner = new EnemySpawner(this.scene, this.snakeParams, null, 9, 400, delay);
+                break;
+
+            default:
+                console.error('Invalid plane type key: ' + key);
+                planeParams = null;
+                spawner = new EnemySpawner(this.scene, { }, null, 5, 500, delay);
+                break;
+        }
+
     }
     
     update(time, delta) {

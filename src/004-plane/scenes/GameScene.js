@@ -20,6 +20,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('plane', 'assets/sprites/plane.png');
         this.load.image('plane2', 'assets/sprites/plane2.png');
         this.load.image('plane3', 'assets/sprites/plane3.png');
+        this.load.image('plane4', 'assets/sprites/plane4.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
         this.load.image('circle-bullet', 'assets/sprites/circle-bullet.png');
         this.load.image('tiny-bullet', 'assets/sprites/tiny-bullet.png');
@@ -158,12 +159,13 @@ export default class GameScene extends Phaser.Scene {
         this.add.existing(this.player);
         this.updateHealthText();
         
-
-        this.enemySpawnerFactory.spawn('default', 500, .5 * this.screenWidth);
-        //this.enemySpawnerFactory.spawn('hitNRun', 2000, 0, .2 * this.screenHeight);
-        //this.enemySpawnerFactory.spawn('uTurn', 3000, .2 * this.screenWidth);
-        this.enemySpawnerFactory.spawn('snake', 4000, .3 * this.screenWidth);
-        this.enemySpawnerFactory.spawn('strikerRound', 150, .25 * this.screenWidth);
+        this.enemySpawnerFactory.spawnPremade('dartCrash', 500);
+        this.enemySpawnerFactory.spawnPremade('dartCrash', 500, .5 * this.screenWidth);
+        this.enemySpawnerFactory.spawnPremade('dartCrash', 500, this.screenWidth);
+        //this.enemySpawnerFactory.spawnPremade('hitNRun', 2000, 0, .2 * this.screenHeight);
+        //this.enemySpawnerFactory.spawnPremade('uTurn', 3000, .2 * this.screenWidth);
+        //this.enemySpawnerFactory.spawnPremade('snake', 4000, .3 * this.screenWidth);
+        this.enemySpawnerFactory.spawnPremade('strikerRound', 150, .25 * this.screenWidth);
 
         
     }

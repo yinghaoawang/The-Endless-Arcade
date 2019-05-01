@@ -12,7 +12,7 @@ export default class PlayerPlane extends Plane {
 
         this.on('pointerdown', () => {
             this.gun.nextLevel();
-            this.rotation += Math.PI / 2;
+            //this.rotation += Math.PI / 2;
         });
 
         this.setCollisionCategory(scene.allyCollCat);
