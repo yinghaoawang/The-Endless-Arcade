@@ -165,8 +165,9 @@ export default class GameScene extends Phaser.Scene {
         //this.enemySpawnerFactory.spawnPremade('hitNRun', 2000, 0, .2 * this.screenHeight);
         //this.enemySpawnerFactory.spawnPremade('uTurn', 3000, .2 * this.screenWidth);
         //this.enemySpawnerFactory.spawnPremade('snake', 4000, .3 * this.screenWidth);
-        this.enemySpawnerFactory.spawnPremade('strikerRound', 150, .25 * this.screenWidth);
+        ///this.enemySpawnerFactory.spawnPremade('strikerRound', 150, .25 * this.screenWidth);
 
+        this.enemySpawnerFactory.spawnFromParts('striker', 'roundU', 'striker', 3, 500, 0, 50)
         
     }
 

@@ -32,7 +32,7 @@ export default class EnemySpawnerFactory {
                 }
             }
         }.bind(scene);
-
+        
         this.hitAndRunMove = function (t, gameObject) {
             let x = gameObject.x;
             let screenWidth = scene.screenWidth;
@@ -67,7 +67,7 @@ export default class EnemySpawnerFactory {
                 
             }
         }.bind(scene);
-
+        
         this.roundUMove = function (t, gameObject) {
             let screenWidth = scene.screenWidth;
             let screenHeight = scene.screenHeight;
@@ -195,26 +195,88 @@ export default class EnemySpawnerFactory {
         }
     }
 
-    getPlaneParams(key) {
-        let planeParams = null;
+    spawnFromParts(planeKey, moveFunctionKey, firingSchemeKey, count, gap, delay, xOffset, yOffset) {
+        let planeTypeParams = Object.assign({}, this.getPlaneParams(planeKey));
+        let moveFunction = this.getMoveFunction(moveFunctionKey);
+        let firingSchemeParams = this.getFiringSchemeParams(firingSchemeKey);
+        planeTypeParams.moveFn = moveFunction;
+        if (typeof xOffset != 'undefined') {
+            if (typeof planeTypeParams.x == 'undefined') planeTypeParams.x = 0;
+            planeTypeParams.x += xOffset;
+        }
+        if (typeof yOffset != 'undefined') {
+            if (typeof planeTypeParams.y == 'undefined') planeTypeParams.y = 0;
+            planeTypeParams.y += yOffset;
+        }
+        
+        let spawner = new EnemySpawner(this.scene, planeTypeParams, firingSchemeParams, count, gap, delay);
+        this.spawnQueue.push(spawner);
+    }
+
+    getMoveFunction(key) {
         switch (key) {
             case 'default':
-                spawner = new EnemySpawner(this.scene, { }, null, 5, 500, delay);
-                break
+                return null;
+
+            case 'hitNRun':
+                return this.hitAndRunMove;
+
+            case 'kamikaze':
+                return this.kamikazeMove;
+
+            case 'roundU':
+                return this.roundUMove;
+
+            case 'uTurn':
+                return this.uTurnMove;
+
+            default:
+                console.error('Invalid move function type key: ' + key);
+                return null;
+        }
+    }
+
+    getFiringSchemeParams(key) {
+        switch (key) {
+            case 'default':
+                return null;
+
             case 'striker':
-                spawner = new EnemySpawner(this.scene, this.hitAndRunParams, { fireRate: 2 }, 5, 500, delay);
-                break;
+                return {
+                    fireRate: 2
+                };
+
             case 'dart':
-                spawner = new EnemySpawner(this.scene, this.snakeParams, null, 9, 400, delay);
-                break;
+                return null;
+
+            default:
+                console.error('Invalid firing scheme key: ' + key);
+                return null;
+        }
+    }
+
+    getPlaneParams(key) {
+        switch (key) {
+            case 'default':
+                return {};
+
+            case 'striker':
+                return {
+                    speed: 200, maxHealth: 6,
+                    texture: 'plane3', width: 36, height: 24,
+                    fireChance: .75, targetPlayer: true,
+                };
+
+            case 'dart':
+                return {
+                    speed: 750, maxHealth: 1,
+                texture: 'plane4', width: 27, height: 9,
+                }
 
             default:
                 console.error('Invalid plane type key: ' + key);
-                planeParams = null;
-                spawner = new EnemySpawner(this.scene, { }, null, 5, 500, delay);
-                break;
+                return {};
         }
-
     }
     
     update(time, delta) {
