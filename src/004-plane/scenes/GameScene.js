@@ -21,6 +21,8 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('plane2', 'assets/sprites/plane2.png');
         this.load.image('plane3', 'assets/sprites/plane3.png');
         this.load.image('plane4', 'assets/sprites/plane4.png');
+        this.load.image('plane5', 'assets/sprites/plane5.png');
+        this.load.image('plane6', 'assets/sprites/plane6.png');
         this.load.image('bullet', 'assets/sprites/bullet.png');
         this.load.image('circle-bullet', 'assets/sprites/circle-bullet.png');
         this.load.image('tiny-bullet', 'assets/sprites/tiny-bullet.png');
@@ -158,6 +160,10 @@ export default class GameScene extends Phaser.Scene {
         this.add.existing(this.player);
         this.updateHealthText();
         
+
+        this.enemySpawnerFactory.spawnFromParts('typhoon', 'hitNRun', 'typhoon', 1, null, 0, 0, this.screenHeight * .3);
+        this.enemySpawnerFactory.spawnFromParts('blimp', 'default', null, 1, null, 2500, .5 * this.screenWidth, -128);
+
         this.enemySpawnerFactory.spawnFromParts('homingDart', 'homing', null, 1, null, 1000);
         this.enemySpawnerFactory.spawnFromParts('homingDart', 'homing', null, 1, null, 1000, this.screenWidth);
         this.enemySpawnerFactory.spawnFromParts('homingDart', 'homing', null, 1, null, 1000, 0, this.screenHeight);

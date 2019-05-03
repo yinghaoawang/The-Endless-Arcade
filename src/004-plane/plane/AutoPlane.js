@@ -13,6 +13,11 @@ export default class AutoPlane extends Plane {
         if (gun) {
             this.gun.collisionCategory = scene.enemyBulletCollCat;
             this.gun.collidesWith = [scene.allyCollCat];
+            this.originalDirections = [];
+            for (let i = 0; i < this.gun.firingPattern.bullets.length; ++i) {
+                let direction = this.gun.firingPattern.bullets[i].direction;
+                this.originalDirections[i] = direction;
+            }
         }
         this.soundName = 'enemy-shoot';
     }
@@ -41,11 +46,15 @@ export default class AutoPlane extends Plane {
                     x: this.scene.player.x - this.x,
                     y: this.scene.player.y - this.y,
                 };
-                this.gun.firingPattern.bullets[0].direction = Math.atan2(direction.y, direction.x) - this.rotation;
+                for (let i = 0; i < this.originalDirections.length; ++i) {
+                    let dir = Math.atan2(direction.y, direction.x) - this.rotation + this.originalDirections[i];
+                    this.gun.firingPattern.bullets[i].direction = dir;
+                };
             }
             this.fire(time, delta);
         } else {
             this.timeOutOfBounds = 0;
         }
+        super.update(time, delta);
     }
 }

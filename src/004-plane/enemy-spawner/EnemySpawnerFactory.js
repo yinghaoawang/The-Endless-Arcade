@@ -147,7 +147,7 @@ export default class EnemySpawnerFactory {
                 gameObject.notInitted = true;
             }
 
-            let rotationalSpeed = 5 / 1000;
+            let rotationalSpeed = 3 / 1000;
             if ((gameObject.targetRotation < 0 && gameObject.rotation > 0) ||
                 (gameObject.targetRotation > 0 && gameObject.rotation < 0)) {
                     gameObject.rotation -= rotationalSpeed;
@@ -197,21 +197,33 @@ export default class EnemySpawnerFactory {
 
             case 'striker':
                 return {
-                    speed: 200, maxHealth: 6,
+                    speed: 180, maxHealth: 6,
                     texture: 'plane3', width: 36, height: 24,
-                    fireChance: .75, targetPlayer: true,
+                    fireChance: .5, targetPlayer: true,
                 };
 
             case 'dart':
                 return {
-                    speed: 900, maxHealth: 1, damage: 2,
+                    speed: 750, maxHealth: 1, damage: 2,
                     texture: 'plane4', width: 27, height: 9,
                 }
 
             case 'homingDart':
                 return {
-                    speed: 200, maxHealth: 1, damage: 2,
+                    speed: 180, maxHealth: 1, damage: 2,
                     texture: 'plane4', width: 27, height: 9,
+                }
+
+            case 'blimp':
+                return {
+                    speed: 65, maxHealth: 50, damage: 5,
+                    texture: 'plane5', width: 160, height: 80
+                }
+
+            case 'typhoon':
+                return {
+                    speed: 75, maxHealth: 3, damage: 1,
+                    texture: 'plane6', width: 48, height: 24
                 }
 
             case null:
@@ -263,20 +275,35 @@ export default class EnemySpawnerFactory {
 
             case 'peashooter':
                 return {
-                    fireRate: 1
+                    fireRate: .5
                 };
 
             case 'peastriker':
                 return {
-                    fireRate: 1,
+                    fireRate: .5,
                     targetPlayer: true
                 }
 
             case 'striker':
                 return {
-                    fireRate: 2,
-                    texture: 'circle-bullet'
+                    fireRate: .5,
+                    texture: 'circle-bullet',
+                    bullets: [
+                        { direction: 0, },
+                        { direction: -Math.PI / 10, },
+                        { direction: Math.PI / 10, },
+                    ]
                 };
+
+            case 'typhoon':
+                return {
+                    fireRate: .25,
+                    texture: 'circle-bullet',
+                    targetPlayer: true,
+                    bulletDelay: 2000,
+                    bulletGap: 50,
+                    bullets: [{}, {}, {}, {}, {}]
+                }
 
             case 'dart':
                 return null;

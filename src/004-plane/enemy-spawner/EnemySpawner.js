@@ -50,6 +50,8 @@ export default class EnemySpawner {
                 speed: this.firingSchemeParams.speed || 125,
                 texture: this.firingSchemeParams.texture || 'tiny-bullet',
                 targetPlayer: this.firingSchemeParams.targetPlayer || false,
+                bulletDelay: this.firingSchemeParams.bulletDelay || 0,
+                bulletGap: this.firingSchemeParams.bulletGap || 0,
                 
                 bullets: this.firingSchemeParams.bullets || [{ direction: 0 }],
             };

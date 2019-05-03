@@ -9,6 +9,8 @@ export default class Gun {
         this.level = level;
         this.firingPattern = firingScheme[level - 1];
         
+        this.bulletSpawnTimes = [];
+        this.useTimedBullets = false;
     }
 
     get fireRate() {
@@ -20,13 +22,34 @@ export default class Gun {
         this.firingPattern = this.firingScheme[this.level - 1];
     }
 
+    update(gameObject, time, delta) {
+        if (!this.useTimedBullets) {
+            return;
+        }
+        let scene = gameObject.scene;
+        for (let i = 0; i < this.bulletSpawnTimes; ++i) {
+
+        }
+    }
+
     shoot(scene, x, y, rotation) {
+        if (this.firingPattern.bulletDelay > 0 || this.firingPattern.bulletGap > 0) {
+            this.useTimedBullets = true;
+        }
+
         if (this.firingPattern.targetPlayer && scene.player && !scene.player.beingDestroyed) {
             let direction = {
                 x: scene.player.x - x,
                 y: scene.player.y - y,
             };
             this.firingPattern.bullets[0].direction = Math.atan2(direction.y, direction.x) - rotation;
+        }
+
+        // TODO HERE
+        if (this.useTimedBullets) {
+            this.firingPattern.bullets.forEach(bulletPattern => {
+                return;
+            });
         }
         this.firingPattern.bullets.forEach(bulletPattern => {
             let bulletDirection = 0;

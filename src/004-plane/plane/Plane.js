@@ -30,7 +30,7 @@ export default class Plane extends Phaser.Physics.Matter.Sprite {
 
     fire(time, delta) {
         if (time > this.lastFired + this.cooldown) {
-            this.lastFired = time;
+             this.lastFired = time;
 
             if (!this.fireChance || Math.random() < this.fireChance) {
                 this.gun.shoot(this.scene, this.x + Math.cos(this.rotation) * this.displayWidth / 2, this.y + Math.sin(this.rotation) * this.displayHeight / 2, this.rotation, this);
@@ -38,6 +38,9 @@ export default class Plane extends Phaser.Physics.Matter.Sprite {
             }
             
         }
+    }
+    update(time, delta) {
+        if (this.gun) this.gun.update(this, time, delta);
     }
 
     get cooldown() {
