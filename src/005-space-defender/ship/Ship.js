@@ -7,11 +7,23 @@ export default class Ship extends Phaser.Physics.Arcade.Sprite {
         this._height = height;
         this.setDisplaySize(this._width, this._height);
 
+        this.lastFired = Number.NEGATIVE_INFINITY;
+
         this.velocity = {
             x: 0, y: 0,
         }
-
+        
         scene.add.existing(this);
+        scene.physics.add.existing(this);
+
+        this.body.setCollideWorldBounds();
+    }
+
+    destroy() {
+        if (this.beingDestroyed) return;
+        this.scene.physics.world.remove(this);
+        super.destroy();
+        this.beingDestroyed = true;
     }
 
     get width() {
