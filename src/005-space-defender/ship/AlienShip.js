@@ -13,8 +13,8 @@ export default class AlienShip extends Ship {
 
         this.setCircle(this.width / 2);
 
-        this.wanderDuration = 1000;
         this.nextWanderTime = Number.NEGATIVE_INFINITY;
+        this.wanderDuration = 1000;
         this.wanderDistance = 3000;
 
         this.detectionRadius = 300;
@@ -99,30 +99,30 @@ export default class AlienShip extends Ship {
                 this.once('animationcomplete', (anim, frame) => {
                     // get direction towards the player
                     let targetDirection = {
-                    x: player.x - this.x,
-                    y: player.y - this.y
-                };
+                        x: player.x - this.x,
+                        y: player.y - this.y
+                    };
 
-                // normalize the direction and adjust to the ship's speed
-                let distance = Math.sqrt(targetDirection.x * targetDirection.x + targetDirection.y * targetDirection.y);
-                let normalizedDirection = {
-                    x: (targetDirection.x / distance),
-                    y: (targetDirection.y / distance),
-                };
+                    // normalize the direction and adjust to the ship's speed
+                    let distance = Math.sqrt(targetDirection.x * targetDirection.x + targetDirection.y * targetDirection.y);
+                    let normalizedDirection = {
+                        x: (targetDirection.x / distance),
+                        y: (targetDirection.y / distance),
+                    };
 
-                let bulletVelocity = {
-                    x: this.bulletSpeed * normalizedDirection.x,
-                    y: this.bulletSpeed * normalizedDirection.y
-                };
+                    let bulletVelocity = {
+                        x: this.bulletSpeed * normalizedDirection.x,
+                        y: this.bulletSpeed * normalizedDirection.y
+                    };
 
-                let bullet = new Bullet(this.scene, this, this.x, this.y, 'alien-bullet', 8, 8, bulletVelocity.x, bulletVelocity.y);
-                if (bulletVelocity.x < 0) bullet.flipX = true;
-                if (bulletVelocity.y > 0) bullet.flipY = true;
-                this.isFiring = false;
-                
-                this.setFrame(0);
-                this.lastFired = this.scene.time.now;
-            });
+                    let bullet = new Bullet(this.scene, this, this.x, this.y, 'alien-bullet', 8, 8, bulletVelocity.x, bulletVelocity.y);
+                    if (bulletVelocity.x < 0) bullet.flipX = true;
+                    if (bulletVelocity.y > 0) bullet.flipY = true;
+                    this.isFiring = false;
+                    
+                    this.setFrame(0);
+                    this.lastFired = this.scene.time.now;
+                });
             } else {
                 this.lastFired = time;
             }

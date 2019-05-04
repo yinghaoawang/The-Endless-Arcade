@@ -15,7 +15,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.spritesheet('player-ship', 'assets/sprites/player-ship.png', { frameWidth: 80, frameHeight: 32 });
         this.load.image('alien-bullet', 'assets/sprites/alien-bullet.png');
         this.load.image('player-beam', 'assets/sprites/player-beam.png');
-        this.load.spritesheet('alien-ship', 'assets/sprites/alien-ship.png', { frameWidth: 32, frameHeight: 28 });
+        this.load.spritesheet('alien-ship', 'assets/sprites/alien-ship.png', { frameWidth: 48, frameHeight: 42 });
     }
 
     create() {
@@ -27,7 +27,7 @@ export default class GameScene extends Phaser.Scene {
         this.anims.create({
             key: 'player-thrust',
             frames: this.anims.generateFrameNumbers('player-ship', { start: 1, end: 4 }),
-            frameRate: 10,
+            frameRate: 15,
             repeat: -1
         });
 
@@ -66,8 +66,8 @@ export default class GameScene extends Phaser.Scene {
 
         this._score = 0;
         this._level = 1;
-        this.scoreText = new Phaser.GameObjects.Text(this, this.screenWidth - 10, 10, ' DFAFDS', { color: '#ffffff', fontFamily: 'VT323'}).setOrigin(1, 0).setAlign('right').setScrollFactor(0);
-        this.levelText = new Phaser.GameObjects.Text(this, this.screenWidth - 10, 28, 'ASDFASDF ', { fontFamily: 'VT323'}).setOrigin(1, 0).setAlign('right').setScrollFactor(0);
+        this.scoreText = new Phaser.GameObjects.Text(this, this.screenWidth - 20, 10, ' DFAFDS', { color: '#9999ff', fontFamily: 'VT323'}).setOrigin(1, 0).setAlign('right').setScrollFactor(0);
+        this.levelText = new Phaser.GameObjects.Text(this, this.screenWidth - 20, 28, 'ASDFASDF ', { color: '#9999ff', fontFamily: 'VT323'}).setOrigin(1, 0).setAlign('right').setScrollFactor(0);
         this.add.existing(this.scoreText);
         this.add.existing(this.levelText);
         this.minimap.ignore(this.scoreText);
@@ -104,7 +104,7 @@ export default class GameScene extends Phaser.Scene {
 
                 distFromPlayer = Math.sqrt((this.player.x - x) * (this.player.x - x) + (this.player.y - y) * (this.player.y - y)); 
             } while (distFromPlayer < 500);
-            new AlienShip(this, x, y, 'alien-ship', 32, 28);
+            new AlienShip(this, x, y, 'alien-ship', 48, 42);
         }
     }
   
@@ -136,19 +136,14 @@ export default class GameScene extends Phaser.Scene {
             bullet.update(time, delta);
         }
 
-        this.physics.world.collide(this.bullets, this.enemies, (bullet, enemy) => {
-            if (bullet.owner instanceof PlayerShip) {
-                bullet.destroy();
-                enemy.destroy();
-                this.score += 50;
-            }
+        this.physics.world.collide(this.bullets.filter(bullet => bullet.owner instanceof PlayerShip), this.enemies, (bullet, enemy) => {
+            bullet.destroy();
+            enemy.destroy();
+            this.score += 50;
         });
-        this.physics.world.collide(this.bullets, this.player, function (bullet, player) {
-            if (bullet.owner instanceof AlienShip) {
-                bullet.destroy();
-                player.destroy();
-                
-            }
+        this.physics.world.collide(this.bullets.filter(bullet => bullet.owner instanceof AlienShip), this.player, function (bullet, player) {
+            bullet.destroy();
+            player.destroy();
         });
         this.physics.world.collide(this.player, this.enemies, (player, enemy) => {
             player.destroy();
