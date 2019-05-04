@@ -10,11 +10,13 @@ export default class PlayerShip extends Ship {
         super(scene, x, y, 'player-ship', width, height);
         this.lastFired = Number.NEGATIVE_INFINITY;
         this.bulletSpeed = 100;
-        this.fireCooldown = 1;
+        this.fireCooldown = .75;
         this.maxSpeed = playerMaxSpeed;
         this.acceleration = playerAcceleration;
         this.friction = playerFriction;
         this._direction = 'right';
+
+        this.setCircle(this.height / 2, 22, 0);
     }
 
     get direction() {
@@ -52,16 +54,17 @@ export default class PlayerShip extends Ship {
     fire(time, delta) {
         if (time >= this.lastFired + this.fireCooldown * 1000) {
             let bulletArea = {
-                x: this.x + (this.direction == 'left' ? - this.displayWidth / 2 : this.displayWidth / 2),
+                x: this.x + (this.direction == 'left' ? -(this.width / 2 + 50) : (this.width / 2 + 50)),
                 y: this.y,
-                width: 11,
-                height: 3
+                width: 120,
+                height: 8
             };
             let bulletVelocity = {
                 x: this.bulletSpeed * (this.direction == 'left' ? -1 : 1),
                 y: 0
             };
-            new Bullet(this.scene, this, bulletArea.x, bulletArea.y, 'player-beam', bulletArea.width, bulletArea.height, bulletVelocity.x, bulletVelocity.y);
+            let bullet = new Bullet(this.scene, this, bulletArea.x, bulletArea.y, 'player-beam', bulletArea.width, bulletArea.height, bulletVelocity.x, bulletVelocity.y);
+            if (this.direction == 'left') bullet.flipX = true;
             this.lastFired = time;
         }
     }

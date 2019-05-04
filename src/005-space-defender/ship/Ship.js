@@ -5,7 +5,7 @@ export default class Ship extends Phaser.Physics.Arcade.Sprite {
         super(scene, x, y, texture);
         this._width = width;
         this._height = height;
-        this.setDisplaySize(this._width, this._height);
+        
 
         this.lastFired = Number.NEGATIVE_INFINITY;
 
@@ -15,8 +15,11 @@ export default class Ship extends Phaser.Physics.Arcade.Sprite {
         
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        this.setDisplaySize(this._width, this._height);
 
         this.body.setCollideWorldBounds();
+
+        
     }
 
     destroy() {
