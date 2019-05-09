@@ -8,8 +8,6 @@ export default class StaticWindow extends AbstractWindow {
 
         this._depth = 0;
 
-        this.beingDestroyed = false;
-
         this.windowFrame = new StaticWindowFrame(scene, this, this.x, this.y, this.width, this.height, name);
 
         this.contentWidth = this.viewportArea.width;

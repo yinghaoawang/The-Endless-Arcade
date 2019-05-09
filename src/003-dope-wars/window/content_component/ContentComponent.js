@@ -11,8 +11,6 @@ export default class ContentComponent extends Phaser.GameObjects.Group {
 
         this._depth = 0;
 
-        this.beingDestroyed = false;
-
         scene.add.existing(this);
     }
 

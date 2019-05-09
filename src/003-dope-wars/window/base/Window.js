@@ -6,7 +6,6 @@ import WindowComponent from '../window_component/WindowComponent';
 export default class Window extends AbstractWindow {
     constructor(scene, x, y, width, height, name) {
         super(scene, x, y, width, height);
-        
         if (typeof scene.windows == 'undefined') {
             scene.windows = [];
         }
