@@ -97,6 +97,18 @@ eval("!function(t,e){ true?module.exports=e():undefined}(window,function(){retur
 
 /***/ }),
 
+/***/ "./006-brokemon/TextWindow.js":
+/*!************************************!*\
+  !*** ./006-brokemon/TextWindow.js ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return TextWindow; });\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n\n\nclass TextWindow {\n    constructor(scene, x, y, width, height) {\n        this.scene = scene;\n        this.x = x;\n        this.y = y;\n        this.width = width;\n        this.height = height;\n        this.createGraphics();\n        this.createTextBox();\n        this.textLeft = null;\n    }\n    displayText(text) {\n        let split = text.split(' ');\n        this.textBox.setText(split);\n        console.log(this.textBox.height);\n        this.textBox.setText(text);\n        console.log(this.textBox.height);\n    }\n\n    createTextBox() {\n        this.textMargin = 10;\n        this.textBox = this.scene.add.text(this.x + this.textMargin, this.y + this.textMargin);\n        this.textBox.setStyle({\n            fontSize: 34,\n            fontFamily: 'VT323',\n            wordWrap: { width: this.width - 2 * this.textMargin },\n        });\n    }\n\n    createGraphics() {\n        this.graphics = this.scene.add.graphics({\n            x: this.x,\n            y: this.y,\n            fillStyle: {\n                color: 0x999999,\n            }\n        });\n        this.graphics.fillRect(0, 0, this.width, this.height);\n    }\n}\n\n\n//# sourceURL=webpack:///./006-brokemon/TextWindow.js?");
+
+/***/ }),
+
 /***/ "./006-brokemon/app.js":
 /*!*****************************!*\
   !*** ./006-brokemon/app.js ***!
@@ -117,7 +129,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var phas
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n    type: phaser3__WEBPACK_IMPORTED_MODULE_0___default.a.AUTO,\n    width: 1000,\n    height: 600,\n    pixelArt: true,\n    audio: {\n        disableWebAudio: true\n    },\n    physics: {\n        default: 'arcade',\n        arcade: {\n            debug: false,\n        }\n    },\n});\n\n\n//# sourceURL=webpack:///./006-brokemon/config/config.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n    type: phaser3__WEBPACK_IMPORTED_MODULE_0___default.a.AUTO,\n    width: 740,\n    height: 576,\n    pixelArt: true,\n    audio: {\n        disableWebAudio: true\n    },\n    physics: {\n        default: 'arcade',\n        arcade: {\n            debug: false,\n        }\n    },\n});\n\n\n//# sourceURL=webpack:///./006-brokemon/config/config.js?");
 
 /***/ }),
 
@@ -129,7 +141,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var phas
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return GameScene; });\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n\n\nclass GameScene extends phaser3__WEBPACK_IMPORTED_MODULE_0___default.a.Scene {\n    constructor() {\n        super();\n    }\n\n    preload() {\n    }\n\n    create() {\n    }\n\n    update(time, delta) {\n    }\n\n}\n\n\n//# sourceURL=webpack:///./006-brokemon/scenes/GameScene.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return GameScene; });\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser3 */ \"../lib/phaser@3.16.2/phaser.min.js\");\n/* harmony import */ var phaser3__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser3__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _TextWindow__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../TextWindow */ \"./006-brokemon/TextWindow.js\");\n\n\n\nclass GameScene extends phaser3__WEBPACK_IMPORTED_MODULE_0___default.a.Scene {\n    constructor() {\n        super();\n    }\n\n    preload() {\n    }\n\n    create() {\n        this.screenWidth = this.cameras.main.width;\n        this.screenHeight = this.cameras.main.height;\n        this.textWindow = new _TextWindow__WEBPACK_IMPORTED_MODULE_1__[\"default\"](this, 0, this.screenHeight * .7, this.screenWidth, this.screenHeight * .3);\n        let text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur faucibus at eros blandit venenatis. Nulla sollicitudin nunc ac dui dignissim, id gravida purus convallis. Aenean in metus bibendum, rutrum erat eget, sagittis metus. Donec vehicula nisi ex, et mattis massa sollicitudin non. Integer ornare interdum dolor sed auctor. Proin maximus eget metus ac pulvinar. Duis facilisis tempor nulla, non finibus magna vehicula sit amet. Aenean eget faucibus libero, eu faucibus est.`;\n        this.textWindow.displayText(text);\n    }\n\n    update(time, delta) {\n    }\n\n}\n\n\n//# sourceURL=webpack:///./006-brokemon/scenes/GameScene.js?");
 
 /***/ })
 
